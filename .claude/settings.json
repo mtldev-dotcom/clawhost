@@ -1,0 +1,19 @@
+{
+  "model": "claude-opus-4-5",
+  "permissions": {
+    "allow": [
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(docker:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(cat:*)",
+      "Bash(curl:*)",
+      "Read(**)",
+      "Write(**)"
+    ]
+  },
+  "env": {
+    "NODE_ENV": "development"
+  }
+}
