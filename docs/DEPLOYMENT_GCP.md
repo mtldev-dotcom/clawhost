@@ -212,7 +212,8 @@ gcloud sql instances list
 | Cloud Run | 512Mi, scale to 0 | ~$0-10 (pay per use) |
 | Cloud SQL | db-f1-micro | ~$10-15 |
 | Artifact Registry | Storage | ~$1-2 |
-| **Total** | | **~$15-30/month** |
+| Dokploy VM | e2-medium | ~$25-30 |
+| **Total** | | **~$40-60/month** |
 
 ## Cleanup
 
@@ -244,11 +245,56 @@ gcloud artifacts repositories delete clawhost --location=us-central1 --quiet
 - Set `--min-instances=1` to keep one instance warm (increases cost)
 - Optimize Docker image size
 
+## Dokploy Setup (for OpenClaw provisioning)
+
+ClawHost uses Dokploy to provision OpenClaw instances for users.
+
+### Create Dokploy VM
+
+```bash
+gcloud compute instances create dokploy \
+  --zone=us-central1-a \
+  --machine-type=e2-medium \
+  --image-family=ubuntu-2204-lts \
+  --image-project=ubuntu-os-cloud \
+  --boot-disk-size=50GB \
+  --tags=dokploy,http-server,https-server \
+  --metadata=startup-script='#!/bin/bash
+apt-get update
+apt-get install -y curl
+curl -sSL https://dokploy.com/install.sh | sh'
+```
+
+### Open Firewall Ports
+
+```bash
+gcloud compute firewall-rules create allow-dokploy \
+  --allow=tcp:80,tcp:443,tcp:3000 \
+  --target-tags=dokploy
+```
+
+### Get API Key
+
+1. Access Dokploy UI at `http://VM_EXTERNAL_IP:3000`
+2. Create admin account
+3. Go to **Profile Settings** → **API/CLI Section**
+4. Generate token
+
+### Add to Cloud Run
+
+```bash
+gcloud run services update clawhost \
+  --region=us-central1 \
+  --update-env-vars="DOKPLOY_URL=http://VM_EXTERNAL_IP:3000" \
+  --update-env-vars="DOKPLOY_API_KEY=your-api-key"
+```
+
 ## Current Deployment
 
 - **Project:** clawdbot-nickdevmtl
 - **Region:** us-central1
 - **Service URL:** https://clawhost-794442866411.us-central1.run.app
 - **Cloud SQL Instance:** clawhost-db (35.225.217.179)
+- **Dokploy VM:** 34.121.34.198:3000
 - **Database:** clawhost
 - **User:** clawhost
