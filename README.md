@@ -138,7 +138,8 @@ clawhost/
 - [Contributing](docs/CONTRIBUTING.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Development](docs/DEVELOPMENT.md)
-- [Deployment](docs/DEPLOYMENT.md)
+- [Deployment (Dokploy)](docs/DEPLOYMENT.md)
+- [Deployment (GCP)](docs/DEPLOYMENT_GCP.md)
 
 ## Known Issues
 
