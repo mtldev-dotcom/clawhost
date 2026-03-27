@@ -1,0 +1,106 @@
+{
+  "common": {
+    "signOut": "Deconnexion",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "test": "Tester",
+    "deploy": "Deployer",
+    "redeploy": "Redeployer",
+    "deploying": "Deploiement...",
+    "loading": "Chargement...",
+    "success": "Succes",
+    "error": "Erreur",
+    "back": "Retour",
+    "continue": "Continuer",
+    "active": "Actif",
+    "valid": "Valide",
+    "invalid": "Invalide"
+  },
+  "nav": {
+    "chat": "Chat",
+    "settings": "Parametres",
+    "skills": "Competences"
+  },
+  "chat": {
+    "title": "Commencer une conversation",
+    "subtitle": "Envoyez un message a votre agent IA. Vous pouvez egalement discuter via votre canal configure (Telegram, Discord, etc.)",
+    "placeholder": "Ecrivez un message...",
+    "thinking": "Reflexion en cours...",
+    "agentNotReady": "Agent non pret",
+    "pendingMessage": "Configurez votre agent dans les Parametres et deployez-le pour commencer a discuter.",
+    "provisioningMessage": "Votre agent est en cours de configuration. Cela prend generalement 1-2 minutes.",
+    "failedMessage": "La configuration de l'agent a echoue. Veuillez verifier les Parametres et reessayer.",
+    "cancelledMessage": "Votre agent a ete annule."
+  },
+  "settings": {
+    "title": "Parametres",
+    "instanceStatus": "Statut de l'instance",
+    "runningAt": "Fonctionne sur",
+    "configureFirst": "Configurez au moins un fournisseur IA et un canal pour deployer",
+    "aiProviders": "Fournisseurs IA",
+    "channel": "Canal",
+    "addProvider": "Ajouter un fournisseur",
+    "saveProvider": "Enregistrer le fournisseur",
+    "testKey": "Tester la cle",
+    "providerSaved": "Fournisseur enregistre avec succes",
+    "providerDeleted": "Fournisseur supprime",
+    "keyValid": "La cle API est valide!",
+    "keyInvalid": "La cle API est invalide",
+    "switchedTo": "Passe a",
+    "channelSaved": "Canal enregistre avec succes",
+    "deploymentStarted": "Deploiement demarre!"
+  },
+  "providers": {
+    "openai": {
+      "label": "OpenAI",
+      "description": "GPT-4o, GPT-4 Turbo"
+    },
+    "anthropic": {
+      "label": "Anthropic",
+      "description": "Claude Sonnet, Opus"
+    },
+    "openrouter": {
+      "label": "OpenRouter",
+      "description": "Acces a plusieurs fournisseurs"
+    }
+  },
+  "channels": {
+    "telegram": {
+      "label": "Telegram",
+      "placeholder": "Jeton du bot de @BotFather"
+    },
+    "discord": {
+      "label": "Discord",
+      "placeholder": "Jeton du bot du portail developpeur Discord"
+    },
+    "whatsapp": {
+      "label": "WhatsApp",
+      "placeholder": "Jeton de l'API WhatsApp Business"
+    }
+  },
+  "onboarding": {
+    "step1": "Etape 1: Choisissez votre canal",
+    "step2": "Etape 2: Configurez le fournisseur IA",
+    "step3": "Etape 3: Verifiez et deployez",
+    "chooseChannel": "Comment voulez-vous interagir avec votre agent IA?",
+    "chooseProvider": "Choisissez votre fournisseur IA et entrez votre cle API.",
+    "review": "Verifiez votre configuration et deployez votre agent.",
+    "deployAgent": "Deployer l'agent"
+  },
+  "status": {
+    "pending": "En attente de configuration",
+    "provisioning": "Provisionnement...",
+    "active": "Actif",
+    "failed": "Echoue",
+    "cancelled": "Annule"
+  },
+  "skills": {
+    "title": "Marketplace des competences",
+    "subtitle": "Ajoutez des capacites a votre agent OpenClaw avec des integrations et des outils.",
+    "noSkills": "Aucune competence disponible",
+    "checkBack": "Revenez bientot pour de nouvelles integrations et outils.",
+    "howItWorks": "Fonctionnement des competences",
+    "howItWorksDescription": "Chaque competence est un serveur MCP (Model Context Protocol) qui etend les capacites de votre agent. Lorsque vous activez une competence, elle est automatiquement configuree et deployee avec votre instance OpenClaw. Votre agent aura alors acces aux outils de la competence et pourra les utiliser pour accomplir des taches."
+  }
+}

@@ -8,9 +8,10 @@ ClawHost is a multi-tenant SaaS platform that lets users subscribe and instantly
 - **Database**: PostgreSQL + Prisma ORM
 - **Auth**: NextAuth v5 (Auth.js)
 - **Payments**: Stripe (subscriptions + webhooks)
-- **Provisioning**: Dokploy REST API
+- **Provisioning**: Dokploy REST API (production) / Local Docker (development)
 - **Styling**: Tailwind CSS + shadcn/ui
-- **Local Dev**: Docker Compose (Postgres + app)
+- **i18n**: next-intl (English/French)
+- **Local Dev**: Docker Compose (Postgres + OpenClaw containers)
 - **Deployment**: Hetzner VPS via Dokploy
 
 ## Build Instructions for Claude Code
@@ -40,7 +41,7 @@ Use parallel sub-agents for these independent tracks:
 - Use `src/lib/dokploy.ts` as the single source for all Dokploy API calls
 - Use `src/lib/stripe.ts` as the single source for Stripe calls
 
-### Key Files to Create
+### Key Files
 ```
 clawhost/
 ├── CLAUDE.md                        ← you are here
@@ -61,13 +62,15 @@ clawhost/
 ├── src/
 │   ├── app/
 │   │   ├── layout.tsx
-│   │   ├── page.tsx                 ← landing/redirect
+│   │   ├── page.tsx                 ← landing page
 │   │   ├── (auth)/
 │   │   │   ├── login/page.tsx
 │   │   │   └── register/page.tsx
 │   │   ├── dashboard/
-│   │   │   ├── page.tsx             ← instance status, channel setup
-│   │   │   └── skills/page.tsx      ← Phase 2
+│   │   │   ├── layout.tsx           ← header with nav + language switcher
+│   │   │   ├── page.tsx             ← chat interface (home)
+│   │   │   ├── settings/            ← providers + channel config
+│   │   │   └── skills/              ← skills marketplace
 │   │   ├── onboarding/
 │   │   │   └── page.tsx             ← post-payment setup wizard
 │   │   └── api/
@@ -77,21 +80,29 @@ clawhost/
 │   │       │   └── webhook/route.ts
 │   │       ├── provision/
 │   │       │   └── route.ts
+│   │       ├── user/locale/route.ts ← save user language preference
 │   │       └── skills/
 │   │           └── route.ts
+│   ├── i18n/
+│   │   ├── config.ts                ← locale definitions
+│   │   ├── request.ts               ← next-intl request handler
+│   │   └── messages/
+│   │       ├── en.json              ← English translations
+│   │       └── fr.json              ← French translations
 │   ├── lib/
 │   │   ├── env.ts                   ← zod env validation
 │   │   ├── prisma.ts
 │   │   ├── stripe.ts
-│   │   ├── dokploy.ts               ← all Dokploy API calls
+│   │   ├── dokploy.ts               ← Dokploy + local Docker provisioning
 │   │   └── auth.ts
 │   ├── types/
 │   │   └── index.ts
 │   └── components/
 │       ├── ui/                      ← shadcn components
+│       ├── LanguageSwitcher.tsx     ← EN/FR toggle
 │       └── dashboard/
-│           ├── InstanceCard.tsx
-│           ├── ChannelSetup.tsx
+│           ├── DashboardHeader.tsx
+│           ├── ChatInterface.tsx
 │           └── SkillCard.tsx
 ├── docker-compose.dev.yml           ← local postgres
 ├── .env.example

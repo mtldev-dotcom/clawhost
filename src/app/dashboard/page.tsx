@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { InstanceCard } from '@/components/dashboard/InstanceCard'
-import { DashboardClient } from './client'
+import { ChatInterface } from '@/components/dashboard/ChatInterface'
+import { getMessages } from 'next-intl/server'
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -11,26 +11,26 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
-  const instance = await prisma.instance.findUnique({
-    where: { userId: session.user.id },
-  })
+  const [instance, messages] = await Promise.all([
+    prisma.instance.findUnique({
+      where: { userId: session.user.id },
+    }),
+    getMessages(),
+  ])
 
   if (!instance) {
-    // User has no instance, redirect to onboarding or show message
     redirect('/onboarding')
   }
 
+  const chatTranslations = (messages as { chat: typeof import('@/i18n/messages/en.json')['chat'] }).chat
+
   return (
-    <div className="container mx-auto max-w-4xl py-8 px-4">
-      <h1 className="mb-8 text-3xl font-bold">Dashboard</h1>
-
-      <div className="space-y-6">
-        <InstanceCard instance={instance} />
-
-        <DashboardClient
-          instance={instance}
-        />
-      </div>
+    <div className="h-[calc(100vh-3.5rem)]">
+      <ChatInterface
+        instanceStatus={instance.status}
+        activeModel={instance.activeModel}
+        translations={chatTranslations}
+      />
     </div>
   )
 }

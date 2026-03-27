@@ -47,7 +47,7 @@ export default function OnboardingPage() {
       // Trigger provision
       await fetch('/api/provision', { method: 'POST' })
 
-      router.push('/dashboard')
+      router.push('/dashboard/settings')
     } catch (error) {
       console.error('Onboarding failed:', error)
     } finally {

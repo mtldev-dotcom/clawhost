@@ -39,21 +39,24 @@
 
 The main web application handling:
 - User authentication (NextAuth v5)
-- Dashboard UI
+- Dashboard UI (Chat, Settings, Skills pages)
 - API routes
 - Server actions
+- Internationalization (English/French via next-intl)
 
 **Key files:**
 - `src/lib/auth.ts` - Authentication configuration
 - `src/app/` - Pages and API routes
+- `src/i18n/` - Translations and locale configuration
 
 ### 2. Database (PostgreSQL + Prisma)
 
 Stores all application data:
 
 **Models:**
-- `User` - Account info, Stripe customer ID
-- `Instance` - Provisioned OpenClaw instances
+- `User` - Account info, Stripe customer ID, locale preference
+- `Instance` - Provisioned OpenClaw instances, active model, agent locale
+- `ProviderConfig` - Multiple AI provider API keys per instance
 - `Skill` - Available MCP integrations
 - `Account/Session` - NextAuth tables
 

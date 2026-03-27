@@ -78,13 +78,6 @@ export default function SkillsPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Skills Marketplace</h1>
-        <p className="mt-1 text-gray-600">
-          Add capabilities to your OpenClaw agent with integrations and tools.
-        </p>
-      </div>
-
       {error && (
         <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
           {error}

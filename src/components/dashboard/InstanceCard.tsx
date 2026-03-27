@@ -4,8 +4,9 @@ import { Instance, InstanceStatus } from '@prisma/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ExternalLink, Copy, Check, RefreshCw } from 'lucide-react'
+import { ExternalLink, Copy, Check, RefreshCw, Settings2 } from 'lucide-react'
 import { useState } from 'react'
+import { getOpenClawDashboardUrl } from '@/app/dashboard/actions'
 
 interface InstanceCardProps {
   instance: Instance
@@ -29,12 +30,32 @@ const statusLabels: Record<InstanceStatus, string> = {
 
 export function InstanceCard({ instance }: InstanceCardProps) {
   const [copied, setCopied] = useState(false)
+  const [openingDashboard, setOpeningDashboard] = useState(false)
 
   const copyUrl = async () => {
     if (!instance.appUrl) return
     await navigator.clipboard.writeText(instance.appUrl)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const openAgentDashboard = async () => {
+    try {
+      setOpeningDashboard(true)
+      const dashboardData = await getOpenClawDashboardUrl()
+      // dashboardData is like "http://localhost:4001/#token=xxx"
+      // Extract port and token, use current window's hostname
+      const url = new URL(dashboardData)
+      const port = url.port
+      const token = url.hash.replace('#token=', '')
+      // Build URL using current browser's hostname (works for Tailscale/remote access)
+      const agentUrl = `http://${window.location.hostname}:${port}/#token=${token}`
+      window.open(agentUrl, '_blank')
+    } catch (err) {
+      console.error('Failed to open dashboard:', err)
+    } finally {
+      setOpeningDashboard(false)
+    }
   }
 
   return (
@@ -59,21 +80,37 @@ export function InstanceCard({ instance }: InstanceCardProps) {
         )}
 
         {instance.appUrl && instance.status === 'active' && (
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Agent URL</label>
-            <div className="flex items-center gap-2">
-              <code className="flex-1 rounded-md bg-muted px-3 py-2 text-sm">
-                {instance.appUrl}
-              </code>
-              <Button variant="outline" size="icon" onClick={copyUrl}>
-                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              </Button>
-              <Button variant="outline" size="icon" asChild>
-                <a href={instance.appUrl} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-4 w-4" />
-                </a>
-              </Button>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Agent URL</label>
+              <div className="flex items-center gap-2">
+                <code className="flex-1 rounded-md bg-muted px-3 py-2 text-sm">
+                  {instance.appUrl}
+                </code>
+                <Button variant="outline" size="icon" onClick={copyUrl}>
+                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                </Button>
+                <Button variant="outline" size="icon" asChild>
+                  <a href={instance.appUrl} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </Button>
+              </div>
             </div>
+            {/* TODO: Fix OpenClaw dashboard URL for remote/Tailscale access
+            <Button
+              variant="outline"
+              onClick={openAgentDashboard}
+              disabled={openingDashboard}
+              className="w-full"
+            >
+              <Settings2 className="mr-2 h-4 w-4" />
+              {openingDashboard ? 'Opening...' : 'Open Agent Dashboard'}
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              Connect ChatGPT Plus/Pro subscription via OAuth in the Agent Dashboard
+            </p>
+            */}
           </div>
         )}
 

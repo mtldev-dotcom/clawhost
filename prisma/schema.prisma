@@ -13,6 +13,7 @@ model User {
   name             String?
   passwordHash     String?
   stripeCustomerId String?   @unique
+  locale           String    @default("en") // 'en' or 'fr'
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   instance         Instance?
@@ -21,10 +22,10 @@ model User {
 }
 
 model Instance {
-  id               String         @id @default(cuid())
-  userId           String         @unique
-  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status           InstanceStatus @default(pending)
+  id               String           @id @default(cuid())
+  userId           String           @unique
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status           InstanceStatus   @default(pending)
   appUrl           String?
   dokployProjectId String?
   dokployAppId     String?
@@ -32,11 +33,28 @@ model Instance {
   channelToken     String?
   aiProvider       String?
   aiApiKey         String?
-  enabledSkills    String[]       @default([])
-  stripeSubId      String?        @unique
+  activeModel      String?          // Currently active model (e.g., "openai/gpt-4o")
+  agentLocale      String           @default("en") // Agent communication language
+  enabledSkills    String[]         @default([])
+  stripeSubId      String?          @unique
   stripePriceId    String?
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  providers        ProviderConfig[]
+}
+
+model ProviderConfig {
+  id         String   @id @default(cuid())
+  instanceId String
+  instance   Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  provider   String   // 'openai', 'anthropic', 'openrouter'
+  apiKey     String
+  isActive   Boolean  @default(false)
+  isValid    Boolean? // null = untested, true = valid, false = invalid
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([instanceId, provider])
 }
 
 enum InstanceStatus {

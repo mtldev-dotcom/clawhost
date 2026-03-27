@@ -1,0 +1,106 @@
+{
+  "common": {
+    "signOut": "Sign out",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "test": "Test",
+    "deploy": "Deploy",
+    "redeploy": "Redeploy",
+    "deploying": "Deploying...",
+    "loading": "Loading...",
+    "success": "Success",
+    "error": "Error",
+    "back": "Back",
+    "continue": "Continue",
+    "active": "Active",
+    "valid": "Valid",
+    "invalid": "Invalid"
+  },
+  "nav": {
+    "chat": "Chat",
+    "settings": "Settings",
+    "skills": "Skills"
+  },
+  "chat": {
+    "title": "Start a conversation",
+    "subtitle": "Send a message to your AI agent. You can also chat via your configured channel (Telegram, Discord, etc.)",
+    "placeholder": "Type a message...",
+    "thinking": "Thinking...",
+    "agentNotReady": "Agent Not Ready",
+    "pendingMessage": "Configure your agent in Settings and deploy it to start chatting.",
+    "provisioningMessage": "Your agent is being set up. This usually takes 1-2 minutes.",
+    "failedMessage": "Agent setup failed. Please check Settings and try redeploying.",
+    "cancelledMessage": "Your agent has been cancelled."
+  },
+  "settings": {
+    "title": "Settings",
+    "instanceStatus": "Instance Status",
+    "runningAt": "Running at",
+    "configureFirst": "Configure at least one AI provider and a channel to deploy",
+    "aiProviders": "AI Providers",
+    "channel": "Channel",
+    "addProvider": "Add Provider",
+    "saveProvider": "Save Provider",
+    "testKey": "Test Key",
+    "providerSaved": "Provider saved successfully",
+    "providerDeleted": "Provider deleted",
+    "keyValid": "API key is valid!",
+    "keyInvalid": "API key is invalid",
+    "switchedTo": "Switched to",
+    "channelSaved": "Channel saved successfully",
+    "deploymentStarted": "Deployment started!"
+  },
+  "providers": {
+    "openai": {
+      "label": "OpenAI",
+      "description": "GPT-4o, GPT-4 Turbo"
+    },
+    "anthropic": {
+      "label": "Anthropic",
+      "description": "Claude Sonnet, Opus"
+    },
+    "openrouter": {
+      "label": "OpenRouter",
+      "description": "Access multiple providers"
+    }
+  },
+  "channels": {
+    "telegram": {
+      "label": "Telegram",
+      "placeholder": "Bot token from @BotFather"
+    },
+    "discord": {
+      "label": "Discord",
+      "placeholder": "Bot token from Discord Developer Portal"
+    },
+    "whatsapp": {
+      "label": "WhatsApp",
+      "placeholder": "WhatsApp Business API token"
+    }
+  },
+  "onboarding": {
+    "step1": "Step 1: Choose your channel",
+    "step2": "Step 2: Configure AI provider",
+    "step3": "Step 3: Review & deploy",
+    "chooseChannel": "How do you want to interact with your AI agent?",
+    "chooseProvider": "Choose your AI provider and enter your API key.",
+    "review": "Review your configuration and deploy your agent.",
+    "deployAgent": "Deploy Agent"
+  },
+  "status": {
+    "pending": "Pending Setup",
+    "provisioning": "Provisioning...",
+    "active": "Active",
+    "failed": "Failed",
+    "cancelled": "Cancelled"
+  },
+  "skills": {
+    "title": "Skills Marketplace",
+    "subtitle": "Add capabilities to your OpenClaw agent with integrations and tools.",
+    "noSkills": "No skills available yet",
+    "checkBack": "Check back soon for new integrations and tools.",
+    "howItWorks": "How Skills Work",
+    "howItWorksDescription": "Each skill is an MCP (Model Context Protocol) server that extends your agent's capabilities. When you enable a skill, it's automatically configured and deployed with your OpenClaw instance. Your agent will then have access to the skill's tools and can use them to complete tasks."
+  }
+}

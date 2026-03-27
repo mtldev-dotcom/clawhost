@@ -17,9 +17,9 @@ const envSchema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().startsWith('whsec_'),
   STRIPE_PRICE_ID: z.string().startsWith('price_'),
 
-  // Dokploy
-  DOKPLOY_URL: z.string().url(),
-  DOKPLOY_API_KEY: z.string().min(1),
+  // Dokploy (optional for local dev)
+  DOKPLOY_URL: z.string().url().optional(),
+  DOKPLOY_API_KEY: z.string().min(1).optional(),
 })
 
 export type Env = z.infer<typeof envSchema>

@@ -8,7 +8,9 @@ Multi-tenant SaaS platform for hosting personal AI agent instances. Users subscr
 - **Custom Subdomains** - Each user gets `username.nickybruno.com`
 - **Channel Integration** - Connect Telegram, Discord, or WhatsApp
 - **AI Provider Choice** - Bring your own OpenAI, Anthropic, or OpenRouter key
+- **Multi-Provider Support** - Save multiple API keys and switch between models
 - **Skills Marketplace** - Extend your agent with MCP-based integrations (Gmail, Calendar, Notion, GitHub, etc.)
+- **Bilingual UI** - Full English and French support with language switcher
 - **Stripe Subscriptions** - $9/month with automatic provisioning on payment
 
 ## Tech Stack
@@ -20,8 +22,9 @@ Multi-tenant SaaS platform for hosting personal AI agent instances. Users subscr
 | Database | PostgreSQL + Prisma ORM |
 | Auth | NextAuth v5 (Auth.js) |
 | Payments | Stripe Subscriptions |
-| Provisioning | Dokploy REST API |
+| Provisioning | Dokploy REST API / Local Docker |
 | Styling | Tailwind CSS + shadcn/ui |
+| i18n | next-intl (English/French) |
 | Deployment | Hetzner VPS via Dokploy |
 
 ## Quick Start
@@ -92,16 +95,20 @@ clawhost/
 │   ├── app/
 │   │   ├── (auth)/        # Login/Register pages
 │   │   ├── api/           # API routes
-│   │   ├── dashboard/     # User dashboard
+│   │   ├── dashboard/     # User dashboard (Chat, Settings, Skills)
 │   │   └── onboarding/    # Post-payment setup
 │   ├── components/
 │   │   ├── ui/            # shadcn components
 │   │   └── dashboard/     # Dashboard components
+│   ├── i18n/
+│   │   ├── config.ts      # Locale configuration
+│   │   ├── request.ts     # next-intl request handler
+│   │   └── messages/      # en.json, fr.json
 │   └── lib/
 │       ├── auth.ts        # NextAuth config
 │       ├── prisma.ts      # Prisma client
 │       ├── stripe.ts      # Stripe client
-│       └── dokploy.ts     # Dokploy API
+│       └── dokploy.ts     # Dokploy/Docker provisioning
 ├── docs/                  # Documentation
 └── CLAUDE.md              # Claude Code instructions
 ```
