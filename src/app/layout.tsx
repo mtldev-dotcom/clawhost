@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { GeistSans } from 'geist/font/sans'
 import './globals.css'
 import { auth } from '@/lib/auth'
 import Link from 'next/link'
@@ -8,29 +8,27 @@ import { signOut } from '@/lib/auth'
 // Force dynamic rendering for auth
 export const dynamic = 'force-dynamic'
 
-const inter = Inter({ subsets: ['latin'] })
-
 export const metadata: Metadata = {
-  title: 'ClawHost - Your Personal AI Agent',
-  description: 'Get a hosted OpenClaw agent instance in 60 seconds',
+  title: 'NestAI - Your AI. Running 24/7.',
+  description: 'Get a hosted AI agent instance in 60 seconds',
 }
 
 async function Nav() {
   const session = await auth()
 
   return (
-    <nav className="border-b bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="border-b border-subtle bg-white dark:bg-ink dark:border-border">
+      <div className="max-w-content mx-auto px-6 md:px-12">
         <div className="flex justify-between h-16 items-center">
-          <Link href="/" className="font-bold text-xl">
-            ClawHost
+          <Link href="/" className="font-medium text-[18px] tracking-tight text-ink dark:text-chalk">
+            NestAI
           </Link>
           <div className="flex items-center gap-4">
             {session?.user ? (
               <>
                 <Link
                   href="/dashboard"
-                  className="text-gray-600 hover:text-gray-900"
+                  className="text-ink/70 hover:text-ink dark:text-chalk/70 dark:hover:text-chalk transition-colors duration-150"
                 >
                   Dashboard
                 </Link>
@@ -42,7 +40,7 @@ async function Nav() {
                 >
                   <button
                     type="submit"
-                    className="text-gray-600 hover:text-gray-900"
+                    className="text-ink/70 hover:text-ink dark:text-chalk/70 dark:hover:text-chalk transition-colors duration-150"
                   >
                     Sign out
                   </button>
@@ -52,13 +50,13 @@ async function Nav() {
               <>
                 <Link
                   href="/login"
-                  className="text-gray-600 hover:text-gray-900"
+                  className="text-ink/70 hover:text-ink dark:text-chalk/70 dark:hover:text-chalk transition-colors duration-150"
                 >
                   Sign in
                 </Link>
                 <Link
                   href="/register"
-                  className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800"
+                  className="bg-ink text-white px-4 py-2 rounded-sm hover:opacity-85 transition-opacity duration-150 dark:bg-chalk dark:text-ink"
                 >
                   Get Started
                 </Link>
@@ -77,8 +75,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className={GeistSans.variable}>
+      <body className="font-sans bg-chalk text-ink dark:bg-ink dark:text-chalk antialiased">
         <Nav />
         <main>{children}</main>
       </body>

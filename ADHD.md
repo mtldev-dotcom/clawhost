@@ -1,4 +1,4 @@
-# ⚡ ClawHost — ADHD.md
+# ⚡ NestAI — ADHD.md
 > *Last updated: 2026-03-27*
 
 ---
@@ -11,11 +11,12 @@ Multi-tenant SaaS that gives users a hosted AI agent instance with custom subdom
 ## ✅ What It Does (Right Now)
 - User registration + Stripe subscription ($9/mo)
 - Auto-provisions OpenClaw instance via Dokploy
-- Custom subdomain per user (user.nickybruno.com)
+- Custom subdomain per user (user.nestai.app)
 - AI provider config (OpenAI/Anthropic/OpenRouter)
 - Channel setup (Telegram/Discord/WhatsApp)
 - Skills marketplace with MCP integrations
 - Bilingual UI (EN/FR)
+- NestAI brand system (Geist font, ink/chalk/emerald palette)
 
 ---
 
@@ -81,8 +82,9 @@ Multi-tenant SaaS that gives users a hosted AI agent instance with custom subdom
 - Cloud Run needs `AUTH_TRUST_HOST=true` for NextAuth
 - DATABASE_URL format different for local (TCP) vs Cloud Run (unix socket)
 - Dokploy API key from Profile Settings → API/CLI Section
+- Brand: Emerald accent **once per screen max** — no decorative use
 
 ---
 
 ## 🗒️ Nick's Notes
-> 2026-03-27: GCP deployment complete. Dokploy VM running. Test Stripe keys added. Next up: configure webhook in Stripe dashboard, then test full flow.
+> 2026-03-27: GCP deployment complete. Dokploy VM running. Test Stripe keys added. NestAI brand system implemented with Geist font, ink/chalk/emerald palette. Next up: configure webhook in Stripe dashboard, then test full flow.

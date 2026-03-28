@@ -2,50 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   NestAI Brand System
+   ============================================ */
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Brand Colors */
+    --color-ink: 0 0% 4%;
+    --color-chalk: 40 14% 97%;
+    --color-mint: 156 47% 94%;
+    --color-emerald: 156 69% 37%;
+    --color-emerald-dark: 156 75% 24%;
+    --color-surface: 0 0% 8%;
+    --color-subtle: 40 8% 91%;
+
+    /* shadcn/ui tokens → NestAI mapping */
+    --background: 40 14% 97%;        /* chalk */
+    --foreground: 0 0% 4%;           /* ink */
+    --card: 0 0% 100%;               /* white */
+    --card-foreground: 0 0% 4%;      /* ink */
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
+    --popover-foreground: 0 0% 4%;
+    --primary: 0 0% 4%;              /* ink */
+    --primary-foreground: 0 0% 100%; /* white */
+    --secondary: 40 14% 97%;         /* chalk */
+    --secondary-foreground: 0 0% 4%;
+    --muted: 40 14% 97%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 156 69% 37%;           /* emerald */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 40 8% 91%;             /* subtle */
+    --input: 40 8% 91%;
+    --ring: 156 69% 37%;             /* emerald */
+    --radius: 8px;
+
+    /* Brand Spacing */
+    --page-padding-mobile: 24px;
+    --page-padding-desktop: 48px;
+    --section-gap: 64px;
+    --card-padding: 24px;
+    --tap-target: 44px;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --background: 0 0% 4%;           /* ink */
+    --foreground: 40 14% 97%;        /* chalk */
+    --card: 0 0% 8%;                 /* surface */
+    --card-foreground: 40 14% 97%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 40 14% 97%;
+    --primary: 40 14% 97%;           /* chalk */
+    --primary-foreground: 0 0% 4%;   /* ink */
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 40 14% 97%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 240 4% 65%;
+    --accent: 156 69% 37%;           /* emerald */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 40 14% 97%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 156 69% 37%;
   }
 }
 
@@ -53,7 +74,105 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* NestAI: No shadows on focus, use ring */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-emerald ring-offset-2 ring-offset-background;
+  }
+}
+
+/* ============================================
+   Brand Typography Classes
+   ============================================ */
+
+@layer components {
+  .text-display {
+    @apply text-[32px] font-medium leading-tight tracking-tight;
+    letter-spacing: -0.03em;
+  }
+
+  .text-heading {
+    @apply text-[22px] font-medium leading-snug;
+    letter-spacing: -0.02em;
+  }
+
+  .text-body {
+    @apply text-base font-normal leading-relaxed;
+  }
+
+  .text-label {
+    @apply text-xs font-medium uppercase tracking-wide;
+    letter-spacing: 0.07em;
+  }
+}
+
+/* ============================================
+   Brand Component Classes
+   ============================================ */
+
+@layer components {
+  /* Primary Button */
+  .btn-primary {
+    @apply w-full min-h-[44px] bg-ink text-white rounded-sm px-6 py-3;
+    @apply font-medium text-[15px];
+    @apply transition-opacity duration-150 ease-out;
+    @apply hover:opacity-85;
+    @apply dark:bg-chalk dark:text-ink;
+  }
+
+  /* Secondary Button */
+  .btn-secondary {
+    @apply w-full min-h-[44px] bg-transparent text-ink rounded-sm px-6 py-3;
+    @apply font-medium text-[15px];
+    @apply border border-subtle;
+    @apply transition-colors duration-150 ease-out;
+    @apply hover:bg-chalk;
+    @apply dark:text-chalk dark:border-border dark:hover:bg-surface;
+  }
+
+  /* Card */
+  .brand-card {
+    @apply bg-white border border-subtle rounded-md p-6;
+    @apply dark:bg-surface dark:border-border;
+    /* No shadows - ever */
+  }
+
+  /* Active Badge */
+  .badge-active {
+    @apply inline-flex items-center px-3 py-1;
+    @apply bg-emerald-light text-emerald-dark rounded-pill;
+    @apply text-xs font-medium;
+    @apply dark:bg-emerald/20 dark:text-emerald;
+  }
+
+  /* Page Wrapper */
+  .page-wrapper {
+    @apply px-6 md:px-12 max-w-content mx-auto;
+  }
+
+  /* Section spacing */
+  .section-gap {
+    @apply py-16;
+  }
+}
+
+/* ============================================
+   shadcn/ui Overrides (remove shadows)
+   ============================================ */
+
+@layer components {
+  /* Remove all shadows from shadcn components */
+  .shadow-sm, .shadow, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl {
+    box-shadow: none !important;
+  }
+
+  /* Card override */
+  [data-slot="card"] {
+    box-shadow: none;
   }
 }
