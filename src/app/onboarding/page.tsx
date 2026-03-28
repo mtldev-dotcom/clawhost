@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,20 +11,13 @@ import { Label } from '@/components/ui/label'
 type Channel = 'telegram' | 'discord' | 'whatsapp'
 type AiProvider = 'openai' | 'anthropic' | 'openrouter'
 
-const channels: { id: Channel; name: string; icon: string }[] = [
-  { id: 'telegram', name: 'Telegram', icon: '🤖' },
-  { id: 'discord', name: 'Discord', icon: '💬' },
-  { id: 'whatsapp', name: 'WhatsApp', icon: '📱' },
-]
-
-const providers: { id: AiProvider; name: string }[] = [
-  { id: 'openai', name: 'OpenAI' },
-  { id: 'anthropic', name: 'Anthropic' },
-  { id: 'openrouter', name: 'OpenRouter' },
-]
-
 export default function OnboardingPage() {
   const router = useRouter()
+  const t = useTranslations('onboarding')
+  const tc = useTranslations('common')
+  const tch = useTranslations('channels')
+  const tp = useTranslations('providers')
+  const ts = useTranslations('settings')
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
 
@@ -31,6 +25,18 @@ export default function OnboardingPage() {
   const [channelToken, setChannelToken] = useState('')
   const [aiProvider, setAiProvider] = useState<AiProvider | null>(null)
   const [aiApiKey, setAiApiKey] = useState('')
+
+  const channels: { id: Channel; icon: string }[] = [
+    { id: 'telegram', icon: '🤖' },
+    { id: 'discord', icon: '💬' },
+    { id: 'whatsapp', icon: '📱' },
+  ]
+
+  const providers: { id: AiProvider }[] = [
+    { id: 'openai' },
+    { id: 'anthropic' },
+    { id: 'openrouter' },
+  ]
 
   async function handleSubmit() {
     if (!channel || !channelToken || !aiProvider || !aiApiKey) return
@@ -60,9 +66,9 @@ export default function OnboardingPage() {
       <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle>
-            {step === 1 && 'Step 1: Choose your channel'}
-            {step === 2 && 'Step 2: Configure AI provider'}
-            {step === 3 && 'Step 3: Review & deploy'}
+            {step === 1 && t('step1')}
+            {step === 2 && t('step2')}
+            {step === 3 && t('step3')}
           </CardTitle>
           <div className="flex gap-2 mt-4">
             {[1, 2, 3].map((s) => (
@@ -79,7 +85,7 @@ export default function OnboardingPage() {
           {step === 1 && (
             <div className="space-y-4">
               <p className="text-gray-600 mb-4">
-                How do you want to interact with your AI agent?
+                {t('chooseChannel')}
               </p>
               <div className="grid gap-3">
                 {channels.map((c) => (
@@ -93,23 +99,20 @@ export default function OnboardingPage() {
                     }`}
                   >
                     <span className="text-2xl">{c.icon}</span>
-                    <span className="font-medium">{c.name}</span>
+                    <span className="font-medium">{tch(`${c.id}.label`)}</span>
                   </button>
                 ))}
               </div>
               {channel && (
                 <div className="mt-4">
                   <Label htmlFor="channelToken">
-                    {channel === 'telegram' && 'Bot Token (from @BotFather)'}
-                    {channel === 'discord' && 'Bot Token'}
-                    {channel === 'whatsapp' && 'Webhook Secret'}
+                    {tch(`${channel}.placeholder`)}
                   </Label>
                   <Input
                     id="channelToken"
                     type="password"
                     value={channelToken}
                     onChange={(e) => setChannelToken(e.target.value)}
-                    placeholder="Paste your token here"
                     className="mt-1"
                   />
                 </div>
@@ -119,7 +122,7 @@ export default function OnboardingPage() {
                 disabled={!channel || !channelToken}
                 className="w-full mt-4"
               >
-                Continue
+                {tc('continue')}
               </Button>
             </div>
           )}
@@ -127,7 +130,7 @@ export default function OnboardingPage() {
           {step === 2 && (
             <div className="space-y-4">
               <p className="text-gray-600 mb-4">
-                Choose your AI provider and enter your API key.
+                {t('chooseProvider')}
               </p>
               <div className="grid gap-3">
                 {providers.map((p) => (
@@ -140,7 +143,8 @@ export default function OnboardingPage() {
                         : 'border-gray-200'
                     }`}
                   >
-                    <span className="font-medium">{p.name}</span>
+                    <span className="font-medium">{tp(`${p.id}.label`)}</span>
+                    <span className="text-sm text-gray-500 ml-2">{tp(`${p.id}.description`)}</span>
                   </button>
                 ))}
               </div>
@@ -159,14 +163,14 @@ export default function OnboardingPage() {
               )}
               <div className="flex gap-3 mt-4">
                 <Button variant="outline" onClick={() => setStep(1)}>
-                  Back
+                  {tc('back')}
                 </Button>
                 <Button
                   onClick={() => setStep(3)}
                   disabled={!aiProvider || !aiApiKey}
                   className="flex-1"
                 >
-                  Continue
+                  {tc('continue')}
                 </Button>
               </div>
             </div>
@@ -175,28 +179,28 @@ export default function OnboardingPage() {
           {step === 3 && (
             <div className="space-y-4">
               <p className="text-gray-600 mb-4">
-                Review your configuration and deploy your agent.
+                {t('review')}
               </p>
               <div className="bg-gray-50 rounded-lg p-4 space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Channel</span>
-                  <span className="font-medium capitalize">{channel}</span>
+                  <span className="text-gray-500">{ts('channel')}</span>
+                  <span className="font-medium">{channel && tch(`${channel}.label`)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">AI Provider</span>
-                  <span className="font-medium capitalize">{aiProvider}</span>
+                  <span className="text-gray-500">{ts('aiProviders')}</span>
+                  <span className="font-medium">{aiProvider && tp(`${aiProvider}.label`)}</span>
                 </div>
               </div>
               <div className="flex gap-3 mt-4">
                 <Button variant="outline" onClick={() => setStep(2)}>
-                  Back
+                  {tc('back')}
                 </Button>
                 <Button
                   onClick={handleSubmit}
                   disabled={loading}
                   className="flex-1"
                 >
-                  {loading ? 'Deploying...' : 'Deploy Agent'}
+                  {loading ? tc('deploying') : t('deployAgent')}
                 </Button>
               </div>
             </div>

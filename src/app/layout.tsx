@@ -4,6 +4,10 @@ import './globals.css'
 import { auth } from '@/lib/auth'
 import Link from 'next/link'
 import { signOut } from '@/lib/auth'
+import { getTranslations, getLocale, getMessages } from 'next-intl/server'
+import { NextIntlClientProvider } from 'next-intl'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import type { Locale } from '@/i18n/config'
 
 // Force dynamic rendering for auth
 export const dynamic = 'force-dynamic'
@@ -15,6 +19,8 @@ export const metadata: Metadata = {
 
 async function Nav() {
   const session = await auth()
+  const t = await getTranslations('common')
+  const locale = await getLocale() as Locale
 
   return (
     <nav className="border-b border-subtle bg-white dark:bg-ink dark:border-border">
@@ -24,13 +30,14 @@ async function Nav() {
             NestAI
           </Link>
           <div className="flex items-center gap-4">
+            <LanguageSwitcher currentLocale={locale} />
             {session?.user ? (
               <>
                 <Link
                   href="/dashboard"
                   className="text-ink/70 hover:text-ink dark:text-chalk/70 dark:hover:text-chalk transition-colors duration-150"
                 >
-                  Dashboard
+                  {t('dashboard')}
                 </Link>
                 <form
                   action={async () => {
@@ -42,7 +49,7 @@ async function Nav() {
                     type="submit"
                     className="text-ink/70 hover:text-ink dark:text-chalk/70 dark:hover:text-chalk transition-colors duration-150"
                   >
-                    Sign out
+                    {t('signOut')}
                   </button>
                 </form>
               </>
@@ -52,13 +59,13 @@ async function Nav() {
                   href="/login"
                   className="text-ink/70 hover:text-ink dark:text-chalk/70 dark:hover:text-chalk transition-colors duration-150"
                 >
-                  Sign in
+                  {t('signIn')}
                 </Link>
                 <Link
                   href="/register"
                   className="bg-ink text-white px-4 py-2 rounded-sm hover:opacity-85 transition-opacity duration-150 dark:bg-chalk dark:text-ink"
                 >
-                  Get Started
+                  {t('getStarted')}
                 </Link>
               </>
             )}
@@ -69,16 +76,21 @@ async function Nav() {
   )
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const locale = await getLocale()
+  const messages = await getMessages()
+
   return (
-    <html lang="en" className={GeistSans.variable}>
+    <html lang={locale} className={GeistSans.variable}>
       <body className="font-sans bg-chalk text-ink dark:bg-ink dark:text-chalk antialiased">
-        <Nav />
-        <main>{children}</main>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <Nav />
+          <main>{children}</main>
+        </NextIntlClientProvider>
       </body>
     </html>
   )

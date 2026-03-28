@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,6 +12,7 @@ import { Label } from '@/components/ui/label'
 
 export default function RegisterPage() {
   const router = useRouter()
+  const t = useTranslations('auth')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -32,7 +34,7 @@ export default function RegisterPage() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || 'Registration failed')
+        setError(data.error || t('registrationFailed'))
         setLoading(false)
         return
       }
@@ -45,7 +47,7 @@ export default function RegisterPage() {
       })
 
       if (result?.error) {
-        setError('Account created but sign in failed. Please try logging in.')
+        setError(t('signInFailed'))
         setLoading(false)
         return
       }
@@ -53,7 +55,7 @@ export default function RegisterPage() {
       router.push('/onboarding')
       router.refresh()
     } catch {
-      setError('Something went wrong. Please try again.')
+      setError(t('somethingWrong'))
       setLoading(false)
     }
   }
@@ -62,9 +64,9 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+          <CardTitle className="text-2xl font-bold">{t('createAccount')}</CardTitle>
           <CardDescription>
-            Enter your details to get started with ClawHost
+            {t('createAccountDescription')}
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -75,22 +77,22 @@ export default function RegisterPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{t('name')}</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Your name"
+                placeholder={t('namePlaceholder')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 disabled={loading}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('email')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder={t('emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -98,11 +100,11 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('password')}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Create a password"
+                placeholder={t('createPasswordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -110,18 +112,18 @@ export default function RegisterPage() {
                 disabled={loading}
               />
               <p className="text-xs text-muted-foreground">
-                Must be at least 8 characters
+                {t('passwordRequirement')}
               </p>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Creating account...' : 'Create account'}
+              {loading ? t('creatingAccount') : t('createAccount')}
             </Button>
             <p className="text-sm text-center text-muted-foreground">
-              Already have an account?{' '}
+              {t('hasAccount')}{' '}
               <Link href="/login" className="text-primary hover:underline">
-                Sign in
+                {t('signIn')}
               </Link>
             </p>
           </CardFooter>
