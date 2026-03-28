@@ -94,7 +94,7 @@ const config: Config = {
 
       // Content width
       maxWidth: {
-        'content': '640px',
+        'content': '72rem',
       },
 
       // Min height for tap targets

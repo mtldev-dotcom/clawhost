@@ -112,8 +112,15 @@ clawhost/
 
 ### Local Dev Setup
 ```bash
-docker compose -f docker-compose.dev.yml up -d   # start postgres
 npm install
+npx prisma db push   # sync schema to GCP postgres
+npm run dev
+```
+
+### Alternative: Local Postgres
+```bash
+docker compose -f docker-compose.dev.yml up -d   # start local postgres
+# Update DATABASE_URL in .env to localhost:5432
 npx prisma migrate dev
 npm run dev
 ```
@@ -123,3 +130,17 @@ Only pause and ask Nick if:
 1. A Stripe product/price ID needs to be manually created in the dashboard
 2. Dokploy API key is not yet in `.env.local`
 3. OpenClaw Docker image name is unclear (default: `ghcr.io/openclaw/openclaw:latest`)
+
+## Session Notes
+
+### 2026-03-28
+- Configured hybrid development: local Next.js + GCP PostgreSQL
+- Created GCP firewall rule `allow-postgres-dev` for port 5432 access
+- Cleaned up local Docker containers and volumes
+- Database now at `34.121.34.198:5432/nestai`
+
+### 2026-03-27
+- Added Dokploy API response compatibility handling in `src/lib/dokploy.ts`
+- Added parser helpers in `src/lib/dokploy-api.ts` and regression coverage
+- Set up automated testing infrastructure (Vitest + Playwright)
+- Fixed auth/layout issues (double header, middleware location)
