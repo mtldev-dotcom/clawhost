@@ -134,10 +134,14 @@ Only pause and ask Nick if:
 ## Session Notes
 
 ### 2026-03-28
-- Configured hybrid development: local Next.js + GCP PostgreSQL
-- Created GCP firewall rule `allow-postgres-dev` for port 5432 access
-- Cleaned up local Docker containers and volumes
-- Database now at `34.121.34.198:5432/nestai`
+- Fixed OpenClaw provisioning: `sourceType: "raw"` for inline compose, correct env vars (`TELEGRAM_BOT_TOKEN`, `OPENAI_API_KEY`)
+- Redesigned onboarding: 5-step flow with API key validation and Telegram pairing
+- Added `/api/onboarding/test-provider` and `/api/onboarding/approve-pairing` endpoints
+- Added pairing code UI to settings page for existing users
+- Upgraded GCP VM to e2-standard-2 (8GB RAM) due to memory crashes
+- **New IP: 35.202.32.236** - DNS for `*.nickybruno.com` needs update
+- Database now at `35.202.32.236:5432/nestai`
+- Dokploy at `http://35.202.32.236:3000`
 
 ### 2026-03-27
 - Added Dokploy API response compatibility handling in `src/lib/dokploy.ts`

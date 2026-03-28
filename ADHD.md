@@ -53,8 +53,8 @@ Multi-tenant SaaS that gives users a hosted AI agent instance with custom subdom
 - **Repo:** `github.com/mtldev-dotcom/clawhost`
 - **Local:** `localhost:3000` (Next.js) + GCP PostgreSQL
 - **Production:** `https://nestai.nickybruno.com`
-- **Dokploy Panel:** `http://34.121.34.198:3000`
-- **GCP DB:** `34.121.34.198:5432/nestai`
+- **Dokploy Panel:** `http://35.202.32.236:3000`
+- **GCP DB:** `35.202.32.236:5432/nestai`
 - **Deploy:** Dokploy (frontend + DB + user instances)
 - **Env:** `.env.local` — `DATABASE_URL`, `NEXTAUTH_SECRET`, `STRIPE_*`, `DOKPLOY_*`
 
@@ -96,5 +96,7 @@ Multi-tenant SaaS that gives users a hosted AI agent instance with custom subdom
 > 2026-03-28: Hybrid dev setup complete. Local Next.js connects to GCP PostgreSQL (34.121.34.198:5432). Created firewall rule `allow-postgres-dev`. Cleaned up local Docker. Next: configure Stripe webhook + test full signup flow.
 
 > 2026-03-28: Deployed to Dokploy via API. PostgreSQL + Next.js app live at nestai.nickybruno.com. Deleted Cloud Run + Cloud SQL.
+
+> 2026-03-28: Major session - Fixed OpenClaw provisioning. Key fixes: 1) Dokploy needs `sourceType: "raw"` for inline compose, 2) OpenClaw uses `TELEGRAM_BOT_TOKEN` + `OPENAI_API_KEY` env vars (not OPENCLAW_*), 3) Must set `agents.defaults.model` to selected model. Redesigned onboarding to 5-step flow with API key validation and Telegram pairing. Upgraded GCP VM to e2-standard-2 (8GB RAM) due to memory issues. **New IP: 35.202.32.236** - need to update DNS.
 
 > 2026-03-27: NestAI brand system implemented. Automated testing setup (Vitest + Playwright).
