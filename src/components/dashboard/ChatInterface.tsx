@@ -114,7 +114,7 @@ export function ChatInterface({ instanceStatus, activeModel, translations: t }: 
             </p>
           </div>
         ) : (
-          <div className="mx-auto max-w-3xl space-y-4">
+          <div className="mx-auto max-w-2xl space-y-4 lg:max-w-4xl">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -163,7 +163,7 @@ export function ChatInterface({ instanceStatus, activeModel, translations: t }: 
 
       {/* Input area */}
       <div className="border-t bg-background p-4">
-        <form onSubmit={handleSubmit} className="mx-auto flex max-w-3xl gap-2">
+        <form onSubmit={handleSubmit} className="mx-auto flex max-w-2xl gap-2 lg:max-w-4xl">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}

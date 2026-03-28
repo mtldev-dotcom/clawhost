@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { MessageSquare, Settings, Sparkles, Brain, Zap } from 'lucide-react'
+import { signOut } from 'next-auth/react'
+import { MessageSquare, Settings, Sparkles, Brain, Zap, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
@@ -38,7 +39,7 @@ export function DashboardHeader({ activeModel, instanceStatus, locale, translati
 
   return (
     <header className="border-b bg-background">
-      <div className="container mx-auto flex h-14 items-center justify-between px-4">
+      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 lg:px-8">
         <div className="flex items-center gap-6">
           <Link href="/dashboard" className="text-xl font-bold">
             ClawHost
@@ -84,12 +85,13 @@ export function DashboardHeader({ activeModel, instanceStatus, locale, translati
             </Badge>
           )}
           <LanguageSwitcher currentLocale={locale} />
-          <Link
-            href="/api/auth/signout"
-            className="text-sm text-muted-foreground hover:text-foreground"
+          <button
+            onClick={() => signOut({ callbackUrl: '/' })}
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
+            <LogOut className="h-4 w-4" />
             {translations.common.signOut}
-          </Link>
+          </button>
         </div>
       </div>
     </header>

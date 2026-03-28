@@ -67,7 +67,7 @@ export default async function SettingsPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-4xl py-8 px-4">
+    <div className="mx-auto max-w-3xl py-8 px-4 lg:max-w-5xl lg:px-8">
       <h1 className="mb-8 text-3xl font-bold">{translations.settings.title}</h1>
       <SettingsClient instance={instance} providers={instance.providers} translations={translations} />
     </div>

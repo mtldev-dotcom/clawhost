@@ -20,6 +20,7 @@ export default function OnboardingPage() {
   const ts = useTranslations('settings')
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const [channel, setChannel] = useState<Channel | null>(null)
   const [channelToken, setChannelToken] = useState('')
@@ -42,21 +43,33 @@ export default function OnboardingPage() {
     if (!channel || !channelToken || !aiProvider || !aiApiKey) return
 
     setLoading(true)
+    setError(null)
+
     try {
-      // Update channel config
-      await fetch('/api/instance', {
+      // Create/update instance config
+      const instanceRes = await fetch('/api/instance', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ channel, channelToken, aiProvider, aiApiKey }),
       })
 
+      if (!instanceRes.ok) {
+        const data = await instanceRes.json()
+        throw new Error(data.error || 'Failed to save configuration')
+      }
+
       // Trigger provision
-      await fetch('/api/provision', { method: 'POST' })
+      const provisionRes = await fetch('/api/provision', { method: 'POST' })
+
+      if (!provisionRes.ok) {
+        const data = await provisionRes.json()
+        throw new Error(data.error || 'Failed to start deployment')
+      }
 
       router.push('/dashboard/settings')
-    } catch (error) {
-      console.error('Onboarding failed:', error)
-    } finally {
+    } catch (err) {
+      console.error('Onboarding failed:', err)
+      setError(err instanceof Error ? err.message : 'Something went wrong')
       setLoading(false)
     }
   }
@@ -191,8 +204,13 @@ export default function OnboardingPage() {
                   <span className="font-medium">{aiProvider && tp(`${aiProvider}.label`)}</span>
                 </div>
               </div>
+              {error && (
+                <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                  {error}
+                </div>
+              )}
               <div className="flex gap-3 mt-4">
-                <Button variant="outline" onClick={() => setStep(2)}>
+                <Button variant="outline" onClick={() => setStep(2)} disabled={loading}>
                   {tc('back')}
                 </Button>
                 <Button
