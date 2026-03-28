@@ -6,7 +6,7 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 const nextConfig: NextConfig = {
   output: 'standalone',
   experimental: {
-    serverActions: { allowedOrigins: ['localhost:3000'] },
+    serverActions: { allowedOrigins: ['localhost:3000', '100.119.162.2:3000'] },
   },
   // Workaround for next-auth + app router build issue
   eslint: {

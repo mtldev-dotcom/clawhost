@@ -146,6 +146,7 @@ export async function provisionInstance(user: User, instance: Instance) {
       body: JSON.stringify({
         composeId,
         composeFile: composeYaml,
+        sourceType: 'raw',
       }),
     })
 
@@ -255,6 +256,9 @@ export async function approvePairing(containerName: string, channel: string, pai
 function buildComposeYaml({ slug, subdomain, channelToken, aiApiKey, aiProvider }: {
   slug: string, subdomain: string, channelToken: string, aiApiKey: string, aiProvider: string
 }) {
+  // Map provider to correct env var name
+  const aiKeyEnvVar = aiProvider === 'anthropic' ? 'ANTHROPIC_API_KEY' : 'OPENAI_API_KEY'
+
   return `
 version: '3.8'
 services:
@@ -262,10 +266,8 @@ services:
     image: ghcr.io/openclaw/openclaw:latest
     restart: unless-stopped
     environment:
-      - OPENCLAW_CHANNEL_TOKEN=${channelToken}
-      - OPENCLAW_AI_PROVIDER=${aiProvider}
-      - OPENCLAW_AI_API_KEY=${aiApiKey}
-      - OPENCLAW_INSTANCE_SLUG=${slug}
+      - TELEGRAM_BOT_TOKEN=${channelToken}
+      - ${aiKeyEnvVar}=${aiApiKey}
     volumes:
       - openclaw_data:/app/data
     networks:
