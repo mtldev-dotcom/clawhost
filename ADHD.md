@@ -1,5 +1,5 @@
 # ⚡ NestAI — ADHD.md
-> *Last updated: 2026-03-27*
+> *Last updated: 2026-03-28*
 
 ---
 
@@ -21,11 +21,12 @@ Multi-tenant SaaS that gives users a hosted AI agent instance with custom subdom
 ---
 
 ## 🚀 What It Will Do
+- [x] Deploy frontend to Dokploy (instead of Cloud Run)
+- [x] Deploy PostgreSQL to Dokploy (instead of Cloud SQL)
+- [x] Delete old Cloud Run + Cloud SQL (saves ~$25/mo)
 - [ ] Configure Stripe webhook in production
-- [ ] Test full user signup → provision flow on GCP
-- [ ] Fix OpenClaw dashboard URL for remote access
+- [ ] Test full user signup → provision flow
 - [ ] Wire up actual chat API to OpenClaw gateway
-- [ ] Skills MCP server injection into running instances
 
 ---
 
@@ -44,17 +45,16 @@ Multi-tenant SaaS that gives users a hosted AI agent instance with custom subdom
 | Payments | Stripe Subscriptions |
 | Provisioning | Dokploy REST API |
 | i18n | next-intl |
-| Hosting | GCP Cloud Run + Cloud SQL |
+| Hosting | Dokploy on GCP VM |
 
 ---
 
 ## 🔧 Systems & Infra
 - **Repo:** `github.com/mtldev-dotcom/clawhost`
 - **Local:** `localhost:3000`
-- **Prod:** `https://clawhost-794442866411.us-central1.run.app`
-- **Dokploy:** `http://34.121.34.198:3000`
-- **Cloud SQL:** `35.225.217.179`
-- **Deploy:** Docker → Artifact Registry → Cloud Run
+- **Production:** `https://nestai.nickybruno.com`
+- **Dokploy Panel:** `http://34.121.34.198:3000`
+- **Deploy:** Dokploy (frontend + DB + user instances)
 - **Env:** `.env.local` — `DATABASE_URL`, `NEXTAUTH_SECRET`, `STRIPE_*`, `DOKPLOY_*`
 
 ---
@@ -73,18 +73,17 @@ Multi-tenant SaaS that gives users a hosted AI agent instance with custom subdom
 | Stripe | Subscriptions + webhooks | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` |
 | Dokploy | Instance provisioning | `DOKPLOY_URL`, `DOKPLOY_API_KEY` |
 | NextAuth | Auth sessions | `NEXTAUTH_SECRET` |
-| Cloud SQL | PostgreSQL | `DATABASE_URL` (unix socket) |
 
 ---
 
 ## ⚠️ Watch Out
 - Next.js 15 + next-auth has prerender bug on error pages (build warnings OK)
-- Cloud Run needs `AUTH_TRUST_HOST=true` for NextAuth
-- DATABASE_URL format different for local (TCP) vs Cloud Run (unix socket)
-- Dokploy API key from Profile Settings → API/CLI Section
+- Need `AUTH_TRUST_HOST=true` for NextAuth in production
 - Brand: Emerald accent **once per screen max** — no decorative use
 
 ---
 
 ## 🗒️ Nick's Notes
-> 2026-03-27: GCP deployment complete. Dokploy VM running. Test Stripe keys added. NestAI brand system implemented with Geist font, ink/chalk/emerald palette. Next up: configure webhook in Stripe dashboard, then test full flow.
+> 2026-03-28: Deployed to Dokploy via API. PostgreSQL + Next.js app live at nestai.nickybruno.com. Deleted Cloud Run + Cloud SQL. Next: configure Stripe webhook URL and test full flow.
+
+> 2026-03-27: NestAI brand system implemented. Plan to consolidate on Dokploy: deploy frontend + PostgreSQL there instead of Cloud Run + Cloud SQL. Saves ~$25/mo. Next session: set up Dokploy project with DB + app.
