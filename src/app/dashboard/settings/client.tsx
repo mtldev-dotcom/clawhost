@@ -29,6 +29,7 @@ import {
   setActiveProvider,
   updateChannelConfig,
   deployInstance,
+  approvePairingCode,
 } from './actions'
 import type { AiProvider, Channel } from '@/types'
 
@@ -97,6 +98,10 @@ export function SettingsClient({ instance, providers: initialProviders, translat
   const [channel, setChannel] = useState<Channel | null>((instance.channel as Channel) || null)
   const [channelToken, setChannelToken] = useState(instance.channelToken || '')
   const [savingChannel, setSavingChannel] = useState(false)
+
+  // Pairing state
+  const [pairingCode, setPairingCode] = useState('')
+  const [approvingPairing, setApprovingPairing] = useState(false)
 
   // Deploy state
   const [deploying, setDeploying] = useState(false)
@@ -198,6 +203,22 @@ export function SettingsClient({ instance, providers: initialProviders, translat
       setError(err instanceof Error ? err.message : 'Deployment failed')
     } finally {
       setDeploying(false)
+    }
+  }
+
+  const handleApprovePairing = async () => {
+    if (!pairingCode.trim()) return
+    setApprovingPairing(true)
+    setError(null)
+    try {
+      await approvePairingCode(pairingCode.trim())
+      setSuccess('Pairing approved! You can now chat with the bot.')
+      setPairingCode('')
+      setTimeout(() => setSuccess(null), 5000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to approve pairing')
+    } finally {
+      setApprovingPairing(false)
     }
   }
 
@@ -446,19 +467,44 @@ export function SettingsClient({ instance, providers: initialProviders, translat
               </div>
 
               {channel && (
-                <div className="space-y-2">
-                  <Label htmlFor="channel-token">{t.channels[channel]?.label || channel} Token</Label>
-                  <Input
-                    id="channel-token"
-                    type="password"
-                    placeholder={t.channels[channel]?.placeholder || ''}
-                    value={channelToken}
-                    onChange={(e) => setChannelToken(e.target.value)}
-                  />
-                  <Button onClick={handleSaveChannel} disabled={!channelToken || savingChannel}>
-                    {savingChannel ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    {t.common.save}
-                  </Button>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="channel-token">{t.channels[channel]?.label || channel} Token</Label>
+                    <Input
+                      id="channel-token"
+                      type="password"
+                      placeholder={t.channels[channel]?.placeholder || ''}
+                      value={channelToken}
+                      onChange={(e) => setChannelToken(e.target.value)}
+                    />
+                    <Button onClick={handleSaveChannel} disabled={!channelToken || savingChannel}>
+                      {savingChannel ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      {t.common.save}
+                    </Button>
+                  </div>
+
+                  {/* Pairing Code Section */}
+                  {instance.status === 'active' && channel === 'telegram' && (
+                    <div className="space-y-2 border-t pt-4">
+                      <Label htmlFor="pairing-code">Telegram Pairing Code</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Message your bot on Telegram to get a pairing code, then enter it here to authorize.
+                      </p>
+                      <div className="flex gap-2">
+                        <Input
+                          id="pairing-code"
+                          placeholder="e.g. 93KKNB9G"
+                          value={pairingCode}
+                          onChange={(e) => setPairingCode(e.target.value.toUpperCase())}
+                          className="font-mono"
+                        />
+                        <Button onClick={handleApprovePairing} disabled={!pairingCode.trim() || approvingPairing}>
+                          {approvingPairing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                          Approve
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>

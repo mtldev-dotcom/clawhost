@@ -139,6 +139,7 @@ export async function provisionInstance(user: User, instance: Instance) {
       channelToken: instance.channelToken ?? '',
       aiApiKey: instance.aiApiKey ?? '',
       aiProvider: instance.aiProvider ?? 'openai',
+      model: instance.activeModel ?? undefined,
     })
 
     await dokployFetch('/api/compose.update', {
@@ -205,6 +206,28 @@ export async function deprovisionInstance(instance: Instance) {
   })
 }
 
+export async function execInContainer(composeId: string, command: string): Promise<{ success: boolean; output?: string; error?: string }> {
+  if (!DOKPLOY_CONFIGURED) {
+    return { success: false, error: 'Dokploy not configured' }
+  }
+
+  try {
+    // Get compose details to find container name
+    const compose = await dokployFetch(`/api/compose.one?composeId=${composeId}`)
+    const containerName = `${compose.appName}-openclaw-1`
+
+    // Execute command via SSH to GCP instance
+    const sshCommand = `gcloud compute ssh dokploy --zone us-central1-a --command "sudo docker exec ${containerName} ${command}" 2>&1`
+    const { stdout, stderr } = await execAsync(sshCommand, { timeout: 30000 })
+
+    return { success: true, output: stdout || stderr }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Unknown error'
+    console.error('execInContainer failed:', error)
+    return { success: false, error }
+  }
+}
+
 export async function injectSkill(instance: Instance, mcpConfig: object) {
   if (!DOKPLOY_CONFIGURED) {
     // For local, we'd need to restart the container with new config
@@ -253,11 +276,24 @@ export async function approvePairing(containerName: string, channel: string, pai
   return { success: true }
 }
 
-function buildComposeYaml({ slug, subdomain, channelToken, aiApiKey, aiProvider }: {
-  slug: string, subdomain: string, channelToken: string, aiApiKey: string, aiProvider: string
+function buildComposeYaml({ slug, subdomain, channelToken, aiApiKey, aiProvider, model }: {
+  slug: string, subdomain: string, channelToken: string, aiApiKey: string, aiProvider: string, model?: string
 }) {
   // Map provider to correct env var name
   const aiKeyEnvVar = aiProvider === 'anthropic' ? 'ANTHROPIC_API_KEY' : 'OPENAI_API_KEY'
+
+  // Build environment variables
+  const envVars = [
+    `TELEGRAM_BOT_TOKEN=${channelToken}`,
+    `${aiKeyEnvVar}=${aiApiKey}`,
+  ]
+
+  // Add model config if specified
+  if (model) {
+    envVars.push(`OPENCLAW_MODEL=${model}`)
+  }
+
+  const envBlock = envVars.map(v => `      - ${v}`).join('\n')
 
   return `
 version: '3.8'
@@ -266,8 +302,7 @@ services:
     image: ghcr.io/openclaw/openclaw:latest
     restart: unless-stopped
     environment:
-      - TELEGRAM_BOT_TOKEN=${channelToken}
-      - ${aiKeyEnvVar}=${aiApiKey}
+${envBlock}
     volumes:
       - openclaw_data:/app/data
     networks:

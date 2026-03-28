@@ -234,6 +234,39 @@ export async function updateChannelConfig(channel: Channel, token: string) {
   return { success: true }
 }
 
+export async function approvePairingCode(code: string) {
+  const session = await auth()
+  if (!session?.user?.id) {
+    throw new Error('Unauthorized')
+  }
+
+  const instance = await prisma.instance.findUnique({
+    where: { userId: session.user.id },
+  })
+
+  if (!instance) {
+    throw new Error('No instance found')
+  }
+
+  if (!instance.dokployAppId) {
+    throw new Error('Instance not deployed yet')
+  }
+
+  // Execute pairing approve command in the container via Dokploy
+  const { execInContainer } = await import('@/lib/dokploy')
+  const result = await execInContainer(
+    instance.dokployAppId,
+    `openclaw pairing approve telegram ${code}`
+  )
+
+  if (!result.success) {
+    throw new Error(result.error || 'Failed to approve pairing')
+  }
+
+  revalidatePath('/dashboard/settings')
+  return { success: true }
+}
+
 export async function deployInstance() {
   const session = await auth()
   if (!session?.user?.id) {
