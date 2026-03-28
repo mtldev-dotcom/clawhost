@@ -41,4 +41,36 @@ next-env.d.ts
 # Testing
 coverage/
 .nyc_output/
-.env
+
+# Editor/Agent configs
+.adal/
+.agents/
+.augment/
+.claude/skills/
+.codebuddy/
+.commandcode/
+.continue/
+.cortex/
+.crush/
+.factory/
+.goose/
+.iflow/
+.junie/
+.kilocode/
+.kiro/
+.kode/
+.mcpjam/
+.mux/
+.neovate/
+.openhands/
+.pi/
+.pochi/
+.qoder/
+.qwen/
+.roo/
+.trae/
+.vibe/
+.windsurf/
+.zencoder/
+skills/
+skills-lock.json
