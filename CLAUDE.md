@@ -139,7 +139,9 @@ Only pause and ask Nick if:
 - Added `/api/onboarding/test-provider` and `/api/onboarding/approve-pairing` endpoints
 - Added pairing code UI to settings page for existing users
 - Upgraded GCP VM to e2-standard-2 (8GB RAM) due to memory crashes
-- **New IP: 35.202.32.236** - DNS for `*.nickybruno.com` needs update
+- **New IP: 35.202.32.236** - DNS updates needed:
+  - `*.nickybruno.com` → `35.202.32.236` (user subdomains)
+  - `dok.nestai.nickybruno.com` → `35.202.32.236` (Dokploy panel)
 - Database now at `35.202.32.236:5432/nestai`
 - Dokploy at `http://35.202.32.236:3000`
 
