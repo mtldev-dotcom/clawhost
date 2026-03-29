@@ -3,8 +3,12 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { exec } from 'child_process'
 import { promisify } from 'util'
+import { existsSync } from 'fs'
 
 const execAsync = promisify(exec)
+
+// Detect if running in production (Docker socket available) or local dev
+const isProduction = existsSync('/var/run/docker.sock')
 
 export async function POST(req: Request) {
   const session = await auth()
@@ -52,10 +56,16 @@ export async function POST(req: Request) {
     const compose = await composeRes.json()
     const containerName = `${compose.appName}-openclaw-1`
 
-    // Execute docker command directly (requires Docker socket mount)
-    const dockerCmd = `docker exec ${containerName} node /app/openclaw.mjs pairing approve telegram ${code} 2>&1`
+    let dockerCmd: string
+    if (isProduction) {
+      // Production: Docker socket available
+      dockerCmd = `docker exec ${containerName} node /app/openclaw.mjs pairing approve telegram ${code} 2>&1`
+    } else {
+      // Local dev: Use SSH via gcloud
+      dockerCmd = `gcloud compute ssh dokploy --zone us-central1-a --project clawdbot-nickdevmtl --command "sudo docker exec ${containerName} node /app/openclaw.mjs pairing approve telegram ${code}" 2>&1`
+    }
 
-    const { stdout, stderr } = await execAsync(dockerCmd, { timeout: 30000 })
+    const { stdout, stderr } = await execAsync(dockerCmd, { timeout: 60000 })
     const output = stdout || stderr
 
     console.log('Pairing output:', output)
@@ -83,7 +93,15 @@ export async function POST(req: Request) {
     console.error('Pairing approval failed:', err)
     const message = err instanceof Error ? err.message : 'Unknown error'
 
-    // Check if Docker socket is not available
+    // Check for container not ready
+    if (message.includes('No such container')) {
+      return NextResponse.json({
+        success: false,
+        error: 'Instance still starting. Please wait 30 seconds and try again.'
+      })
+    }
+
+    // Check if Docker/SSH not available
     if (message.includes('ENOENT') || message.includes('permission denied') || message.includes('Cannot connect')) {
       return NextResponse.json({
         success: false,

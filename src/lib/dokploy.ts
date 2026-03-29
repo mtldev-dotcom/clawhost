@@ -2,10 +2,14 @@ import { env } from './env'
 import { prisma } from './prisma'
 import { exec } from 'child_process'
 import { promisify } from 'util'
+import { existsSync } from 'fs'
 import type { User, Instance } from '@prisma/client'
 import { extractComposeId, extractEnvironmentId, extractProjectId } from './dokploy-api'
 
 const execAsync = promisify(exec)
+
+// Detect if running in production (Docker socket available) or local dev
+const isProduction = existsSync('/var/run/docker.sock')
 const DOKPLOY_CONFIGURED = !!(env.DOKPLOY_URL && env.DOKPLOY_API_KEY)
 const DOKPLOY_BASE = env.DOKPLOY_URL ?? ''
 const HEADERS = {
@@ -216,14 +220,36 @@ export async function execInContainer(composeId: string, command: string): Promi
     const compose = await dokployFetch(`/api/compose.one?composeId=${composeId}`)
     const containerName = `${compose.appName}-openclaw-1`
 
-    // Execute command via SSH to GCP instance
-    const sshCommand = `gcloud compute ssh dokploy --zone us-central1-a --command "sudo docker exec ${containerName} ${command}" 2>&1`
-    const { stdout, stderr } = await execAsync(sshCommand, { timeout: 30000 })
+    let execCommand: string
+    if (isProduction) {
+      // Production: Docker socket available
+      execCommand = `docker exec ${containerName} ${command} 2>&1`
+    } else {
+      // Local dev: Use SSH via gcloud
+      execCommand = `gcloud compute ssh dokploy --zone us-central1-a --project clawdbot-nickdevmtl --command "sudo docker exec ${containerName} ${command}" 2>&1`
+    }
 
-    return { success: true, output: stdout || stderr }
+    const { stdout, stderr } = await execAsync(execCommand, { timeout: 60000 })
+    const output = stdout || stderr
+
+    // Check for known error patterns
+    if (output.includes('No pending pairing request') || output.includes('not found')) {
+      return { success: false, error: 'Pairing code expired. Send a new message to the bot.' }
+    }
+
+    return { success: true, output }
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error'
     console.error('execInContainer failed:', error)
+
+    // Extract meaningful error from output
+    if (error.includes('No pending pairing request')) {
+      return { success: false, error: 'Pairing code expired. Send a new message to the bot.' }
+    }
+    if (error.includes('No such container')) {
+      return { success: false, error: 'Instance still starting. Wait 30 seconds and try again.' }
+    }
+
     return { success: false, error }
   }
 }
