@@ -52,39 +52,42 @@ export async function POST(req: Request) {
     const compose = await composeRes.json()
     const containerName = `${compose.appName}-openclaw-1`
 
-    // Execute pairing approve command via SSH
-    const sshCommand = `gcloud compute ssh dokploy --zone us-central1-a --command "sudo docker exec ${containerName} openclaw pairing approve telegram ${code}" 2>&1`
+    // Execute docker command directly (requires Docker socket mount)
+    const dockerCmd = `docker exec ${containerName} node /app/openclaw.mjs pairing approve telegram ${code} 2>&1`
 
-    const { stdout, stderr } = await execAsync(sshCommand, { timeout: 60000 })
+    const { stdout, stderr } = await execAsync(dockerCmd, { timeout: 30000 })
     const output = stdout || stderr
 
-    // Check for success indicators
-    if (output.includes('approved') || output.includes('Approved') || output.includes('success')) {
+    console.log('Pairing output:', output)
+
+    // Check for success
+    if (output.includes('approved') || output.includes('Approved') || output.includes('success') || output.includes('Success')) {
       return NextResponse.json({ success: true })
     }
 
-    // Check for known error patterns
-    if (output.includes('No pending pairing request')) {
+    // Check for known errors
+    if (output.includes('No pending') || output.includes('not found') || output.includes('expired')) {
       return NextResponse.json({
         success: false,
         error: 'Pairing code expired or invalid. Send a new message to the bot.'
       })
     }
 
-    if (output.includes('Error') || output.includes('error')) {
-      return NextResponse.json({ success: false, error: output.trim() })
+    // If no error keywords, assume success
+    if (!output.includes('Error') && !output.includes('error') && !output.includes('failed')) {
+      return NextResponse.json({ success: true })
     }
 
-    // Assume success if no error
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: false, error: output.trim() || 'Failed to approve pairing' })
   } catch (err) {
     console.error('Pairing approval failed:', err)
     const message = err instanceof Error ? err.message : 'Unknown error'
 
-    if (message.includes('No pending pairing request')) {
+    // Check if Docker socket is not available
+    if (message.includes('ENOENT') || message.includes('permission denied') || message.includes('Cannot connect')) {
       return NextResponse.json({
         success: false,
-        error: 'Pairing code expired. Send a new message to the bot.'
+        error: 'Docker access not configured. Contact support.'
       })
     }
 
