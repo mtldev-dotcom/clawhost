@@ -12,7 +12,7 @@ ClawHost is a multi-tenant SaaS platform that lets users subscribe and instantly
 - **Styling**: Tailwind CSS + shadcn/ui
 - **i18n**: next-intl (English/French)
 - **Local Dev**: Docker Compose (Postgres + OpenClaw containers)
-- **Deployment**: Hetzner VPS via Dokploy
+- **Deployment**: GCP VM via Dokploy
 
 ## Build Instructions for Claude Code
 
@@ -104,6 +104,8 @@ clawhost/
 │           ├── DashboardHeader.tsx
 │           ├── ChatInterface.tsx
 │           └── SkillCard.tsx
+├── scripts/
+│   └── reset-users.ts               ← npm run db:reset-users
 ├── docker-compose.dev.yml           ← local postgres
 ├── .env.example
 ├── .env.local                       ← NEVER commit
@@ -133,6 +135,16 @@ Only pause and ask Nick if:
 
 ## Session Notes
 
+### 2026-03-29
+- Fixed database connection: port is `5422` (not 5432), added GCP firewall rule
+- Fixed Dokploy server IP in `webServerSettings` table (was showing old IP)
+- Fixed `package-lock.json` sync issues, Dockerfile now uses `npm install` instead of `npm ci`
+- Added `npm run db:reset-users` script to clear all users/instances
+- Fixed pairing approval: auto-detects local vs production environment
+  - **Production**: requires Docker socket mount (`/var/run/docker.sock:/var/run/docker.sock`)
+  - **Local dev**: uses `gcloud ssh` to execute commands
+- Database connection: `postgresql://clawhost:***@35.202.32.236:5422/nestai-db`
+
 ### 2026-03-28
 - Fixed OpenClaw provisioning: `sourceType: "raw"` for inline compose, correct env vars (`TELEGRAM_BOT_TOKEN`, `OPENAI_API_KEY`)
 - Redesigned onboarding: 5-step flow with API key validation and Telegram pairing
@@ -142,7 +154,7 @@ Only pause and ask Nick if:
 - **New IP: 35.202.32.236** - DNS updates needed:
   - `*.nickybruno.com` → `35.202.32.236` (user subdomains)
   - `dok.nestai.nickybruno.com` → `35.202.32.236` (Dokploy panel)
-- Database now at `35.202.32.236:5432/nestai`
+- Database now at `35.202.32.236:5422/nestai-db`
 - Dokploy at `http://35.202.32.236:3000`
 
 ### 2026-03-27
