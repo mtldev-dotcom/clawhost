@@ -19,17 +19,58 @@ Build `src/lib/dokploy.ts` — the full provisioning/deprovisioning service.
 | Deploy | POST | `/api/compose.deploy` |
 | Delete project | POST | `/api/project.remove` |
 
+## Security Warning
+
+**CRITICAL:** Never pass user input directly to shell commands. The production `dokploy.ts` uses `spawn()` with array arguments and strict input validation to prevent shell injection attacks.
+
+**Key Security Features:**
+- `validateContainerName()` - Only allows alphanumeric, hyphens, underscores
+- `validateCommandArg()` - Blocks shell metacharacters (; | & $ ` " etc.)
+- `validatePairingCode()` - Alphanumeric only, 4-32 characters
+- `execDocker()` - Uses `spawn()` with array args, never string interpolation
+
 ## Create `src/lib/dokploy.ts`
 
 ```typescript
 import { env } from './env'
 import { prisma } from './prisma'
+import { spawn } from 'child_process'
 import type { User, Instance } from '@prisma/client'
 
 const DOKPLOY_BASE = env.DOKPLOY_URL
 const HEADERS = {
   'Content-Type': 'application/json',
   'x-api-key': env.DOKPLOY_API_KEY,
+}
+
+// SECURITY: Input validators to prevent injection
+function validateContainerName(name: string): boolean {
+  return /^[a-zA-Z0-9_-]+$/.test(name) && name.length <= 64
+}
+
+function validateCommandArg(arg: string): boolean {
+  return /^[a-zA-Z0-9_.\/:=-]+$/.test(arg) && arg.length <= 256
+}
+
+function validatePairingCode(code: string): boolean {
+  return /^[a-zA-Z0-9]{4,32}$/.test(code)
+}
+
+// SECURITY: Safe command execution using spawn with array args
+function execSafe(command: string, args: string[]): Promise<{ stdout: string }> {
+  return new Promise((resolve, reject) => {
+    if (args.some(arg => !validateCommandArg(arg))) {
+      reject(new Error('Invalid command argument'))
+      return
+    }
+    const child = spawn(command, args, { stdio: ['pipe', 'pipe', 'pipe'] })
+    let stdout = ''
+    child.stdout?.on('data', (data) => { stdout += data.toString() })
+    child.on('close', (code) => {
+      if (code !== 0) reject(new Error(`Exit code: ${code}`))
+      else resolve({ stdout: stdout.trim() })
+    })
+  })
 }
 
 async function dokployFetch(path: string, options: RequestInit = {}) {

@@ -28,18 +28,27 @@ cp .env.example .env.local
 Edit `.env.local` with your values:
 
 ```bash
-# Generate a secret
-openssl rand -base64 32
+# Generate secrets
+openssl rand -base64 32  # For NEXTAUTH_SECRET
+openssl rand -base64 32  # For ENCRYPTION_KEY
 ```
 
 **Required for local dev:**
 - `DATABASE_URL` - Use default from .env.example
 - `NEXTAUTH_SECRET` - Generate with openssl
 - `NEXTAUTH_URL` - http://localhost:3000
+- `ENCRYPTION_KEY` - Required for API key encryption at rest (32 bytes base64)
 
 **Optional for local dev:**
 - Stripe keys - Only needed for payment testing
 - Dokploy keys - Only needed for provisioning testing
+
+**Rate Limiting Configuration:**
+```bash
+# Format: "count_minutes" (e.g., 100 requests per 15 minutes)
+RATE_LIMIT_AUTH=10_15      # Auth endpoints: 10 req per 15 min
+RATE_LIMIT_API=100_15      # General API: 100 req per 15 min
+```
 
 ### Database Setup
 

@@ -1,6 +1,6 @@
 import { env } from './env'
 import { prisma } from './prisma'
-import { exec } from 'child_process'
+import { exec, spawn } from 'child_process'
 import { promisify } from 'util'
 import { existsSync } from 'fs'
 import type { User, Instance } from '@prisma/client'
@@ -10,6 +10,119 @@ const execAsync = promisify(exec)
 
 // Detect if running in production (Docker socket available) or local dev
 const isProduction = existsSync('/var/run/docker.sock')
+const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID || 'clawdbot-nickdevmtl'
+const GCP_ZONE = process.env.GCP_ZONE || 'us-central1-a'
+
+// ============ SAFETY HELPERS ============
+
+/**
+ * Validate container name to prevent injection
+ * Only allows alphanumeric, hyphens, and underscores
+ */
+function validateContainerName(name: string): boolean {
+  return /^[a-zA-Z0-9_-]+$/.test(name) && name.length <= 64
+}
+
+/**
+ * Validate command arguments to prevent injection
+ * Only allows safe characters for CLI arguments
+ */
+function validateCommandArg(arg: string): boolean {
+  // Allow alphanumeric, hyphens, underscores, dots, slashes, colons
+  // Block: ; | & $ ` " ' \ < > ( ) { } [ ]
+  return /^[a-zA-Z0-9_.\/:=-]+$/.test(arg) && arg.length <= 256
+}
+
+/**
+ * Validate pairing code format
+ */
+function validatePairingCode(code: string): boolean {
+  return /^[a-zA-Z0-9]{4,32}$/.test(code)
+}
+
+/**
+ * Safe command execution using spawn instead of exec
+ * Prevents shell injection by using array arguments
+ */
+function execSafe(
+  command: string,
+  args: string[],
+  options?: { timeout?: number; cwd?: string }
+): Promise<{ stdout: string; stderr: string }> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      timeout: options?.timeout || 60000,
+      cwd: options?.cwd,
+      stdio: ['pipe', 'pipe', 'pipe'],
+    })
+
+    let stdout = ''
+    let stderr = ''
+
+    child.stdout?.on('data', (data) => {
+      stdout += data.toString()
+    })
+
+    child.stderr?.on('data', (data) => {
+      stderr += data.toString()
+    })
+
+    child.on('close', (code) => {
+      if (code !== 0) {
+        reject(
+          new Error(
+            `Command failed with code ${code}: ${stderr || 'Unknown error'}`
+          )
+        )
+      } else {
+        resolve({ stdout: stdout.trim(), stderr: stderr.trim() })
+      }
+    })
+
+    child.on('error', (error) => {
+      reject(error)
+    })
+  })
+}
+
+/**
+ * Execute Docker command with validation
+ * Uses spawn to prevent injection
+ */
+async function execDocker(
+  containerName: string,
+  args: string[],
+  useGcloud = false
+): Promise<{ stdout: string; stderr: string }> {
+  // Validate container name
+  if (!validateContainerName(containerName)) {
+    throw new Error('Invalid container name')
+  }
+
+  // Validate all args
+  for (const arg of args) {
+    if (!validateCommandArg(arg)) {
+      throw new Error('Invalid command argument')
+    }
+  }
+
+  if (useGcloud) {
+    // For gcloud, we need to wrap the docker command
+    const sshArgs = [
+      'compute', 'ssh', 'dokploy',
+      '--zone', GCP_ZONE,
+      '--project', GCP_PROJECT_ID,
+      '--command', `sudo docker exec ${containerName} ${args.join(' ')}`
+    ]
+    return execSafe('gcloud', sshArgs, { timeout: 60000 })
+  }
+
+  // Direct Docker execution
+  return execSafe('docker', ['exec', containerName, ...args], { timeout: 60000 })
+}
+
+// ============ DOKPLOY CONFIG ============
+
 const DOKPLOY_CONFIGURED = !!(env.DOKPLOY_URL && env.DOKPLOY_API_KEY)
 const DOKPLOY_BASE = env.DOKPLOY_URL ?? ''
 const HEADERS = {
@@ -94,11 +207,12 @@ async function createCompose(name: string, projectId: string, environmentId: str
   throw lastError instanceof Error ? lastError : new Error('Dokploy compose.create failed')
 }
 
+// ============ PUBLIC API ============
+
 export async function provisionInstance(user: User, instance: Instance) {
-  const slug = slugify(user.email!)  // e.g. nick-gmail-com
+  const slug = slugify(user.email!)
   const subdomain = `${slug}.nickybruno.com`
 
-  // Local Docker provisioning when Dokploy is not configured
   if (!DOKPLOY_CONFIGURED) {
     console.log(`[LOCAL] Provisioning ${slug} via Docker...`)
     try {
@@ -155,7 +269,7 @@ export async function provisionInstance(user: User, instance: Instance) {
       }),
     })
 
-    // 5. Add domain (Traefik handles SSL automatically)
+    // 5. Add domain
     await dokployFetch('/api/domain.create', {
       method: 'POST',
       body: JSON.stringify({
@@ -196,7 +310,6 @@ export async function provisionInstance(user: User, instance: Instance) {
 
 export async function deprovisionInstance(instance: Instance) {
   if (!DOKPLOY_CONFIGURED) {
-    // Local Docker cleanup
     await deprovisionLocal(instance)
   } else if (instance.dokployProjectId) {
     await dokployFetch('/api/project.remove', {
@@ -220,19 +333,22 @@ export async function execInContainer(composeId: string, command: string): Promi
     const compose = await dokployFetch(`/api/compose.one?composeId=${composeId}`)
     const containerName = `${compose.appName}-openclaw-1`
 
-    let execCommand: string
-    if (isProduction) {
-      // Production: Docker socket available
-      execCommand = `docker exec ${containerName} ${command} 2>&1`
-    } else {
-      // Local dev: Use SSH via gcloud
-      execCommand = `gcloud compute ssh dokploy --zone us-central1-a --project clawdbot-nickdevmtl --command "sudo docker exec ${containerName} ${command}" 2>&1`
+    // Split command into args safely
+    const commandArgs = command.split(' ').filter(arg => arg.length > 0)
+    
+    // Validate command args
+    if (commandArgs.some(arg => !validateCommandArg(arg))) {
+      return { success: false, error: 'Invalid command arguments' }
     }
 
-    const { stdout, stderr } = await execAsync(execCommand, { timeout: 60000 })
+    const { stdout, stderr } = await execDocker(
+      containerName,
+      commandArgs,
+      !isProduction
+    )
+
     const output = stdout || stderr
 
-    // Check for known error patterns
     if (output.includes('No pending pairing request') || output.includes('not found')) {
       return { success: false, error: 'Pairing code expired. Send a new message to the bot.' }
     }
@@ -242,7 +358,6 @@ export async function execInContainer(composeId: string, command: string): Promi
     const error = err instanceof Error ? err.message : 'Unknown error'
     console.error('execInContainer failed:', error)
 
-    // Extract meaningful error from output
     if (error.includes('No pending pairing request')) {
       return { success: false, error: 'Pairing code expired. Send a new message to the bot.' }
     }
@@ -256,15 +371,10 @@ export async function execInContainer(composeId: string, command: string): Promi
 
 export async function injectSkill(instance: Instance, mcpConfig: object) {
   if (!DOKPLOY_CONFIGURED) {
-    // For local, we'd need to restart the container with new config
-    // For now just log - full implementation would recreate container
     console.log(`[LOCAL] Skill injection requires container restart (not implemented)`)
     return
   }
-  // Restart compose with new env vars for the MCP skill
-  // Read current env, merge, update, redeploy
   if (!instance.dokployAppId) throw new Error('No composeId')
-  // TODO: fetch current compose, inject MCP server config, redeploy
   await dokployFetch('/api/compose.deploy', {
     method: 'POST',
     body: JSON.stringify({ composeId: instance.dokployAppId }),
@@ -273,10 +383,17 @@ export async function injectSkill(instance: Instance, mcpConfig: object) {
 
 export async function getGatewayToken(containerName: string): Promise<string | null> {
   try {
-    const { stdout } = await execAsync(
-      `docker exec ${containerName} node /app/openclaw.mjs config get gateway.auth.token`
+    if (!validateContainerName(containerName)) {
+      console.error('Invalid container name')
+      return null
+    }
+
+    const { stdout } = await execDocker(
+      containerName,
+      ['node', '/app/openclaw.mjs', 'config', 'get', 'gateway.auth.token'],
+      !isProduction
     )
-    // Output is JSON string like "abc123", need to parse it
+    
     const token = stdout.trim().replace(/^"|"$/g, '')
     return token || null
   } catch {
@@ -285,38 +402,52 @@ export async function getGatewayToken(containerName: string): Promise<string | n
 }
 
 export async function approvePairing(containerName: string, channel: string, pairingCode: string) {
-  // Validate pairing code format (alphanumeric)
-  if (!/^[a-zA-Z0-9]+$/.test(pairingCode)) {
+  // Validate inputs
+  if (!validateContainerName(containerName)) {
+    throw new Error('Invalid container name')
+  }
+  
+  if (!validateCommandArg(channel)) {
+    throw new Error('Invalid channel')
+  }
+  
+  if (!validatePairingCode(pairingCode)) {
     throw new Error('Invalid pairing code format')
   }
 
-  const cmd = `docker exec ${containerName} node /app/openclaw.mjs pairing approve ${channel} ${pairingCode}`
-  console.log(`[LOCAL] Approving pairing: ${channel} ${pairingCode}`)
+  console.log(`Approving pairing: ${channel} ${pairingCode}`)
 
-  const { stdout, stderr } = await execAsync(cmd)
+  const { stdout, stderr } = await execDocker(
+    containerName,
+    ['node', '/app/openclaw.mjs', 'pairing', 'approve', channel, pairingCode],
+    !isProduction
+  )
+
   if (stderr && !stdout) {
     throw new Error(stderr)
   }
 
-  console.log(`[LOCAL] Pairing approved:`, stdout)
+  console.log(`Pairing approved:`, stdout)
   return { success: true }
 }
 
 function buildComposeYaml({ slug, subdomain, channelToken, aiApiKey, aiProvider, model }: {
-  slug: string, subdomain: string, channelToken: string, aiApiKey: string, aiProvider: string, model?: string
+  slug: string
+  subdomain: string
+  channelToken: string
+  aiApiKey: string
+  aiProvider: string
+  model?: string
 }) {
-  // Map provider to correct env var name
   const aiKeyEnvVar = aiProvider === 'anthropic' ? 'ANTHROPIC_API_KEY' : 'OPENAI_API_KEY'
 
-  // Build environment variables
   const envVars = [
-    `TELEGRAM_BOT_TOKEN=${channelToken}`,
-    `${aiKeyEnvVar}=${aiApiKey}`,
+    `TELEGRAM_BOT_TOKEN=${escapeEnvVar(channelToken)}`,
+    `${aiKeyEnvVar}=${escapeEnvVar(aiApiKey)}`,
   ]
 
-  // Add model config if specified
   if (model) {
-    envVars.push(`OPENCLAW_MODEL=${model}`)
+    envVars.push(`OPENCLAW_MODEL=${escapeEnvVar(model)}`)
   }
 
   const envBlock = envVars.map(v => `      - ${v}`).join('\n')
@@ -343,6 +474,20 @@ networks:
 `.trim()
 }
 
+/**
+ * Escape environment variable values for Docker Compose YAML
+ * Prevents YAML injection
+ */
+function escapeEnvVar(value: string): string {
+  // Remove newlines and carriage returns
+  return value
+    .replace(/[\n\r]/g, '')
+    // Escape double quotes for YAML
+    .replace(/"/g, '\\"')
+    // Remove null bytes
+    .replace(/\0/g, '')
+}
+
 function slugify(email: string) {
   return email
     .toLowerCase()
@@ -358,10 +503,8 @@ const OPENCLAW_IMAGE = process.env.OPENCLAW_IMAGE || 'ghcr.io/openclaw/openclaw:
 const LOCAL_PORT_START = 4000
 
 async function getNextPort(): Promise<number> {
-  // Check both database AND running Docker containers for used ports
   const usedPorts = new Set<number>()
 
-  // Check database
   const instances = await prisma.instance.findMany({
     where: { appUrl: { startsWith: 'http://localhost:' } },
     select: { appUrl: true },
@@ -371,7 +514,6 @@ async function getNextPort(): Promise<number> {
     if (match) usedPorts.add(parseInt(match[1], 10))
   }
 
-  // Check running Docker containers (catches orphaned containers)
   try {
     const { stdout } = await execAsync('docker ps --format "{{.Ports}}" 2>/dev/null || true')
     const portMatches = stdout.matchAll(/0\.0\.0\.0:(\d+)->/g)
@@ -379,10 +521,9 @@ async function getNextPort(): Promise<number> {
       usedPorts.add(parseInt(match[1], 10))
     }
   } catch {
-    // Docker might not be available, continue with DB-only check
+    // Docker might not be available
   }
 
-  // Find next available port starting from LOCAL_PORT_START
   let port = LOCAL_PORT_START
   while (usedPorts.has(port)) {
     port++
@@ -394,10 +535,14 @@ async function provisionLocal(slug: string, instance: Instance) {
   const containerName = `openclaw-${slug}`
   const port = await getNextPort()
 
-  // Stop & remove existing container if any
+  // Validate slug to prevent injection
+  if (!/^[a-z0-9-]+$/.test(slug) || slug.length > 40) {
+    throw new Error('Invalid slug format')
+  }
+
+  // Stop & remove existing container
   await execAsync(`docker rm -f ${containerName} 2>/dev/null || true`)
 
-  // Map provider to standard env var name
   const getApiKeyEnvVar = (provider: string | null) => {
     switch (provider) {
       case 'anthropic': return 'ANTHROPIC_API_KEY'
@@ -407,36 +552,38 @@ async function provisionLocal(slug: string, instance: Instance) {
   }
   const apiKeyEnvVar = getApiKeyEnvVar(instance.aiProvider)
 
-  // Build docker run command (port 18789 is OpenClaw's gateway port)
-  // No volume mount - container manages its own state (ephemeral for local dev)
-  const envVars = [
-    `-e ${apiKeyEnvVar}=${instance.aiApiKey || ''}`,
-  ].join(' ')
+  // Use execSafe with array args instead of shell string
+  const dockerArgs = [
+    'run', '-d',
+    '--name', containerName,
+    '-p', `${port}:18789`,
+    '-e', `${apiKeyEnvVar}=${instance.aiApiKey || ''}`,
+    OPENCLAW_IMAGE
+  ]
 
-  const cmd = `docker run -d --name ${containerName} -p ${port}:18789 ${envVars} ${OPENCLAW_IMAGE}`
-
-  console.log(`[LOCAL] Running: docker run ... -p ${port}:18789 ${containerName}`)
-
-  const { stdout } = await execAsync(cmd)
+  console.log(`[LOCAL] Starting container ${containerName} on port ${port}`)
+  const { stdout } = await execSafe('docker', dockerArgs)
   const containerId = stdout.trim().slice(0, 12)
 
-  // Wait for gateway to initialize
-  console.log(`[LOCAL] Waiting 3s for gateway to initialize...`)
+  // Wait for gateway
   await new Promise(resolve => setTimeout(resolve, 3000))
 
-  // Configure secrets provider to read API keys from env vars
-  const secretsCmd = `docker exec ${containerName} node /app/openclaw.mjs config set secrets.providers.default --provider-source env --provider-allowlist OPENAI_API_KEY --provider-allowlist ANTHROPIC_API_KEY --provider-allowlist OPENROUTER_API_KEY`
-  console.log(`[LOCAL] Configuring secrets provider...`)
+  // Configure secrets provider
   try {
-    await execAsync(secretsCmd)
+    await execDocker(containerName, [
+      'node', '/app/openclaw.mjs', 'config', 'set', 'secrets.providers.default',
+      '--provider-source', 'env',
+      '--provider-allowlist', 'OPENAI_API_KEY',
+      '--provider-allowlist', 'ANTHROPIC_API_KEY',
+      '--provider-allowlist', 'OPENROUTER_API_KEY'
+    ])
   } catch {
-    console.log(`[LOCAL] Secrets config triggered restart, waiting...`)
+    console.log('[LOCAL] Secrets config triggered restart')
   }
 
-  // Wait for container to restart after config change
   await new Promise(resolve => setTimeout(resolve, 5000))
 
-  // Set default model based on provider
+  // Set default model
   const getDefaultModel = (provider: string | null) => {
     switch (provider) {
       case 'anthropic': return 'anthropic/claude-sonnet-4-6'
@@ -446,39 +593,45 @@ async function provisionLocal(slug: string, instance: Instance) {
   }
   const model = getDefaultModel(instance.aiProvider)
   console.log(`[LOCAL] Setting model: ${model}`)
+
   try {
-    // Use single quotes for the JSON value
-    await execAsync(`docker exec ${containerName} node /app/openclaw.mjs config set agents.defaults.model '"${model}"'`)
+    await execDocker(containerName, [
+      'node', '/app/openclaw.mjs', 'config', 'set', 'agents.defaults.model', `"${model}"`
+    ])
   } catch {
-    console.log(`[LOCAL] Model config triggered restart, waiting...`)
+    console.log('[LOCAL] Model config triggered restart')
   }
 
-  // Wait for restart
   await new Promise(resolve => setTimeout(resolve, 3000))
 
-  // Configure channel via CLI
+  // Add channel
   if (instance.channel && instance.channelToken) {
-    console.log(`[LOCAL] Adding channel: ${instance.channel}`)
-    try {
-      await execAsync(`docker exec ${containerName} node /app/openclaw.mjs channels add --channel ${instance.channel} --token ${instance.channelToken}`)
-    } catch {
-      console.log(`[LOCAL] Channel added (container restarting...)`)
+    const validChannels = ['telegram', 'discord', 'whatsapp']
+    if (validChannels.includes(instance.channel)) {
+      console.log(`[LOCAL] Adding channel: ${instance.channel}`)
+      try {
+        await execDocker(containerName, [
+          'node', '/app/openclaw.mjs', 'channels', 'add',
+          '--channel', instance.channel,
+          '--token', instance.channelToken
+        ])
+      } catch {
+        console.log('[LOCAL] Channel added (container may restart)')
+      }
     }
   }
 
-  // Final restart to ensure clean state
   await new Promise(resolve => setTimeout(resolve, 2000))
+
   try {
-    await execAsync(`docker restart ${containerName}`)
-    console.log(`[LOCAL] Container restarted`)
+    await execDocker(containerName, ['restart'])
+    console.log('[LOCAL] Container restarted')
   } catch {
-    console.log(`[LOCAL] Container already restarting...`)
+    console.log('[LOCAL] Container already restarting')
   }
 
-  // Wait for gateway to be ready
   await new Promise(resolve => setTimeout(resolve, 4000))
 
-  // Update DB
   await prisma.instance.update({
     where: { id: instance.id },
     data: {
@@ -495,7 +648,13 @@ async function provisionLocal(slug: string, instance: Instance) {
 async function deprovisionLocal(instance: Instance) {
   if (instance.dokployAppId) {
     const containerName = instance.dokployAppId
-    await execAsync(`docker rm -f ${containerName} 2>/dev/null || true`)
-    console.log(`[LOCAL] Stopped ${containerName}`)
+    if (validateContainerName(containerName)) {
+      try {
+        await execSafe('docker', ['rm', '-f', containerName])
+        console.log(`[LOCAL] Stopped ${containerName}`)
+      } catch (error) {
+        console.error(`[LOCAL] Failed to stop ${containerName}:`, error)
+      }
+    }
   }
 }
