@@ -20,7 +20,7 @@ interface DashboardHeaderProps {
 }
 
 const navItems = [
-  { href: '/dashboard', labelKey: 'chat' as const, icon: MessageSquare },
+  { href: '/chat', labelKey: 'chat' as const, icon: MessageSquare },
   { href: '/dashboard/settings', labelKey: 'settings' as const, icon: Settings },
   { href: '/dashboard/skills', labelKey: 'skills' as const, icon: Sparkles },
 ]

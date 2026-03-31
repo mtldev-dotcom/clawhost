@@ -287,7 +287,17 @@ export async function provisionInstance(user: User, instance: Instance) {
       body: JSON.stringify({ composeId }),
     })
 
-    // 7. Update DB
+    // 7. Get gateway token from container
+    const containerName = `openclaw-${slug}-openclaw-1`
+    let gatewayToken: string | null = null
+    try {
+      gatewayToken = await getGatewayToken(containerName)
+      console.log(`Retrieved gateway token for ${slug}`)
+    } catch (err) {
+      console.warn(`Failed to get gateway token for ${slug}:`, err)
+    }
+
+    // 8. Update DB
     await prisma.instance.update({
       where: { id: instance.id },
       data: {
@@ -295,6 +305,8 @@ export async function provisionInstance(user: User, instance: Instance) {
         appUrl: `https://${subdomain}`,
         dokployProjectId: projectId,
         dokployAppId: composeId,
+        containerHost: containerName,
+        gatewayToken: gatewayToken,
       },
     })
 
@@ -632,6 +644,15 @@ async function provisionLocal(slug: string, instance: Instance) {
 
   await new Promise(resolve => setTimeout(resolve, 4000))
 
+  // Get gateway token from local container
+  let gatewayToken: string | null = null
+  try {
+    gatewayToken = await getGatewayToken(containerName)
+    console.log(`[LOCAL] Retrieved gateway token for ${slug}`)
+  } catch (err) {
+    console.warn(`[LOCAL] Failed to get gateway token for ${slug}:`, err)
+  }
+
   await prisma.instance.update({
     where: { id: instance.id },
     data: {
@@ -639,6 +660,9 @@ async function provisionLocal(slug: string, instance: Instance) {
       appUrl: `http://localhost:${port}`,
       dokployProjectId: `local-${containerId}`,
       dokployAppId: containerName,
+      containerHost: 'localhost',
+      gatewayPort: port,
+      gatewayToken: gatewayToken,
     },
   })
 

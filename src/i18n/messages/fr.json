@@ -70,12 +70,13 @@
     "title": "Commencer une conversation",
     "subtitle": "Envoyez un message a votre agent IA. Vous pouvez egalement discuter via votre canal configure (Telegram, Discord, etc.)",
     "placeholder": "Ecrivez un message...",
-    "thinking": "Reflexion en cours...",
+    "thinking": "Reflexion...",
     "agentNotReady": "Agent non pret",
-    "pendingMessage": "Configurez votre agent dans les Parametres et deployez-le pour commencer a discuter.",
-    "provisioningMessage": "Votre agent est en cours de configuration. Cela prend generalement 1-2 minutes.",
-    "failedMessage": "La configuration de l'agent a echoue. Veuillez verifier les Parametres et reessayer.",
-    "cancelledMessage": "Votre agent a ete annule."
+    "pendingMessage": "Configurez votre agent dans les parametres et deployez-le pour commencer a discuter.",
+    "provisioningMessage": "Votre agent est en cours de configuration. Cela prend generalement 1 a 2 minutes.",
+    "failedMessage": "La configuration de l'agent a echoue. Verifiez les parametres et essayez de redeployer.",
+    "cancelledMessage": "Votre agent a ete annule.",
+    "welcomeMessage": "Votre agent est pret. Dites bonjour ! 👋"
   },
   "settings": {
     "title": "Parametres",

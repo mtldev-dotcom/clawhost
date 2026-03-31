@@ -9,7 +9,7 @@ services:
     environment:
       POSTGRES_USER: clawhost
       POSTGRES_PASSWORD: clawhost
-      POSTGRES_DB: clawhost
+      POSTGRES_DB: nestai-db
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

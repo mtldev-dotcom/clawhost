@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Loader2, Check, X, MessageSquare } from 'lucide-react'
+import { Loader2, Check, X } from 'lucide-react'
 
 type AiProvider = 'openai' | 'anthropic' | 'openrouter'
 
@@ -32,7 +32,6 @@ export default function OnboardingPage() {
   const router = useRouter()
   const t = useTranslations('onboarding')
   const tc = useTranslations('common')
-  const tch = useTranslations('channels')
   const tp = useTranslations('providers')
 
   const [step, setStep] = useState(1)
@@ -42,13 +41,9 @@ export default function OnboardingPage() {
   const [apiKeyValid, setApiKeyValid] = useState<boolean | null>(null)
 
   // Form state
-  const [channelToken, setChannelToken] = useState('')
   const [aiProvider, setAiProvider] = useState<AiProvider | null>(null)
   const [aiApiKey, setAiApiKey] = useState('')
   const [selectedModel, setSelectedModel] = useState<string | null>(null)
-  const [pairingCode, setPairingCode] = useState('')
-  const [botUsername, setBotUsername] = useState<string | null>(null)
-  const [deployed, setDeployed] = useState(false)
 
   const providers: { id: AiProvider }[] = [
     { id: 'openai' },
@@ -56,27 +51,7 @@ export default function OnboardingPage() {
     { id: 'openrouter' },
   ]
 
-  const totalSteps = 5
-
-  async function testTelegramToken() {
-    if (!channelToken) return
-    setTesting(true)
-    setError(null)
-    try {
-      const res = await fetch(`https://api.telegram.org/bot${channelToken}/getMe`)
-      const data = await res.json()
-      if (data.ok) {
-        setBotUsername(data.result.username)
-        setStep(2)
-      } else {
-        setError('Invalid Telegram bot token')
-      }
-    } catch {
-      setError('Failed to verify token')
-    } finally {
-      setTesting(false)
-    }
-  }
+  const totalSteps = 3
 
   async function testApiKey() {
     if (!aiProvider || !aiApiKey) return
@@ -94,7 +69,7 @@ export default function OnboardingPage() {
 
       if (data.valid) {
         setApiKeyValid(true)
-        setStep(3)
+        setStep(2)
       } else {
         setApiKeyValid(false)
         setError(data.error || 'Invalid API key')
@@ -107,8 +82,8 @@ export default function OnboardingPage() {
     }
   }
 
-  async function deployAndWaitForPairing() {
-    if (!selectedModel || !aiProvider || !aiApiKey || !channelToken) return
+  async function deployAgent() {
+    if (!selectedModel || !aiProvider || !aiApiKey) return
     setLoading(true)
     setError(null)
 
@@ -118,8 +93,6 @@ export default function OnboardingPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          channel: 'telegram',
-          channelToken,
           aiProvider,
           aiApiKey,
           activeModel: selectedModel,
@@ -139,38 +112,11 @@ export default function OnboardingPage() {
         throw new Error(data.error || 'Failed to start deployment')
       }
 
-      setDeployed(true)
-      setStep(4)
+      setStep(3)
+      // Redirect to chat after short delay
+      setTimeout(() => router.push('/chat'), 2000)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Deployment failed')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function approvePairing() {
-    if (!pairingCode.trim()) return
-    setLoading(true)
-    setError(null)
-
-    try {
-      const res = await fetch('/api/onboarding/approve-pairing', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: pairingCode.trim().toUpperCase() }),
-      })
-
-      const data = await res.json()
-
-      if (data.success) {
-        setStep(5)
-        // Redirect to dashboard after short delay
-        setTimeout(() => router.push('/dashboard'), 2000)
-      } else {
-        setError(data.error || 'Failed to approve pairing')
-      }
-    } catch {
-      setError('Failed to approve pairing')
     } finally {
       setLoading(false)
     }
@@ -181,11 +127,9 @@ export default function OnboardingPage() {
       <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle>
-            {step === 1 && 'Connect Telegram Bot'}
-            {step === 2 && 'Configure AI Provider'}
-            {step === 3 && 'Select Model'}
-            {step === 4 && 'Authorize Your Account'}
-            {step === 5 && 'Setup Complete!'}
+            {step === 1 && 'Configure AI Provider'}
+            {step === 2 && 'Select Model'}
+            {step === 3 && 'Success!'}
           </CardTitle>
           <div className="flex gap-2 mt-4">
             {Array.from({ length: totalSteps }, (_, i) => i + 1).map((s) => (
@@ -205,35 +149,8 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Step 1: Telegram Token */}
+          {/* Step 1: Provider + API Key */}
           {step === 1 && (
-            <div className="space-y-4">
-              <p className="text-gray-600">
-                Enter your Telegram bot token from @BotFather
-              </p>
-              <div className="space-y-2">
-                <Label htmlFor="channelToken">Bot Token</Label>
-                <Input
-                  id="channelToken"
-                  type="password"
-                  placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
-                  value={channelToken}
-                  onChange={(e) => setChannelToken(e.target.value)}
-                />
-              </div>
-              <Button
-                onClick={testTelegramToken}
-                disabled={!channelToken || testing}
-                className="w-full"
-              >
-                {testing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Verify & Continue
-              </Button>
-            </div>
-          )}
-
-          {/* Step 2: Provider + API Key */}
-          {step === 2 && (
             <div className="space-y-4">
               <p className="text-gray-600">
                 Select your AI provider and enter your API key
@@ -283,24 +200,19 @@ export default function OnboardingPage() {
                   </div>
                 </div>
               )}
-              <div className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep(1)}>
-                  {tc('back')}
-                </Button>
-                <Button
-                  onClick={testApiKey}
-                  disabled={!aiProvider || !aiApiKey || testing}
-                  className="flex-1"
-                >
-                  {testing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Test & Continue
-                </Button>
-              </div>
+              <Button
+                onClick={testApiKey}
+                disabled={!aiProvider || !aiApiKey || testing}
+                className="w-full"
+              >
+                {testing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Test & Continue
+              </Button>
             </div>
           )}
 
-          {/* Step 3: Model Selection */}
-          {step === 3 && aiProvider && (
+          {/* Step 2: Model Selection & Deploy */}
+          {step === 2 && aiProvider && (
             <div className="space-y-4">
               <p className="text-gray-600">
                 Choose which model your agent will use
@@ -321,11 +233,11 @@ export default function OnboardingPage() {
                 ))}
               </div>
               <div className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep(2)}>
+                <Button variant="outline" onClick={() => setStep(1)}>
                   {tc('back')}
                 </Button>
                 <Button
-                  onClick={deployAndWaitForPairing}
+                  onClick={deployAgent}
                   disabled={!selectedModel || loading}
                   className="flex-1"
                 >
@@ -336,53 +248,15 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Step 4: Pairing */}
-          {step === 4 && (
-            <div className="space-y-4">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <MessageSquare className="h-5 w-5 text-blue-600 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-blue-900">
-                      Message your bot on Telegram
-                    </p>
-                    <p className="text-sm text-blue-700 mt-1">
-                      Send any message to{' '}
-                      <span className="font-mono font-bold">@{botUsername}</span>{' '}
-                      and copy the pairing code it sends back.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="pairingCode">Pairing Code</Label>
-                <Input
-                  id="pairingCode"
-                  placeholder="e.g. ABC123XY"
-                  value={pairingCode}
-                  onChange={(e) => setPairingCode(e.target.value.toUpperCase())}
-                  className="font-mono text-center text-lg tracking-wider"
-                />
-              </div>
-              <Button
-                onClick={approvePairing}
-                disabled={!pairingCode.trim() || loading}
-                className="w-full"
-              >
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Complete Setup
-              </Button>
-            </div>
-          )}
-
-          {/* Step 5: Success */}
-          {step === 5 && (
+          {/* Step 3: Success */}
+          {step === 3 && (
             <div className="text-center space-y-4">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
                 <Check className="h-8 w-8 text-green-600" />
               </div>
+              <h2 className="text-xl font-semibold">Your agent is ready!</h2>
               <p className="text-gray-600">
-                Your agent is ready! Redirecting to dashboard...
+                Redirecting to your chat dashboard...
               </p>
             </div>
           )}
