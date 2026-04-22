@@ -474,7 +474,7 @@ test.describe('Onboarding — platform model selection', () => {
 
 **Mark complete when:** All three verification items pass.
 
-- [ ] M0-7
+- [x] M0-7
 
 ---
 

@@ -6,19 +6,19 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `1c3d1a6 test: retire stale Playwright specs for old channel-first onboarding UI`
+**Last commit:** `PENDING_COMMIT`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
-**State:** M0-6 complete, ready for TASK M0-7
+**State:** M0-7 complete, ready for TASK M0-8
 **Updated:** 2026-04-22
 
 ---
 
 ## Next suggested task
 
-`TASK M0-7` — Add replacement Playwright spec: onboarding model-select flow
+`TASK M0-8` — Add replacement Playwright spec: workspace shell smoke
 
-See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M0-7`.
+See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M0-8`.
 
 ---
 
@@ -39,19 +39,18 @@ See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M
 
 ## Context at handoff time
 
-TASK M0-6 completed on `dev-claude`.
+TASK M0-7 completed on `dev-claude`.
 
 Verified in this session:
 - `git status` was clean
 - `git branch --show-current` returned `dev-claude`
 - `node --version` returned `v24.14.1`
 - `npm run db:up` succeeded
-- preflight staleness checks returned `6`, `1`, and `1`
-- deleted stale Playwright specs `tests/e2e/onboarding/wizard.spec.ts` and `tests/e2e/dashboard/settings.spec.ts`
+- created `tests/e2e/onboarding/model-select.spec.ts` with the exact task content
+- `npm run lint` exited 0 with warnings only
 - `npm run test:run` exited 0
-- `npm run build` exited 0
-- `ls tests/e2e/onboarding/wizard.spec.ts` returned `No such file or directory`
-- committed and pushed `1c3d1a6 test: retire stale Playwright specs for old channel-first onboarding UI` to `origin/dev-claude`
+- `ls tests/e2e/onboarding/model-select.spec.ts` returned the file path
+- plan updated to mark `M0-7` complete
 
 `progress-report.md` includes the raw command output for this session.
-Next agent should start at TASK M0-7 and follow the same contract.
+Next agent should start at TASK M0-8 and follow the same contract.
