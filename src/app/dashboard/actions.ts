@@ -35,7 +35,9 @@ export async function approveChannelPairing(pairingCode: string) {
     throw new Error('No instance found')
   }
 
-  if (!instance.dokployAppId) {
+  const containerName = instance.containerHost ?? instance.dokployAppId
+
+  if (!containerName) {
     throw new Error('Instance not deployed')
   }
 
@@ -43,7 +45,7 @@ export async function approveChannelPairing(pairingCode: string) {
     throw new Error('No channel configured')
   }
 
-  await approvePairing(instance.dokployAppId, instance.channel, pairingCode)
+  await approvePairing(containerName, instance.channel, pairingCode)
 
   revalidatePath('/dashboard')
   return { success: true }
@@ -59,11 +61,13 @@ export async function getOpenClawDashboardUrl() {
     where: { userId: session.user.id },
   })
 
-  if (!instance || !instance.dokployAppId || !instance.appUrl) {
+  const containerName = instance?.containerHost ?? instance?.dokployAppId
+
+  if (!instance || !containerName || !instance.appUrl) {
     throw new Error('Instance not deployed')
   }
 
-  const token = await getGatewayToken(instance.dokployAppId)
+  const token = await getGatewayToken(containerName)
   if (!token) {
     throw new Error('Could not retrieve gateway token')
   }

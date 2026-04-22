@@ -8,7 +8,7 @@ import { NextIntlClientProvider } from 'next-intl'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'NestAI - Your AI. Running 24/7.',
+  title: 'ClawHost - Your AI. Running 24/7.',
   description: 'Get a hosted AI agent instance in 60 seconds',
 }
 

@@ -313,7 +313,13 @@ export async function deployInstance() {
   }
 
   // Trigger provisioning (runs async, don't await)
-  provisionInstance(user, updatedInstance).catch(console.error)
+  provisionInstance(user, updatedInstance).catch(async (error) => {
+    console.error('Provisioning failed:', error)
+    await prisma.instance.update({
+      where: { id: updatedInstance.id },
+      data: { status: 'failed' },
+    })
+  })
 
   revalidatePath('/dashboard/settings')
   revalidatePath('/dashboard')

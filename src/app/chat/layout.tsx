@@ -29,7 +29,7 @@ export default async function ChatLayout({
   ])
 
   const translations = {
-    nav: (messages as { nav: { chat: string; settings: string; skills: string } }).nav,
+    nav: (messages as { nav: { workspace: string; chat: string; settings: string; skills: string } }).nav,
     common: (messages as { common: { signOut: string } }).common,
   }
 

@@ -39,7 +39,13 @@ export async function POST(req: Request) {
 
     // Provision async (don't await — respond to Stripe fast)
     const user = await prisma.user.findUnique({ where: { id: userId } })
-    provisionInstance(user!, instance).catch(console.error)
+    provisionInstance(user!, instance).catch(async (error) => {
+      console.error('Provisioning failed from Stripe webhook:', error)
+      await prisma.instance.update({
+        where: { id: instance.id },
+        data: { status: 'failed' },
+      })
+    })
   }
 
   if (event.type === 'customer.subscription.deleted') {

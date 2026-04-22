@@ -331,7 +331,14 @@ export async function deprovisionInstance(instance: Instance) {
   }
   await prisma.instance.update({
     where: { id: instance.id },
-    data: { status: 'cancelled', appUrl: null, dokployProjectId: null, dokployAppId: null },
+    data: {
+      status: 'cancelled',
+      appUrl: null,
+      dokployProjectId: null,
+      dokployAppId: null,
+      containerHost: null,
+      gatewayToken: null,
+    },
   })
 }
 

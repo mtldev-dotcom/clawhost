@@ -82,6 +82,7 @@ export default function RegisterPage() {
                 id="name"
                 type="text"
                 placeholder={t('namePlaceholder')}
+                name="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 disabled={loading}
@@ -93,6 +94,7 @@ export default function RegisterPage() {
                 id="email"
                 type="email"
                 placeholder={t('emailPlaceholder')}
+                name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -105,6 +107,7 @@ export default function RegisterPage() {
                 id="password"
                 type="password"
                 placeholder={t('createPasswordPlaceholder')}
+                name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required

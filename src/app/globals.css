@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* ============================================
-   NestAI Brand System
+   ClawHost Brand System
    ============================================ */
 
 @layer base {
@@ -17,7 +17,7 @@
     --color-surface: 0 0% 8%;
     --color-subtle: 40 8% 91%;
 
-    /* shadcn/ui tokens → NestAI mapping */
+    /* shadcn/ui tokens → ClawHost mapping */
     --background: 40 14% 97%;        /* chalk */
     --foreground: 0 0% 4%;           /* ink */
     --card: 0 0% 100%;               /* white */
@@ -80,7 +80,7 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* NestAI: No shadows on focus, use ring */
+  /* ClawHost: No shadows on focus, use ring */
   *:focus-visible {
     @apply outline-none ring-2 ring-emerald ring-offset-2 ring-offset-background;
   }

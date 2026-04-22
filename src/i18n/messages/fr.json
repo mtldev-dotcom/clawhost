@@ -21,6 +21,7 @@
     "invalid": "Invalide"
   },
   "nav": {
+    "workspace": "Espace",
     "chat": "Chat",
     "settings": "Parametres",
     "skills": "Competences"
@@ -48,7 +49,7 @@
     "signInDescription": "Entrez votre email et mot de passe pour acceder a votre compte",
     "signingIn": "Connexion en cours...",
     "createAccount": "Creer un compte",
-    "createAccountDescription": "Entrez vos informations pour commencer avec NestAI",
+    "createAccountDescription": "Entrez vos informations pour commencer avec ClawHost",
     "creatingAccount": "Creation du compte...",
     "email": "Email",
     "emailPlaceholder": "vous@exemple.com",

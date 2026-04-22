@@ -1,13 +1,19 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
+
+async function waitForHydration(page: Page) {
+  await page.waitForLoadState('domcontentloaded')
+  await page.waitForTimeout(5000)
+}
 
 test.describe('Signup Flow', () => {
-  const uniqueEmail = () => `test-${Date.now()}@example.com`
+  const uniqueEmail = () => `test-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`
 
   test('successful signup redirects to onboarding', async ({ page }) => {
     const email = uniqueEmail()
 
     await page.goto('/register')
     await expect(page).toHaveURL('/register')
+    await waitForHydration(page)
 
     // Fill form
     await page.fill('input[type="email"]', email)
@@ -30,6 +36,7 @@ test.describe('Signup Flow', () => {
 
     // Try to register with same email via UI
     await page.goto('/register')
+    await waitForHydration(page)
     await page.fill('input[type="email"]', email)
     await page.fill('input[type="password"]', 'TestPassword123!')
     await page.click('button[type="submit"]')
@@ -40,6 +47,7 @@ test.describe('Signup Flow', () => {
 
   test('shows validation for short password', async ({ page }) => {
     await page.goto('/register')
+    await waitForHydration(page)
 
     await page.fill('input[type="email"]', uniqueEmail())
     await page.fill('input[type="password"]', 'short')
@@ -52,6 +60,7 @@ test.describe('Signup Flow', () => {
 
   test('form is disabled during submission', async ({ page }) => {
     await page.goto('/register')
+    await waitForHydration(page)
 
     await page.fill('input[type="email"]', uniqueEmail())
     await page.fill('input[type="password"]', 'TestPassword123!')
@@ -65,6 +74,7 @@ test.describe('Signup Flow', () => {
 
   test('link to login page works', async ({ page }) => {
     await page.goto('/register')
+    await waitForHydration(page)
 
     await page.click('a[href="/login"]')
     await expect(page).toHaveURL('/login')

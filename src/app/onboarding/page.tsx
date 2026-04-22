@@ -113,8 +113,8 @@ export default function OnboardingPage() {
       }
 
       setStep(3)
-      // Redirect to chat after short delay
-      setTimeout(() => router.push('/chat'), 2000)
+      // Redirect to workspace after short delay
+      setTimeout(() => router.push('/dashboard/workspace'), 2000)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Deployment failed')
     } finally {
@@ -254,9 +254,9 @@ export default function OnboardingPage() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
                 <Check className="h-8 w-8 text-green-600" />
               </div>
-              <h2 className="text-xl font-semibold">Your agent is ready!</h2>
+              <h2 className="text-xl font-semibold">Your workspace is ready!</h2>
               <p className="text-gray-600">
-                Redirecting to your chat dashboard...
+                Redirecting to your workspace...
               </p>
             </div>
           )}
