@@ -8,6 +8,7 @@ ClawHost is now being reshaped into a PageBase-style workspace product on top of
 - **Typed Pages** - Create Standard, Database, Board, Dashboard, and Capture pages from the workspace shell
 - **Database Primitives** - Database pages now store starter field schema and simple rows inside `Page.content`
 - **Workspace Files Foundation** - Root workspace folders now bootstrap automatically as the first cut of the file system layer
+- **Workspace Files API** - Authenticated listing and multipart upload route now exist at `/api/workspace/files`
 - **Instant Provisioning** - Hosted OpenClaw instances deployed via Dokploy
 - **Custom Subdomains** - Each user gets `username.nickybruno.com`
 - **Channel Integration** - Connect Telegram, Discord, or WhatsApp
@@ -188,6 +189,7 @@ clawhost/
 | `/api/instance` | GET/PATCH | Get/update instance config |
 | `/api/skills` | GET/POST | List skills / toggle skill |
 | `/dashboard/workspace` | GET | Authenticated workspace shell with default page tree |
+| `/api/workspace/files` | GET, POST | List workspace files/folders and upload new files |
 
 ## Documentation
 

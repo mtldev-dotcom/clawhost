@@ -49,6 +49,18 @@
 - [ ] Featured/popular skills
 - [ ] Usage tracking per skill
 
+## Workspace Productization
+
+### Step 2.1, in progress
+- [x] Workspace/page shell foundation
+- [x] Typed pages + database starter schema
+- [x] Database rows + simple table rendering
+- [x] Workspace folder/file schema foundation
+- [x] Authenticated workspace files list/upload API foundation
+- [ ] Workspace file upload UI
+- [ ] File download/delete/search
+- [ ] Agent MCP workspace read/write hooks
+
 ## Phase 3: Advanced Features
 
 ### Multi-tenancy

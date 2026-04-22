@@ -174,6 +174,19 @@ Allow selected page title + notes editing backed by `Page.content`
 Allow database pages to carry starter schema primitives (fields + rows, with richer views next) inside `Page.content`
     ↓
 Start the file-system layer with `WorkspaceFolder` + `WorkspaceFile` foundations for uploads, search, and agent write access
+    ↓
+Expose authenticated `/api/workspace/files` list + upload endpoints backed by a local storage boundary
+```
+
+### Workspace Files API
+```
+/dashboard/workspace
+    ↓
+Workspace file state bootstraps root folders
+    ↓
+GET /api/workspace/files lists folders + files for the authenticated user
+    ↓
+POST /api/workspace/files accepts multipart upload, writes bytes to the storage root, and creates a WorkspaceFile record
 ```
 
 ### Skill Activation

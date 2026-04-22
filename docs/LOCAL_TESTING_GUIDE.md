@@ -212,6 +212,8 @@ After signing in with any valid account:
 9. Create a subpage under it
 10. Archive the child page and confirm it disappears from the active tree
 11. Confirm the workspace shows bootstrapped root folders for the file-system layer (Inbox, Projects, Notes)
+12. POST a small text file to `/api/workspace/files` and confirm it returns a created file record
+13. GET `/api/workspace/files` and confirm the uploaded file appears in the response
 
 ### Test 6: Complete End-to-End User Flow (Sign Up → Chat via Telegram)
 
