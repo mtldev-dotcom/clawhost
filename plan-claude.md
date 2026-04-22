@@ -309,7 +309,7 @@ grep -r "onboarding/approve-pairing" tests/ --include="*.ts"
 
 **Mark complete when:** Both verification items pass.
 
-- [ ] M0-4
+- [x] M0-4
 
 ---
 

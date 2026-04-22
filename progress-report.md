@@ -507,3 +507,134 @@
 - Open blockers: none
 
 ---
+
+## Session 2026-04-22 22:40 UTC — OpenClaw subagent
+**Starting branch:** `dev-claude`
+**Starting commit:** `242b292 chore: delete dead dashboard UI components (AiSetup, ChannelSetup, ChatInterface, InstanceCard)`
+**Plan version:** `plan-claude.md @ 242b292`
+
+### Task: M0-4 — Delete dead API routes (test-provider, approve-pairing)
+- Started: 22:40 UTC
+- Files touched: `src/app/api/onboarding/approve-pairing/route.ts` (deleted), `src/app/api/onboarding/test-provider/route.ts` (deleted), `progress-report.md`, `plan-claude.md`, `docs/HANDOFF.md`
+- Steps run (literal copy from plan-claude.md):
+  1. Run all four preflight greps.
+  2. Delete the directories:
+     ```bash
+     rm -rf src/app/api/onboarding/test-provider
+     rm -rf src/app/api/onboarding/approve-pairing
+     ```
+  3. Check if `src/app/api/onboarding/` is now empty:
+     ```bash
+     ls src/app/api/onboarding/
+     ```
+     If it is empty, delete the parent dir too:
+     ```bash
+     rmdir src/app/api/onboarding/
+     ```
+  4. Run `npm run build`.
+- Verification commands + raw output (paste exact terminal output, do not summarize):
+  ```
+  $ git status
+  On branch dev-claude
+  Your branch is up to date with 'origin/dev-claude'.
+  
+  nothing to commit, working tree clean
+  
+  $ git branch --show-current
+  dev-claude
+  
+  $ node --version
+  v24.14.1
+  
+  $ npm run db:up
+  > clawhost@0.1.0 db:up
+  > docker compose -f docker-compose.dev.yml up -d
+  
+  time="2026-04-22T18:40:59-04:00" level=warning msg="/home/mtldev/active-dev-projects/clawhost/docker-compose.dev.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+   Container clawhost-postgres-1 Running 
+  
+  $ grep -r "onboarding/test-provider" src/ --include="*.ts" --include="*.tsx"
+  
+  $ grep -r "onboarding/approve-pairing" src/ --include="*.ts" --include="*.tsx"
+  
+  $ grep -r "onboarding/test-provider" tests/ --include="*.ts"
+  tests/e2e/onboarding/wizard.spec.ts:    await page.route('**/api/onboarding/test-provider', async (route) => {
+  tests/e2e/dashboard/settings.spec.ts:  await page.route('**/api/onboarding/test-provider', async (route) => {
+  
+  $ grep -r "onboarding/approve-pairing" tests/ --include="*.ts"
+  
+  $ ls src/app/api/onboarding/
+  
+  $ rmdir src/app/api/onboarding/
+  
+  $ npm run build
+  > clawhost@0.1.0 build
+  > next build
+  
+     ▲ Next.js 15.5.14
+     - Environments: .env.local, .env
+     - Experiments (use with caution):
+       · serverActions
+  
+     Creating an optimized production build ...
+   ✓ Compiled successfully in 3.6s
+     Skipping validation of types
+     Skipping linting
+     Collecting page data ...
+     Generating static pages (0/12) ...
+     Generating static pages (3/12) 
+     Generating static pages (6/12) 
+     Generating static pages (9/12) 
+   ✓ Generating static pages (12/12)
+  [WS] Cleaning up connections...
+     Finalizing page optimization ...
+     Collecting build traces ...
+  [WS] Cleaning up connections...
+  
+  Route (app)                                 Size  First Load JS
+  ┌ ƒ /                                    2.11 kB         128 kB
+  ├ ƒ /_not-found                            993 B         103 kB
+  ├ ƒ /api/auth/[...nextauth]                154 B         102 kB
+  ├ ƒ /api/auth/register                     154 B         102 kB
+  ├ ƒ /api/chat/history                      154 B         102 kB
+  ├ ƒ /api/chat/send                         154 B         102 kB
+  ├ ƒ /api/instance                          154 B         102 kB
+  ├ ƒ /api/provision                         154 B         102 kB
+  ├ ƒ /api/skills                            154 B         102 kB
+  ├ ƒ /api/stripe/checkout                   154 B         102 kB
+  ├ ƒ /api/stripe/webhook                    154 B         102 kB
+  ├ ƒ /api/user/locale                       154 B         102 kB
+  ├ ƒ /api/workspace/files                   154 B         102 kB
+  ├ ƒ /api/workspace/files/[id]/download     154 B         102 kB
+  ├ ƒ /chat                                3.64 kB         126 kB
+  ├ ƒ /dashboard                             154 B         102 kB
+  ├ ƒ /dashboard/settings                  3.88 kB         114 kB
+  ├ ƒ /dashboard/skills                       2 kB         104 kB
+  ├ ƒ /dashboard/workspace                  2.7 kB         116 kB
+  ├ ƒ /login                                  2 kB         130 kB
+  ├ ƒ /onboarding                          3.44 kB         113 kB
+  └ ƒ /register                            2.15 kB         130 kB
+  + First Load JS shared by all             102 kB
+    ├ chunks/255-38b49df12a94ee57.js         46 kB
+    ├ chunks/4bd1b696-c023c6e3521b1417.js  54.2 kB
+    └ other shared chunks (total)          1.93 kB
+  
+  
+  ƒ Middleware                             45.7 kB
+  
+  ƒ  (Dynamic)  server-rendered on demand
+  
+  $ ls src/app/api/onboarding/
+  ls: cannot access 'src/app/api/onboarding/': No such file or directory
+  ```
+- Result: ✅ complete
+- Commit (if task completed): PENDING
+
+### Session end
+- Ending branch: `dev-claude`
+- Ending commit: PENDING
+- Tasks completed this session: `M0-4`
+- Next task to pick up: `M0-5`
+- Open blockers: none
+
+---
