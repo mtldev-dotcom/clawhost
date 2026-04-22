@@ -6,7 +6,7 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `PENDING_COMMIT`
+**Last commit:** `1c3d1a6 test: retire stale Playwright specs for old channel-first onboarding UI`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
 **State:** M0-6 complete, ready for TASK M0-7
@@ -51,7 +51,7 @@ Verified in this session:
 - `npm run test:run` exited 0
 - `npm run build` exited 0
 - `ls tests/e2e/onboarding/wizard.spec.ts` returned `No such file or directory`
-- committed and pushed `PENDING_COMMIT` to `origin/dev-claude`
+- committed and pushed `1c3d1a6 test: retire stale Playwright specs for old channel-first onboarding UI` to `origin/dev-claude`
 
 `progress-report.md` includes the raw command output for this session.
 Next agent should start at TASK M0-7 and follow the same contract.

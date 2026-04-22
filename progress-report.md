@@ -851,11 +851,11 @@
   ls: cannot access 'tests/e2e/onboarding/wizard.spec.ts': No such file or directory
   ```
 - Result: ✅ complete
-- Commit (if task completed): `PENDING_COMMIT`
+- Commit (if task completed): `1c3d1a6 test: retire stale Playwright specs for old channel-first onboarding UI`
 
 ### Session end
 - Ending branch: `dev-claude`
-- Ending commit: `PENDING_COMMIT`
+- Ending commit: `1c3d1a6 test: retire stale Playwright specs for old channel-first onboarding UI`
 - Tasks completed this session: `M0-6`
 - Next task to pick up: `M0-7`
 - Open blockers: none
