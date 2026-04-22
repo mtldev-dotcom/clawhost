@@ -6,7 +6,7 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `413236a chore: close milestone M0 — clean foundation verified`
+**Last commit:** `d29e6a3 chore: close milestone M0 — clean foundation verified`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
 **State:** M0 complete, next milestone M1

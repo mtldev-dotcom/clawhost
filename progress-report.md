@@ -1274,7 +1274,7 @@
   ƒ  (Dynamic)  server-rendered on demand
   ```
 - Result: ✅ complete
-- Commit (if task completed): `413236a chore: close milestone M0 — clean foundation verified`
+- Commit (if task completed): `d29e6a3 chore: close milestone M0 — clean foundation verified`
 
 ### M0 — Clean Foundation
 - Status: 🟢 done
@@ -1396,7 +1396,7 @@
 
 ### Session end
 - Ending branch: `dev-claude`
-- Ending commit: `413236a chore: close milestone M0 — clean foundation verified`
+- Ending commit: `d29e6a3 chore: close milestone M0 — clean foundation verified`
 - Tasks completed this session: `M0-10`
 - Next task to pick up: `M1-1`
 - Open blockers: none
