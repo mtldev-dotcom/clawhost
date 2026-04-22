@@ -1402,3 +1402,96 @@
 - Open blockers: none
 
 ---
+
+## Session 2026-04-22 23:29 UTC — OpenClaw subagent clawhost-m1-1
+**Starting branch:** `dev-claude`
+**Starting commit:** `0586ef7 docs: sync handoff and progress after M0-10`
+**Plan version:** plan-claude.md @ `0586ef7`
+
+### Task: M1-1 — Create schema cleanup migration
+- Started: 23:29 UTC
+- Files touched: `progress-report.md`, `docs/HANDOFF.md`
+- Steps run (literal copy from plan-claude.md):
+  1. Run all five preflight greps and review results.
+  2. Edit `prisma/schema.prisma`:
+     - Remove the four fields from `Instance` model.
+     - Remove `providers ProviderConfig[]` relation from `Instance`.
+     - Remove the entire `ProviderConfig` model block.
+  3. Run `npx prisma migrate dev --name remove_deprecated_instance_fields`
+     - This will only work against local Postgres. If you get a connection error → STOP EVENT.
+  4. Run `npx prisma generate`.
+  5. Run `npm run build`.
+  6. Run `npm run test:run`.
+- Verification commands + raw output (paste exact terminal output, do not summarize):
+  ```
+  $ git status
+  On branch dev-claude
+  Your branch is up to date with 'origin/dev-claude'.
+  
+  nothing to commit, working tree clean
+  
+  $ git branch --show-current
+  dev-claude
+  
+  $ node --version
+  v24.14.1
+  
+  $ npm run db:up
+  > clawhost@0.1.0 db:up
+  > docker compose -f docker-compose.dev.yml up -d
+  
+  time="2026-04-22T19:29:40-04:00" level=warning msg="/home/mtldev/active-dev-projects/clawhost/docker-compose.dev.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+   Container clawhost-postgres-1 Running
+  
+  $ grep -r "ProviderConfig" src/ --include="*.ts" --include="*.tsx"
+  
+  $ grep -r "\.channel\b" src/ --include="*.ts" --include="*.tsx"
+  src/app/api/instance/route.ts:        channel: user.instance.channel,
+  src/app/dashboard/actions.ts:  if (!instance.channel) {
+  src/app/dashboard/actions.ts:  await approvePairing(containerName, instance.channel, pairingCode)
+  src/lib/dokploy.ts:  if (instance.channel && instance.channelToken) {
+  src/lib/dokploy.ts:    if (validChannels.includes(instance.channel)) {
+  src/lib/dokploy.ts:      console.log(`[LOCAL] Adding channel: ${instance.channel}`)
+  src/lib/dokploy.ts:          '--channel', instance.channel,
+  
+  $ grep -r "channelToken" src/ --include="*.ts" --include="*.tsx"
+  src/app/api/instance/route.ts:    const { channel, channelToken, aiProvider, aiApiKey, activeModel } = await req.json()
+  src/app/api/instance/route.ts:          channelToken,
+  src/app/api/instance/route.ts:        ...(channelToken !== undefined && { channelToken }),
+  src/lib/dokploy.ts:      channelToken: instance.channelToken ?? '',
+  src/lib/dokploy.ts:function buildComposeYaml({ slug, subdomain, channelToken, aiApiKey, aiProvider, model }: {
+  src/lib/dokploy.ts:  channelToken: string
+  src/lib/dokploy.ts:  if (channelToken) {
+  src/lib/dokploy.ts:    envVars.push(`TELEGRAM_BOT_TOKEN=${escapeEnvVar(channelToken)}`)
+  src/lib/dokploy.ts:  if (instance.channel && instance.channelToken) {
+  src/lib/dokploy.ts:          '--token', instance.channelToken
+  
+  $ grep -r "aiApiKey" src/ --include="*.ts" --include="*.tsx"
+  src/app/api/instance/route.ts:    const { channel, channelToken, aiProvider, aiApiKey, activeModel } = await req.json()
+  src/app/api/instance/route.ts:          aiApiKey,
+  src/app/api/instance/route.ts:        ...(aiApiKey !== undefined && { aiApiKey }),
+  src/lib/dokploy.ts:      aiApiKey: instance.aiApiKey ?? '',
+  src/lib/dokploy.ts:function buildComposeYaml({ slug, subdomain, channelToken, aiApiKey, aiProvider, model }: {
+  src/lib/dokploy.ts:  aiApiKey: string
+  src/lib/dokploy.ts:  const effectiveAiApiKey = getEffectiveAiApiKey(aiProvider, aiApiKey)
+  src/lib/dokploy.ts:  const effectiveAiApiKey = getEffectiveAiApiKey(instance.aiProvider, instance.aiApiKey)
+  
+  $ grep -r "telegramChannelId" src/ --include="*.ts" --include="*.tsx"
+  ```
+- Result: ❌ blocked
+- Commit (if task completed): none
+
+### STOP EVENT (add this section only if a stop trigger fired)
+- Trigger (from AGENTS.md §9 or AGENT_PIPELINE.md stop table): M1-1 preflight found matches in non-test `src/` files for `.channel`, `channelToken`, and `aiApiKey`, which per task instructions means STOP and ask human before removing those schema fields.
+- Context: I completed the required startup checks, then ran the five mandated M1-1 preflight greps before editing `prisma/schema.prisma`.
+- Asked human: yes, should these legacy runtime/provisioning references be removed first in code, or should M1-1 be rewritten/split before schema cleanup proceeds?
+- Resolution: human override received, proceed past the M1-1 stop event and adapt the plan to current code.
+
+### Session end
+- Ending branch: `dev-claude`
+- Ending commit: `0586ef7 docs: sync handoff and progress after M0-10`
+- Tasks completed this session: none
+- Next task to pick up: `M1-1` (override approved, adapt to current code)
+- Open blockers: none, human explicitly authorized adaptation past the stop event
+
+---

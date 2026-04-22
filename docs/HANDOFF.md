@@ -6,25 +6,30 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `d29e6a3 chore: close milestone M0 — clean foundation verified`
+**Last commit:** `0586ef7 docs: sync handoff and progress after M0-10`
 **Plan version:** `plan-claude.md` at repo root
-**Task in flight:** none
-**State:** M0 complete, next milestone M1
+**Task in flight:** `TASK M1-1` — Create schema cleanup migration
+**State:** human override received, continue and adapt plan to current code
 **Updated:** 2026-04-22
 
 ---
 
 ## Next suggested task
 
-`TASK M1-1` — Create schema cleanup migration
+Proceed with `TASK M1-1`, using the human-approved override to adapt the task to the repo's current code.
 
-See `plan-claude.md` → section "Milestone M1 — Schema Cleanup" → `TASK M1-1`.
+Preflight found active non-test `src/` references to deprecated schema fields:
+- `.channel`
+- `channelToken`
+- `aiApiKey`
+
+Do not ignore them. Update the implementation in the safest way that preserves the intent of M1-1 against the current codebase.
 
 ---
 
 ## Open questions for the human
 
-- None at this moment. If a STOP EVENT is logged in `progress-report.md`, fill this section with the open question before ending the session.
+- None. Human explicitly said: `Proceed past the M1-1 stop event and adapt the plan to current code`.
 
 ---
 
@@ -39,17 +44,21 @@ See `plan-claude.md` → section "Milestone M1 — Schema Cleanup" → `TASK M1-
 
 ## Context at handoff time
 
-TASK M0-10 completed on `dev-claude`.
-
-Verified in this session:
+I completed the required reading and startup checks for the session:
 - `git status` was clean
 - `git branch --show-current` returned `dev-claude`
 - `node --version` returned `v24.14.1`
 - `npm run db:up` succeeded
-- `npm run lint && npm run test:run && npm run build` exited 0 in a single run
-- `ADHD.md` now notes dead components and stale tests were removed/replaced during M0
-- `docs/PROGRESS_LOG.md` includes the M0 milestone close entry
-- `plan-claude.md` now marks `M0-10` complete
 
-`progress-report.md` includes the raw command output for this session.
-Next agent should start at TASK M1-1 and follow the same contract.
+I then ran the exact M1-1 preflight greps.
+
+Results:
+- `ProviderConfig` in `src/`: 0 matches
+- `telegramChannelId` in `src/`: 0 matches
+- `.channel` in `src/`: matches found in non-test files
+- `channelToken` in `src/`: matches found in non-test files
+- `aiApiKey` in `src/`: matches found in non-test files
+
+This originally triggered a STOP condition, but the human explicitly overrode it and authorized adapting the task to current code.
+
+`progress-report.md` includes the raw command output, STOP EVENT entry, and override resolution.
