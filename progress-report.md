@@ -1683,11 +1683,11 @@
   $ grep "channelToken" prisma/schema.prisma
   ```
 - Result: ✅ complete
-- Commit (if task completed): `6ce4203 refactor: remove deprecated Instance fields and ProviderConfig model via migration`
+- Commit (if task completed): `18f275c refactor: remove deprecated Instance fields and ProviderConfig model via migration`
 
 ### Session end
 - Ending branch: `dev-claude`
-- Ending commit: `6ce4203 refactor: remove deprecated Instance fields and ProviderConfig model via migration`
+- Ending commit: `18f275c refactor: remove deprecated Instance fields and ProviderConfig model via migration`
 - Tasks completed this session: `M1-1`
 - Next task to pick up: `M1-2`
 - Open blockers: none

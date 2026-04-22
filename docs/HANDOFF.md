@@ -6,7 +6,7 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `6ce4203 refactor: remove deprecated Instance fields and ProviderConfig model via migration`
+**Last commit:** `18f275c refactor: remove deprecated Instance fields and ProviderConfig model via migration`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
 **State:** `M1-1` complete, next task `M1-2`
