@@ -1,7 +1,6 @@
-// @ts-nocheck - Test mocks don't match Prisma's complex relation types
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { prismaMock } from '../../setup/prisma-mock'
-import { mockAuth, setAuthenticatedUser, setUnauthenticated } from '../../setup/auth-mock'
+import { setAuthenticatedUser, setUnauthenticated } from '../../setup/auth-mock'
 import { createUser, createInstance, createActiveInstance, createSkill } from '../../setup/test-fixtures'
 
 // Mock injectSkill

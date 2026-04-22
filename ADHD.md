@@ -1,5 +1,5 @@
-# ⚡ NestAI — ADHD.md
-> *Last updated: 2026-03-28*
+# ⚡ ClawHost / NestAI — ADHD.md
+> *Last updated: 2026-04-21*
 
 ---
 
@@ -16,7 +16,9 @@ Multi-tenant SaaS that gives users a hosted AI agent instance with custom subdom
 - Channel setup (Telegram/Discord/WhatsApp)
 - Skills marketplace with MCP integrations
 - Bilingual UI (EN/FR)
-- NestAI brand system (Geist font, ink/chalk/emerald palette)
+- Chat UI + chat API routes landed in code
+- Security hardening landed: rate limiting, encrypted key storage helpers, stronger registration password policy
+- Local dev now runs safely on localhost + local Postgres
 
 ---
 
@@ -25,8 +27,9 @@ Multi-tenant SaaS that gives users a hosted AI agent instance with custom subdom
 - [x] Deploy PostgreSQL to Dokploy (instead of Cloud SQL)
 - [x] Delete old Cloud Run + Cloud SQL (saves ~$25/mo)
 - [ ] Configure Stripe webhook in production
-- [ ] Test full user signup → provision flow
-- [ ] Wire up actual chat API to OpenClaw gateway
+- [ ] Test full user signup → payment → provision flow end to end
+- [ ] Verify chat flow against a real OpenClaw gateway instance
+- [ ] Clean up lint/test workflow so it stays green without manual babysitting
 
 ---
 
@@ -51,12 +54,12 @@ Multi-tenant SaaS that gives users a hosted AI agent instance with custom subdom
 
 ## 🔧 Systems & Infra
 - **Repo:** `github.com/mtldev-dotcom/clawhost`
-- **Local:** `localhost:3000` (Next.js) + GCP PostgreSQL
+- **Local:** `localhost:3000` (Next.js) + Docker PostgreSQL (`nestai-db`)
 - **Production:** `https://nestai.nickybruno.com`
 - **Dokploy Panel:** `http://35.202.32.236:3000`
 - **GCP DB:** `35.202.32.236:5432/nestai`
 - **Deploy:** Dokploy (frontend + DB + user instances)
-- **Env:** `.env.local` — `DATABASE_URL`, `NEXTAUTH_SECRET`, `STRIPE_*`, `DOKPLOY_*`
+- **Env:** `.env.local` — keep local pointed at `localhost`, back up remote env before local testing
 
 ---
 
@@ -88,7 +91,29 @@ Multi-tenant SaaS that gives users a hosted AI agent instance with custom subdom
 
 ---
 
+## 📚 Truth Sources
+- `AGENTS.md` = repo rules
+- `docs/ARCHITECTURE.md` = architecture truth
+- `docs/WORKFLOW.md` = workflow / pipeline / done rules
+- `docs/DEVELOPMENT.md` + `docs/LOCAL_TESTING_GUIDE.md` = local dev + testing truth
+- Notion = planning, priorities, launch tasks
+- `ADHD.md` = short current-state truth
+
+If any of those drift from code, fix them.
+
 ## 🗒️ Nick's Notes
+> 2026-04-21: Local eval pass done. Pulled latest master, merged `dev-laptop`, deleted that branch, created `dev-V1`, installed deps, started Docker Postgres, ran Prisma migrations + seed, and booted app at `http://localhost:3000`.
+
+> 2026-04-21: Real checks run. Updated stale auth tests to match the stronger password policy and generic duplicate-email behavior. Result: `npm run test:run` now passes cleanly, 35/35.
+
+> 2026-04-21: E2E signup spec re-run after fixing stale duplicate-email expectation. Result: `tests/e2e/auth/signup.spec.ts` passes 5/5 in Chromium.
+
+> 2026-04-21: Full Playwright pass run. Result: 11/20 passing, 9 failing. Failure cluster is not random, it is mostly onboarding/dashboard tests that still expect the older channel-first wizard while the current UI is provider-first. Logout also lands on `/login` instead of the older home-page expectation.
+
+> 2026-04-21: Production build now completes locally. Still shows NextAuth/Edge runtime warnings via `jose`, but the build itself succeeds.
+
+> 2026-04-21: Lint workflow was broken because `next lint` now prompts interactively. Switched repo toward ESLint CLI config so lint now runs non-interactively and passes with warnings only.
+
 > 2026-03-27: Automated testing setup complete. Vitest for unit/integration (34 tests), Playwright for E2E. Tests cover: auth flows, instance API, skills API, onboarding wizard, dashboard navigation. Run `npm test` for unit tests, `npm run test:e2e` for E2E.
 
 > 2026-03-27: Auth/Layout refactor + provisioning flow review. Fixed: double header, middleware location (must be in src/), onboarding error handling, provision API now sets status='provisioning'. Flow: register → auto-login → onboarding → PATCH instance → POST provision → redirect to settings.

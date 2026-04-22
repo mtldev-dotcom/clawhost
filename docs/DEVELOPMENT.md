@@ -1,5 +1,8 @@
 # Development Guide
 
+This file is part of the repo truth source for how ClawHost is developed locally.
+Keep it aligned with `AGENTS.md`, `docs/WORKFLOW.md`, `docs/ARCHITECTURE.md`, `ADHD.md`, and Notion whenever the workflow changes.
+
 ## Local Setup
 
 ### Prerequisites
@@ -21,6 +24,9 @@ npm install
 
 # Copy environment file
 cp .env.example .env.local
+
+# Keep local dev local
+# Do not point .env.local at production or remote app/database URLs
 ```
 
 ### Environment Configuration
@@ -37,6 +43,7 @@ openssl rand -base64 32  # For ENCRYPTION_KEY
 - `DATABASE_URL` - Use default from .env.example
 - `NEXTAUTH_SECRET` - Generate with openssl
 - `NEXTAUTH_URL` - http://localhost:3000
+- `NEXT_PUBLIC_APP_URL` - http://localhost:3000
 - `ENCRYPTION_KEY` - Required for API key encryption at rest (32 bytes base64)
 
 **Optional for local dev:**
@@ -77,6 +84,8 @@ npm run dev
 
 ## Development Workflow
 
+For the full execution contract, also read `../AGENTS.md` and `./WORKFLOW.md`.
+
 ### Making Changes
 
 1. Create a feature branch
@@ -91,7 +100,12 @@ npm run dev
    npm run lint
    ```
 
-4. Commit with conventional commits
+4. Update the truth sources that changed
+   - docs
+   - `ADHD.md`
+   - Notion project/tasks when status or next work changed
+
+5. Commit with conventional commits
    ```bash
    git commit -m "feat: add new feature"
    ```
@@ -124,13 +138,33 @@ Components are added to `src/components/ui/`.
 
 ### Manual Testing Checklist
 
-- [ ] Registration flow
-- [ ] Login/logout
+- [x] Home page loads locally
+- [x] Registration page loads locally
+- [x] Login page loads locally
+- [x] Registration API accepts strong passwords
+- [x] Registration API rejects weak passwords with validation details
+- [x] Full browser signup flow to onboarding
+- [ ] Login/logout browser flow
 - [ ] Dashboard loads with/without instance
 - [ ] Onboarding wizard steps
 - [ ] Channel configuration saves
 - [ ] AI provider configuration saves
 - [ ] Skills page loads and toggles work
+
+### Current Verified Automated Checks
+
+- `npm run test:run` -> 35/35 passing
+- `npx playwright test tests/e2e/auth/signup.spec.ts --project=chromium` -> 5/5 passing
+- `npm run test:e2e` -> 11/20 passing, 9 failing
+- `npm run build` -> succeeds with NextAuth/Edge runtime warnings
+- `npm run lint` -> passes with warnings only
+
+### Current Stage Assessment
+
+- Auth + registration are working locally.
+- Production build completes.
+- The current onboarding UI is now provider-first, but a chunk of E2E coverage still assumes the older channel-first wizard.
+- Because of that drift, onboarding, dashboard settings, and post-logout behavior still need truth-based revalidation before launch confidence is real.
 
 ### Stripe Testing
 
@@ -150,7 +184,12 @@ Use the REST client of your choice:
 # Register
 curl -X POST http://localhost:3000/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"password123","name":"Test"}'
+  -d '{"email":"test@example.com","password":"SecurePass123","name":"Test"}'
+
+# Verify password policy rejection
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"weak@example.com","password":"password123","name":"Test"}'
 
 # Get skills (no auth required)
 curl http://localhost:3000/api/skills
@@ -216,6 +255,7 @@ npm run db:studio
 npm run dev          # Start dev server
 npm run lint         # Run ESLint
 npm run build        # Production build (may fail, see Known Issues)
+npm run test:run     # Run unit/integration tests
 
 # Database
 npm run db:up        # Start PostgreSQL

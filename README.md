@@ -49,6 +49,7 @@ npm install
 # Copy environment variables
 cp .env.example .env.local
 # Edit .env.local with your values
+# Important: keep local dev pointed at localhost, not the production DB/app URLs
 
 # Start PostgreSQL
 npm run db:up
@@ -59,6 +60,10 @@ npm run db:seed
 
 # Start development server
 npm run dev
+
+# Run checks
+npm run lint
+npm run test:run
 ```
 
 ### Environment Variables
@@ -70,6 +75,8 @@ See [.env.example](.env.example) for all required variables:
 | `DATABASE_URL` | PostgreSQL connection string |
 | `NEXTAUTH_SECRET` | Random secret for JWT signing |
 | `NEXTAUTH_URL` | App URL (http://localhost:3000) |
+| `NEXT_PUBLIC_APP_URL` | Public app URL (http://localhost:3000) |
+| `ENCRYPTION_KEY` | 32-byte secret for encrypting stored provider keys |
 | `STRIPE_SECRET_KEY` | Stripe secret key (sk_...) |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook secret (whsec_...) |
 | `STRIPE_PRICE_ID` | Stripe price ID for subscription |
@@ -83,6 +90,44 @@ See [.env.example](.env.example) for all required variables:
 npm run stripe:listen
 # Copy the webhook secret to .env.local
 ```
+
+## Verified Local Dev Status
+
+As of 2026-04-21, this repo was verified locally with:
+
+- `npm install`
+- local PostgreSQL via `docker compose -f docker-compose.dev.yml up -d`
+- Prisma migrations + seed against local DB
+- dev server at `http://localhost:3000`
+- smoke-checked routes: `/`, `/register`, `/login`
+- registration API verified with:
+  - strong password succeeds
+  - weak password fails with requirement details
+
+Current verified checks:
+
+- `npm run test:run` -> 35/35 tests passing
+- `npx playwright test tests/e2e/auth/signup.spec.ts --project=chromium` -> 5/5 passing
+- `npm run test:e2e` -> 11/20 passing, 9 failing
+- `npm run build` -> succeeds with NextAuth/Edge runtime warnings
+- `npm run lint` -> passes with warnings only
+
+Main current gap: the onboarding/dashboard E2E tests are stale versus the current provider-first onboarding UI, so the launch-critical flow still needs revalidation against the real product behavior.
+
+## Governance and Truth Sources
+
+This repo now treats docs and planning as part of the product, not extras.
+
+Truth sources that must stay aligned:
+
+- `AGENTS.md` for repo operating rules
+- `docs/ARCHITECTURE.md` for system design and real flow shape
+- `docs/WORKFLOW.md` for coding protocol and delivery pipeline
+- `docs/DEVELOPMENT.md` and `docs/LOCAL_TESTING_GUIDE.md` for local dev truth
+- `ADHD.md` for short current-state progress notes
+- Notion project page + launch tasks for planning and execution tracking
+
+If code changes but these stay stale, the repo is lying.
 
 ## Project Structure
 
@@ -117,8 +162,8 @@ clawhost/
 
 1. **Register** - Create account with email/password
 2. **Subscribe** - Stripe checkout for $9/month
-3. **Onboard** - Choose channel + AI provider, enter tokens
-4. **Deploy** - Instance provisioned automatically
+3. **Onboard** - Configure provider credentials in the current onboarding flow
+4. **Deploy** - Instance is configured/provisioned and routed to chat/dashboard
 5. **Extend** - Add skills from marketplace
 
 ## API Routes
@@ -135,9 +180,12 @@ clawhost/
 
 ## Documentation
 
+- [AGENTS contract](AGENTS.md)
+- [Workflow](docs/WORKFLOW.md)
 - [Contributing](docs/CONTRIBUTING.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Development](docs/DEVELOPMENT.md)
+- [Local testing guide](docs/LOCAL_TESTING_GUIDE.md)
 - [Deployment (Dokploy)](docs/DEPLOYMENT.md)
 - [Deployment (GCP)](docs/DEPLOYMENT_GCP.md)
 

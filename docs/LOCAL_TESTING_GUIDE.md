@@ -1,10 +1,13 @@
 # Local Testing Guide - Post Security Hardening
 
 Guide to run ClawHost locally for testing the security fixes.
+This file is a truth source for local verification steps. Keep it aligned with the real app and current tests.
 
 ---
 
 ## Prerequisites
+
+Also read `../AGENTS.md` and `./WORKFLOW.md` before changing or expanding the testing pipeline.
 
 - Node.js 18+ installed
 - Docker Desktop running
@@ -15,7 +18,10 @@ Guide to run ClawHost locally for testing the security fixes.
 ## Step 1: Pull Latest Changes
 
 ```bash
-git pull origin dev-laptop
+git checkout dev-V1
+# or your current working branch
+
+git pull --ff-only origin master
 ```
 
 ---
@@ -54,6 +60,11 @@ NEXTAUTH_SECRET=paste-your-secret-here
 ENCRYPTION_KEY=paste-your-encryption-key-here
 NEXTAUTH_URL=http://localhost:3000
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+DATABASE_URL=postgresql://clawhost:clawhost@localhost:5432/nestai-db
+
+# Important:
+# keep local testing on localhost + local Postgres
+# do not point .env.local at the remote production app or DB during eval
 ```
 
 ### Optional (for full testing)
@@ -112,6 +123,8 @@ curl -X POST http://localhost:3000/api/auth/register \
 ```
 
 **Expected:** 400 error with password requirements message
+
+Current confirmed behavior: passwords must include at least one uppercase letter, one lowercase letter, and one number.
 
 Try with a strong password:
 

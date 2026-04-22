@@ -34,8 +34,8 @@ test.describe('Signup Flow', () => {
     await page.fill('input[type="password"]', 'TestPassword123!')
     await page.click('button[type="submit"]')
 
-    // Should show error
-    await expect(page.locator('text=Email taken')).toBeVisible({ timeout: 5000 })
+    // Should show generic error to avoid leaking account existence
+    await expect(page.locator('text=Registration failed')).toBeVisible({ timeout: 5000 })
   })
 
   test('shows validation for short password', async ({ page }) => {
