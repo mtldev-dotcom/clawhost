@@ -6,19 +6,19 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `2f17d14 docs: sync handoff and progress after M0-8`
+**Last commit:** `413236a chore: close milestone M0 — clean foundation verified`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
-**State:** M0-9 complete, ready for TASK M0-10
+**State:** M0 complete, next milestone M1
 **Updated:** 2026-04-22
 
 ---
 
 ## Next suggested task
 
-`TASK M0-10` — Milestone M0 close
+`TASK M1-1` — Create schema cleanup migration
 
-See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M0-10`.
+See `plan-claude.md` → section "Milestone M1 — Schema Cleanup" → `TASK M1-1`.
 
 ---
 
@@ -39,18 +39,17 @@ See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M
 
 ## Context at handoff time
 
-TASK M0-9 completed on `dev-claude`.
+TASK M0-10 completed on `dev-claude`.
 
 Verified in this session:
 - `git status` was clean
 - `git branch --show-current` returned `dev-claude`
 - `node --version` returned `v24.14.1`
 - `npm run db:up` succeeded
-- created `.github/workflows/ci.yml` with the exact task content
-- `ls .github/workflows/ci.yml` returned the file path
-- `npm run lint` exited 0 with warnings only
-- plan updated to mark `M0-9` complete
-- committed and pushed the M0-9 task commit to `origin/dev-claude`
+- `npm run lint && npm run test:run && npm run build` exited 0 in a single run
+- `ADHD.md` now notes dead components and stale tests were removed/replaced during M0
+- `docs/PROGRESS_LOG.md` includes the M0 milestone close entry
+- `plan-claude.md` now marks `M0-10` complete
 
 `progress-report.md` includes the raw command output for this session.
-Next agent should start at TASK M0-10 and follow the same contract.
+Next agent should start at TASK M1-1 and follow the same contract.

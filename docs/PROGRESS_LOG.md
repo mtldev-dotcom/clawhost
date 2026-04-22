@@ -37,3 +37,22 @@ Format:
 **Verification:** `git branch -a` shows only `master` and `dev-claude` locally plus their remotes.
 
 **Open items:** TASK M0-1 (and onward) awaiting execution by the designated cheap-model runner.
+
+## 2026-04-22 — M0 close: Clean Foundation
+
+**Summary:** Closed milestone M0 with a full verification pass after removing dead code, retiring stale onboarding-era specs, adding replacement smoke coverage for the current workspace flow, and landing baseline CI.
+
+**What changed in the product:**
+- The workspace-first product surface is cleaner, with dead dashboard components and legacy onboarding API routes removed
+- Test coverage now better matches the current onboarding model-select flow and workspace shell instead of the retired channel-first UI
+- CI now runs lint, unit/integration tests, and build on pushes and pull requests
+
+**What changed in the codebase:**
+- Removed broken re-exports, dead dashboard components, dead onboarding API routes, and orphan checks from the M0 cleanup list
+- Replaced stale Playwright specs with `tests/e2e/onboarding/model-select.spec.ts` and `tests/e2e/workspace/workspace-shell.spec.ts`
+- Added `.github/workflows/ci.yml`
+- Updated `ADHD.md`, `plan-claude.md`, `progress-report.md`, and `docs/HANDOFF.md` to reflect M0 completion
+
+**Verification:** `npm run lint && npm run test:run && npm run build` passed in one run at milestone close.
+
+**Open items:** Next up is `TASK M1-1` for schema cleanup.

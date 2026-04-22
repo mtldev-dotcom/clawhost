@@ -672,7 +672,7 @@ jobs:
 
 **Mark complete when:** Full verification passes, all truth files updated, commit landed.
 
-- [ ] M0-10
+- [x] M0-10
 
 ---
 

@@ -18,6 +18,8 @@ Merged app in progress: PageBase-style workspace product on top of ClawHost host
 - Workspace file layer is real with root folders: Inbox, Projects, Notes
 - Authenticated `/api/workspace/files` supports list + upload
 - Workspace UI supports file upload, download, and search
+- Dead dashboard components and legacy onboarding API routes from the old flow are removed
+- Stale Playwright specs for the retired channel-first onboarding UI are removed and replaced with current onboarding/workspace smoke coverage
 - Settings now reflect the newer product direction: platform-managed LLM access, subscription-credit foundation, and shared Telegram bot linking foundation
 - Skills marketplace UI/API exists
 - Bilingual UI (EN/FR)
