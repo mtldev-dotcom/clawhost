@@ -1,273 +1,153 @@
 # Architecture
 
-## Source of Truth Rule
-
 This file is the architecture truth source for ClawHost.
 
-When product flow, service boundaries, or runtime behavior changes, update this file in the same work.
-Also keep `AGENTS.md`, `docs/WORKFLOW.md`, `docs/DEVELOPMENT.md`, `ADHD.md`, and the Clawhost Notion project page aligned.
+## Product Direction
 
-## Merge Direction
+ClawHost is no longer just "host an agent fast".
+It is being reshaped into a workspace-first AI product where:
 
-ClawHost is now being refactored toward a merged product shape:
-
-- **PageBase-style workspace UX** becomes the primary user-facing shell
-- **ClawHost platform services** remain the backend spine for auth, billing, provisioning, provider config, channels, and skills
+- the **workspace** is the main user-facing shell
+- the **hosted agent platform** remains the infrastructure layer underneath
 
 Short version:
-- workspace, pages, databases, and the AI companion become the product face
-- hosted agent infrastructure stays underneath as platform internals
+- pages, lightweight databases, file handling, and AI interaction become the product face
+- auth, billing, provisioning, channels, providers, and skills remain platform internals
 
-## System Overview
+## Current Live System
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        ClawHost Platform                         │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐  │
-│  │  Next.js │    │ Postgres │    │  Stripe  │    │ Dokploy  │  │
-│  │   App    │───▶│ (Prisma) │    │   API    │    │   API    │  │
-│  └──────────┘    └──────────┘    └──────────┘    └──────────┘  │
-│       │                              │                │         │
-│       │         ┌────────────────────┘                │         │
-│       │         │                                     │         │
-│       ▼         ▼                                     ▼         │
-│  ┌─────────────────┐                        ┌─────────────────┐ │
-│  │   Webhook       │                        │   Provisioner   │ │
-│  │   Handler       │───────────────────────▶│   Service       │ │
-│  └─────────────────┘                        └─────────────────┘ │
-│                                                     │           │
-└─────────────────────────────────────────────────────┼───────────┘
-                                                      │
-                                                      ▼
-                              ┌─────────────────────────────────┐
-                              │      Dokploy (Hetzner VPS)      │
-                              ├─────────────────────────────────┤
-                              │  ┌─────────┐  ┌─────────┐       │
-                              │  │OpenClaw │  │OpenClaw │  ...  │
-                              │  │ user-a  │  │ user-b  │       │
-                              │  └─────────┘  └─────────┘       │
-                              └─────────────────────────────────┘
-```
+### App Layer
+- Next.js App Router app
+- auth flows
+- onboarding
+- dashboard/workspace/settings/skills
+- API routes for instance config, skills, provisioning, Stripe, and workspace files
 
-## Core Components
+### Data Layer
+- PostgreSQL via Prisma
+- core models:
+  - `User`
+  - `Workspace`
+  - `Page`
+  - `WorkspaceFolder`
+  - `WorkspaceFile`
+  - `Instance`
+  - `ProviderConfig`
+  - `Skill`
+  - Auth.js tables
 
-### 1. Next.js Application
+### Infrastructure Layer
+- Stripe for billing
+- Dokploy for hosted runtime provisioning
+- OpenClaw runtime per user instance
 
-The main web application handling:
-- User authentication (NextAuth v5)
-- Dashboard UI (Chat, Settings, Skills pages)
-- API routes
-- Server actions
-- Internationalization (English/French via next-intl)
+## Current Route Model
 
-**Key files:**
-- `src/lib/auth.ts` - Authentication configuration
-- `src/app/` - Pages and API routes
-- `src/i18n/` - Translations and locale configuration
+### Auth and setup
+- `/register`
+- `/login`
+- `/onboarding`
 
-### 2. Database (PostgreSQL + Prisma)
+### Main app shell
+- `/dashboard/workspace`
+- `/dashboard/settings`
+- `/dashboard/skills`
+- `/chat`
 
-Stores all application data:
+Important truth:
+- workspace is now the main merged-app shell
+- `/chat` still exists as a direct conversation surface
+- the final route simplification between workspace/chat/dashboard is not completely settled yet
 
-**Models:**
-- `User` - Account info, Stripe customer ID, locale preference
-- `Workspace` - User-owned workspace shell for the merged app
-- `Page` - Workspace page tree foundation, starting with a root Home page
-- `Instance` - Provisioned OpenClaw instances, active model, agent locale
-- `ProviderConfig` - Multiple AI provider API keys per instance
-- `Skill` - Available MCP integrations
-- `Account/Session` - NextAuth tables
+## Current User Flow
 
-**Key files:**
-- `prisma/schema.prisma` - Schema definition
-- `src/lib/prisma.ts` - Client singleton
-
-### 3. Stripe Integration
-
-Handles payments and subscriptions:
-
-**Flow:**
-1. User clicks "Subscribe" → Create checkout session
-2. User completes payment → Webhook receives `checkout.session.completed`
-3. Webhook creates Instance record with `status: provisioning`
-4. Webhook triggers async provisioning
-
-**Key files:**
-- `src/lib/stripe.ts` - Stripe client
-- `src/app/api/stripe/checkout/route.ts` - Checkout creation
-- `src/app/api/stripe/webhook/route.ts` - Event handling
-
-### 4. Dokploy Provisioner
-
-Manages OpenClaw instances on Dokploy:
-
-**Provisioning steps:**
-1. Create project in Dokploy
-2. Create Docker Compose service
-3. Set compose file with env vars
-4. Add domain (Traefik handles SSL)
-5. Deploy
-6. Update DB with URLs
-
-**Key files:**
-- `src/lib/dokploy.ts` - All Dokploy API calls
-
-## Data Flow
-
-### User Registration
-```
-Browser → /api/auth/register → Password policy validation → Hash password → Create User → Return success
+```text
+Register / Login
+  ↓
+Ensure workspace exists
+  ↓
+Ensure root page exists
+  ↓
+Bootstrap root folders (Inbox, Projects, Notes)
+  ↓
+Onboarding configures provider + model
+  ↓
+Provision hosted runtime
+  ↓
+Land in /dashboard/workspace
+  ↓
+Use pages, databases, file layer, settings, skills, and chat from the same account
 ```
 
-### Current Local App Shape
-```
-Login/Register
-    ↓
-Workspace bootstrap ensures one workspace + Home page
-    ↓
-/dashboard/workspace becomes the new app shell center
-    ↓
-Onboarding still configures provider + model
-    ↓
-/api/provision still deploys the hosted agent runtime
-    ↓
-/dashboard/workspace is now the post-onboarding landing surface
-    ↓
-/chat remains the direct agent conversation surface inside the same app shell
-```
+## Workspace Model
 
-Note: older tests still assumed a channel-first onboarding wizard. The current UI is provider-first, so any onboarding/dashboard changes must keep tests and docs in sync.
+### Pages
+Each workspace currently supports:
+- hierarchical page tree
+- page types:
+  - standard
+  - database
+  - board
+  - dashboard
+  - capture
+- title + notes/content editing
 
-### Subscription Flow (current code truth, still partially ambiguous)
-```
-Landing/Dashboard → /api/stripe/checkout → Stripe Checkout → Payment
-    ↓
-Stripe Webhook → /api/stripe/webhook → Create/advance Instance → Provision attempt
-    ↓
-Dokploy API / local Docker → Update DB → Runtime fields stored
-```
+### Database pages
+Current database page behavior:
+- starter schema inside `Page.content`
+- field creation
+- row creation
+- simple rendered table view
 
-Important note:
-- current code still supports a second provisioning path from onboarding/settings after provider configuration
-- that means payment-triggered provisioning vs onboarding-triggered provisioning is not fully settled product truth yet
+This is intentionally lightweight for now. It is not yet a full Notion-style database system.
 
-### Workspace Foundation
-```
-Signed-in user → ensure workspace exists
-    ↓
-Create default workspace if missing
-    ↓
-Create root Home page if missing
-    ↓
-Bootstrap root workspace folders (Inbox, Projects, Notes)
-    ↓
-Render page tree in /dashboard/workspace
-    ↓
-Allow root-level and child page creation inside the merged app shell
-    ↓
-Allow page type selection at creation time (standard, database, board, dashboard, capture)
-    ↓
-Allow selected page title + notes editing backed by `Page.content`
-    ↓
-Allow database pages to carry starter schema primitives (fields + rows, with richer views next) inside `Page.content`
-    ↓
-Start the file-system layer with `WorkspaceFolder` + `WorkspaceFile` foundations for uploads, search, and agent write access
-    ↓
-Expose authenticated `/api/workspace/files` list + upload endpoints backed by a local storage boundary
-```
+### Files
+The new file-system layer currently includes:
+- `WorkspaceFolder`
+- `WorkspaceFile`
+- automatic root folders
+- authenticated file listing
+- authenticated upload
+- authenticated download
+- simple file search UI
 
-### Workspace Files API
-```
-/dashboard/workspace
-    ↓
-Workspace file state bootstraps root folders
-    ↓
-GET /api/workspace/files lists folders + files for the authenticated user
-    ↓
-POST /api/workspace/files accepts multipart upload, writes bytes to the storage root, and creates a WorkspaceFile record
-    ↓
-Workspace shell refreshes and exposes the uploaded file in the root file list
-    ↓
-GET `/api/workspace/files/[id]/download` returns owned file bytes back to the browser
-    ↓
-Workspace shell can search files through `GET /api/workspace/files?search=...` and download matching results
-```
+Current storage truth:
+- app code uses a server-side storage helper
+- default storage root is local to the app workspace unless overridden
+- Dokploy compose truth currently mounts `openclaw_data:/app/data`
+- docs must not claim `/data/workspace` as current runtime truth unless compose is changed to match
 
-### Skill Activation
-```
-Skills Page → /api/skills (POST) → Update enabledSkills → Redeploy or refresh Instance config
-```
+## Provisioning Truth
 
-## Security Considerations
+Provisioning is still a ClawHost platform responsibility.
 
-### Authentication
-- Passwords hashed with bcrypt (12 rounds)
-- JWT sessions (no server-side session storage)
-- Middleware protects routes with `auth()` checks
-- Server-side password validation enforced (8+ chars, upper/lower/digit required)
+Current reality:
+- instance records exist in app DB
+- provider/channel/model config lives in the app
+- provisioning happens through Dokploy helpers in `src/lib/dokploy.ts`
+- Stripe webhook and onboarding/settings paths still create some ambiguity around the exact canonical trigger for provisioning
 
-### API Security
-- All mutations require authentication via `auth()` before processing
-- Stripe webhooks verified with signature validation
-- Environment variables validated at runtime via Zod schema
-- Rate limiting on sensitive endpoints:
-  - Auth: 10 requests per 15 minutes per IP
-  - Provisioning: 5 requests per hour per user
-- Returns sanitized error messages (no internal details leaked)
+That ambiguity is real and should be resolved in product logic, not hidden in docs.
 
-### Secrets Management
-- API keys stored in environment variables
-- Crypto helpers exist in `src/lib/crypto.ts` using AES-256-GCM with a key derived from `ENCRYPTION_KEY`
-- Current provider-key save paths still need explicit end-to-end verification before claiming encrypted-at-rest behavior as launch truth
-- Masked keys shown in logs (`sk-...XXXX`)
-- Hardcoded values extracted to environment variables
+## Security and Boundaries
 
-### Shell Command Security
-- All Docker commands use `spawn()` with array arguments (not string interpolation)
-- Input validation for:
-  - Container names: alphanumeric + hyphens only
-  - Command arguments: strict allowlist pattern
-  - Pairing codes: alphanumeric, 4-32 characters
-  - Environment variables: newline/null byte removal
-- No shell injection vulnerabilities
+- auth checks gate all workspace mutations and file access
+- secrets stay server-side
+- provisioning helpers stay centralized in `src/lib/dokploy.ts`
+- storage access is moving behind `src/lib/workspace-storage.ts`
+- route handlers should stay thin and reusable logic should live in `src/lib/*`
 
-### Infrastructure Security
-- Prisma query logging disabled in production
-- GCP project/zone configurable via environment variables
-- Docker socket mount required for production provisioning
+## Known Gaps
 
-## Scaling Considerations
+These are real architecture gaps, not doc bugs:
+- Stripe → provisioning launch path is not fully proven end to end
+- final workspace/chat/dashboard route simplification is unfinished
+- workspace file delete flow is not complete yet
+- folder navigation is still shallow compared to the intended product
+- agent MCP hooks for workspace files are not wired yet
+- latest workspace-files migration could not be applied locally when the configured remote DB was unreachable
 
-### Current Architecture
-- Single Next.js instance
-- Single PostgreSQL database
-- Dokploy manages container orchestration
-- Documentation + Notion planning are part of delivery, not optional side work
+## What Lives in Archive
 
-### Future Scaling
-- Add Redis for session caching
-- Database read replicas
-- Multiple Dokploy nodes for instance distribution
-- Queue system for async provisioning (Bull/BullMQ)
-
-## Error Handling
-
-### Provisioning Failures
-- Instance status set to `failed`
-- User notified via dashboard
-- Manual retry available via `/api/provision`
-
-### Webhook Failures
-- Stripe retries automatically
-- Idempotent handlers (upsert operations)
-- Logging for debugging
-
-## Monitoring (Future)
-
-Recommended additions:
-- Sentry for error tracking
-- Prometheus metrics
-- Dokploy health checks
-- Uptime monitoring for user instances
+Old agent-build scaffolding, historical audits, GCP-era deployment docs, and speculative PRD/design docs were moved to `docs/archive/2026-04-22-legacy/`.
+They are reference material, not live truth.

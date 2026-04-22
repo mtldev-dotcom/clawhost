@@ -21,6 +21,7 @@ Merged app in progress: PageBase-style workspace product on top of ClawHost host
 - Authenticated `/api/workspace/files` GET/POST routes now exist for listing and uploading workspace files
 - Workspace shell now includes its first real file upload UI wired to the workspace files API
 - Workspace files now support authenticated download via `/api/workspace/files/[id]/download`
+- Live docs were audited and collapsed into a smaller truth surface; stale scaffolding moved to `docs/archive/2026-04-22-legacy/`
 - Channel setup now lives in dashboard settings
 - Custom subdomain per user
 - AI provider config (OpenAI/Anthropic/OpenRouter)
@@ -131,6 +132,8 @@ If any of those drift from code, fix them.
 > 2026-04-22: Workspace download route landed. Uploaded files can now be pulled back out through an authenticated download endpoint, and the workspace shell exposes a direct download link for listed files.
 
 > 2026-04-22: Local Prisma apply for the workspace-files migration is currently blocked by environment reachability. The repo `.env` points at PostgreSQL on `35.202.32.236:5432`, and that database was unreachable during `npx prisma migrate dev --skip-generate`.
+
+> 2026-04-22: Docs audit cleanup landed. Live docs were rewritten around the real workspace-first product direction, legacy build scaffolding and historical reports were archived, and generated test artifacts were cleared so the repo truth surface is smaller and cleaner.
 
 > 2026-04-22: Overnight launch-readiness pass. Targeted Playwright auth/signup/logout/onboarding/settings slice now passes 20/20 after fixing stale channel-first specs, callbackUrl handling, clean Playwright server boot, and logout truth. Current verified flow is provider-first onboarding -> `/chat`, with channel config in dashboard settings and logout landing on `/login`.
 
