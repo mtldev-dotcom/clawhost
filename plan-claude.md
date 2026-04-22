@@ -797,7 +797,7 @@ If grep returns 0 matches → mark this task complete immediately. No file chang
 
 **Mark complete when:** Both verifications pass (or task was a no-op).
 
-- [ ] M1-3
+- [x] M1-3
 
 ---
 

@@ -6,19 +6,19 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `d7cef83 fix: sync npm lockfile for CI and correct M1-1 commit records`
+**Last commit:** `0cc25e2 fix: remove legacy channel/aiApiKey fields from instance PATCH handler`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
-**State:** `M1-2` complete, next task `M1-3`
+**State:** `M1-3` complete, next task `M1-4`
 **Updated:** 2026-04-22
 
 ---
 
 ## Next suggested task
 
-Proceed with `TASK M1-3` — Update seed file to remove deprecated fields.
+Proceed with `TASK M1-4` — Remove Instance.aiApiKey from settings actions.
 
-`M1-2` verified that `/api/instance` already rejects the removed legacy fields. No route code change was needed in this session because the `PATCH` handler was already narrowed to `aiProvider` and `activeModel` only.
+`M1-3` was a no-op. The preflight grep found no deprecated field references in `prisma/seed.ts`, so no seed changes were required. Verification still passed with `npm run test:run` and a zero-match `grep "channelToken" prisma/seed.ts`.
 
 ---
 
@@ -39,7 +39,8 @@ Proceed with `TASK M1-3` — Update seed file to remove deprecated fields.
 
 ## Context at handoff time
 
-Completed in `M1-2`:
-- Confirmed `src/app/api/instance/route.ts` already uses `const { aiProvider, activeModel } = await req.json()` in `PATCH`
-- Confirmed there are no `channelToken` references left in that route
-- Verified with `npm run build`, `npm run test:run`, and `grep "channelToken" src/app/api/instance/route.ts`
+Completed in `M1-3`:
+- Confirmed `prisma/seed.ts` has no references to `channelToken`, `aiApiKey`, `telegramChannelId`, `ProviderConfig`, or `channel:`
+- No code changes were needed for the seed file
+- Marked `M1-3` complete in `plan-claude.md`
+- Logged raw verification output in `progress-report.md`

@@ -1828,3 +1828,74 @@
 - Open blockers: none
 
 ---
+
+## Session 2026-04-22 23:52 UTC — OpenClaw subagent clawhost-m1-3
+**Starting branch:** `dev-claude`
+**Starting commit:** `0cc25e2`
+**Plan version:** plan-claude.md @ `0cc25e2`
+
+### Task: M1-3 — Update seed file to remove deprecated fields
+- Started: 23:52 UTC
+- Files touched: `plan-claude.md`, `progress-report.md`, `docs/HANDOFF.md`
+- Steps run (literal copy from plan-claude.md):
+  1. Run the preflight grep.
+  2. If matches exist, edit `prisma/seed.ts` to remove references to the deleted fields.
+  3. Run `npm run db:seed` (requires local Postgres to be running via `npm run db:up`).
+  4. Run `npm run test:run`.
+- Verification commands + raw output (paste exact terminal output, do not summarize):
+  ```
+  $ git status
+  On branch dev-claude
+  Your branch is up to date with 'origin/dev-claude'.
+  
+  nothing to commit, working tree clean
+  
+  $ git branch --show-current
+  dev-claude
+  
+  $ node --version
+  v24.14.1
+  
+  $ npm run db:up
+  > clawhost@0.1.0 db:up
+  > docker compose -f docker-compose.dev.yml up -d
+  
+  time="2026-04-22T19:52:24-04:00" level=warning msg="/home/mtldev/active-dev-projects/clawhost/docker-compose.dev.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+   Container clawhost-postgres-1 Running
+  
+  $ grep -n "channelToken\|aiApiKey\|telegramChannelId\|ProviderConfig\|channel:" prisma/seed.ts
+  
+  $ npm run test:run
+  > clawhost@0.1.0 test:run
+  > vitest run
+  
+  The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+  
+  [1m[46m RUN [49m[22m [36mv4.1.2 [39m[90m/home/mtldev/active-dev-projects/clawhost[39m
+  
+   [32m✓[39m tests/unit/lib/dokploy-api.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+   [32m✓[39m tests/unit/lib/workspace.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 59[2mms[22m[39m
+   [32m✓[39m tests/integration/api/skills.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 68[2mms[22m[39m
+   [32m✓[39m tests/integration/api/workspace-files.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 84[2mms[22m[39m
+   [32m✓[39m tests/integration/api/auth-register.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 73[2mms[22m[39m
+   [32m✓[39m tests/integration/api/workspace-file-download.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 93[2mms[22m[39m
+   [32m✓[39m tests/integration/api/instance.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 85[2mms[22m[39m
+  
+  [2m Test Files [22m [1m[32m7 passed[39m[22m[90m (7)[39m
+  [2m      Tests [22m [1m[32m45 passed[39m[22m[90m (45)[39m
+  [2m   Start at [22m 19:52:35
+  [2m   Duration [22m 1.66s[2m (transform 579ms, setup 1.66s, import 531ms, tests 475ms, environment 7.05s)[22m
+  
+  $ grep "channelToken" prisma/seed.ts
+  ```
+- Result: ✅ complete
+- Commit (if task completed): pending
+
+### Session end
+- Ending branch: `dev-claude`
+- Ending commit: pending
+- Tasks completed this session: `M1-3`
+- Next task to pick up: `M1-4`
+- Open blockers: none
+
+---
