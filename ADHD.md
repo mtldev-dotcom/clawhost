@@ -9,27 +9,21 @@ Merged app in progress: PageBase-style workspace product on top of ClawHost host
 ---
 
 ## ✅ What It Does (Right Now)
-- User registration + Stripe subscription ($9/mo)
-- Signed-in users now auto-bootstrap into a workspace with a root Home page
-- `/dashboard/workspace` is the new product-shell center
-- Provider-first onboarding (provider key -> model -> deploy)
-- Onboarding success now redirects to `/dashboard/workspace`
-- Page types are now real in the workspace create flow (Standard, Database, Board, Dashboard, Capture)
-- Database pages now support starter schema primitives (fields) inside `Page.content`
-- Database pages now support simple row creation and a rendered table view inside the workspace shell
-- Workspace file-system foundation is now started with real root folders (Inbox, Projects, Notes)
-- Authenticated `/api/workspace/files` GET/POST routes now exist for listing and uploading workspace files
-- Workspace shell now includes its first real file upload UI wired to the workspace files API
-- Workspace files now support authenticated download via `/api/workspace/files/[id]/download`
-- Live docs were audited and collapsed into a smaller truth surface; stale scaffolding moved to `docs/archive/2026-04-22-legacy/`
-- Channel setup now lives in dashboard settings
-- Custom subdomain per user
-- AI provider config (OpenAI/Anthropic/OpenRouter)
-- Skills marketplace with MCP integrations
+- User registration + login
+- Signed-in users auto-bootstrap into a workspace with a root Home page
+- `/dashboard/workspace` is the main product shell
+- Onboarding now picks a default platform-managed OpenRouter model, then routes into `/dashboard/workspace`
+- Page types are real in the workspace create flow (Standard, Database, Board, Dashboard, Capture)
+- Database pages support starter schema fields, row creation, and a simple table view
+- Workspace file layer is real with root folders: Inbox, Projects, Notes
+- Authenticated `/api/workspace/files` supports list + upload
+- Workspace UI supports file upload, download, and search
+- Settings now reflect the newer product direction: platform-managed LLM access, subscription-credit foundation, and shared Telegram bot linking foundation
+- Skills marketplace UI/API exists
 - Bilingual UI (EN/FR)
-- Chat UI + chat API routes landed in code
+- Chat UI + chat API routes exist in code
 - Security hardening landed: rate limiting, crypto helpers, stronger registration password policy
-- Local dev now runs safely on localhost + local Postgres
+- Local dev now runs on localhost + local Postgres
 
 ---
 
@@ -39,7 +33,11 @@ Merged app in progress: PageBase-style workspace product on top of ClawHost host
 - [x] Delete old Cloud Run + Cloud SQL (saves ~$25/mo)
 - [x] Configure Stripe webhook in production
 - [x] Realign the launch-critical auth/onboarding/settings E2E slice with the actual UI
+- [x] Pivot onboarding foundation toward platform-managed OpenRouter + subscription credits
 - [ ] Test full user signup -> payment -> provision flow end to end
+- [ ] Consume shared Telegram bot `/start <token>` and persist account linking
+- [ ] Route shared-bot messages into the correct user/runtime
+- [ ] Add real credit decrement/metering rules
 - [ ] Verify chat flow against a real OpenClaw gateway instance
 - [ ] Prove provisioning against a safe live or local runtime
 - [ ] Reduce remaining lint warnings and route drift
@@ -67,12 +65,12 @@ Merged app in progress: PageBase-style workspace product on top of ClawHost host
 
 ## 🔧 Systems & Infra
 - **Repo:** `github.com/mtldev-dotcom/clawhost`
-- **Local:** `localhost:3000` (Next.js) + Docker PostgreSQL (`nestai-db`)
+- **Local app:** `localhost:3000` (Next.js)
+- **Local DB:** Docker PostgreSQL on `localhost:5432` (`nestai-db`)
 - **Production:** canonical public hostname still needs final cleanup, do not treat legacy NestAI hostnames as settled product truth
 - **Dokploy Panel:** `http://35.202.32.236:3000`
-- **GCP DB:** `35.202.32.236:5432/nestai`
 - **Deploy:** Dokploy (frontend + DB + user instances)
-- **Env:** `.env.local` — keep local pointed at `localhost`, back up remote env before local testing
+- **Env split:** `.env` = local-first repo defaults, `.env.local` = private local overrides/secrets
 
 ---
 
@@ -87,9 +85,11 @@ Merged app in progress: PageBase-style workspace product on top of ClawHost host
 ## 🔌 APIs & Integrations
 | Service | What For | Key |
 |---------|----------|-----|
+| OpenRouter | Platform-managed LLM access | `OPENROUTER_API_KEY` |
 | Stripe | Subscriptions + webhooks | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` |
 | Dokploy | Instance provisioning | `DOKPLOY_URL`, `DOKPLOY_API_KEY` |
 | NextAuth | Auth sessions | `NEXTAUTH_SECRET` |
+| Telegram | Shared bot linking foundation | `TELEGRAM_SHARED_BOT_USERNAME` |
 
 ---
 
@@ -99,10 +99,112 @@ Merged app in progress: PageBase-style workspace product on top of ClawHost host
 - Brand: Emerald accent **once per screen max** — no decorative use
 - Auth flow: Middleware protects `/dashboard` + `/onboarding`, uses JWT strategy
 - Session stored in `authjs.session-token` cookie
+- If you change `NEXTAUTH_SECRET`, old cookies will throw `JWTSessionError` until browser site data is cleared
+- If you browse local dev over a Tailscale/LAN IP, `NEXTAUTH_URL` should match the URL you are actually using
 - Layouts: Root layout has NO nav, public pages use PublicNav, dashboard uses DashboardHeader
 - Middleware must be in `src/middleware.ts` (not project root) for src/app structure
 
 ---
+
+## 🧪 Manual Story Flows You Can Test Yourself
+
+### 1. Fresh signup -> onboarding -> workspace
+1. Open `/register`
+2. Create a new account
+3. Confirm redirect to `/onboarding`
+4. Pick a default model
+5. Continue into `/dashboard/workspace`
+6. Confirm a workspace exists and the shell loads
+
+### 2. Login -> workspace
+1. Open `/login`
+2. Sign in with an existing account
+3. Confirm redirect into the authenticated app
+4. Confirm `/dashboard/workspace` loads
+
+### 3. Workspace bootstrap truth
+1. Open `/dashboard/workspace`
+2. Confirm the workspace exists
+3. Confirm root folders exist: `Inbox`, `Projects`, `Notes`
+4. Confirm the root Home page exists
+
+### 4. Create a standard page
+1. Open the workspace page creator
+2. Create a `Standard` page
+3. Open it
+4. Edit title/content
+5. Refresh and confirm it persisted
+
+### 5. Create a database page
+1. Create a `Database` page
+2. Add one or more fields
+3. Add a row
+4. Confirm the row appears in the rendered table view
+5. Refresh and confirm the structure still exists
+
+### 6. Create the other page types
+1. Create `Board`, `Dashboard`, and `Capture` pages
+2. Confirm each page type can be created and opened without crashing the shell
+
+### 7. Workspace file upload
+1. In `/dashboard/workspace`, upload a small file
+2. Confirm it appears in the list
+3. Add a description if the UI allows it
+4. Refresh and confirm it still appears
+
+### 8. Workspace file download
+1. From the file list, click download on an uploaded file
+2. Confirm the file is returned successfully
+3. Confirm another user's file is not exposed through the URL
+
+### 9. Workspace file search
+1. Upload a file with an obvious name
+2. Search by name or description
+3. Confirm matching files appear
+4. Confirm unrelated files do not appear
+
+### 10. Settings -> model selection
+1. Open `/dashboard/settings`
+2. Confirm subscription + credits UI renders
+3. Change the default model
+4. Save it
+5. Refresh and confirm the selection persisted
+
+### 11. Settings -> Telegram connect link
+1. Open `/dashboard/settings`
+2. Click `Connect Telegram`
+3. Confirm a Telegram deep link opens for the shared bot
+4. Current expected truth: link generation exists, but full `/start <token>` account linking is still not finished
+
+### 12. Settings -> deploy state
+1. Open `/dashboard/settings`
+2. Confirm runtime status renders
+3. Confirm deploy is gated when no active subscription/credits exist
+4. If you later create an active paid state, re-check deploy behavior
+
+### 13. Logout
+1. From the authenticated app, log out
+2. Confirm you land back on `/login`
+3. Confirm protected routes redirect back to login when signed out
+
+### 14. Language smoke check
+1. Switch locale if the UI exposes it
+2. Confirm core auth/workspace/settings copy changes cleanly
+3. Watch for missing translations or mixed-language screens
+
+### 15. Manual API smoke checks
+- `GET /api/instance`
+- `PATCH /api/instance`
+- `GET /api/workspace/files`
+- `POST /api/workspace/files`
+- `GET /api/workspace/files/[id]/download`
+
+### Not fully manual-proven yet
+- real Stripe payment -> credit grant -> deploy chain
+- real shared Telegram bot account linking completion
+- real message routing from shared Telegram bot into the correct runtime
+- real credit decrement based on usage
+- full live provisioning against a safe runtime
 
 ## 📚 Truth Sources
 - `AGENTS.md` = repo rules
