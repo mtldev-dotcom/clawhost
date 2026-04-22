@@ -73,7 +73,6 @@ export const createSkill = (overrides?: Partial<Skill>): Skill => ({
 // Test credentials from .env.local
 export const TEST_CREDENTIALS = {
   openai: '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',
-  anthropic: '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',
   telegram: '8325083161:AAHk9BnUL6OsP_HtciaFP4EmnH4IYVYJ630',
 }
 
