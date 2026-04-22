@@ -749,3 +749,115 @@
 - Open blockers: none
 
 ---
+## Session 2026-04-22 22:48 UTC — OpenClaw subagent
+**Starting branch:** `dev-claude`
+**Starting commit:** `a29b3a0 chore: remove orphaned src/types directory`
+**Plan version:** `plan-claude.md @ a29b3a0`
+
+### Task: M0-6 — Retire stale Playwright E2E specs
+- Started: 22:48 UTC
+- Files touched: `tests/e2e/onboarding/wizard.spec.ts` (deleted), `tests/e2e/dashboard/settings.spec.ts` (deleted), `progress-report.md`, `plan-claude.md`, `docs/HANDOFF.md`
+- Steps run (literal copy from plan-claude.md):
+  1. Run preflight greps to confirm staleness.
+  2. Delete:
+     ```bash
+     rm tests/e2e/onboarding/wizard.spec.ts
+     rm tests/e2e/dashboard/settings.spec.ts
+     ```
+  3. Run `npm run test:run` (Vitest only, not Playwright — these are Playwright files).
+  4. Run `npm run build`.
+- Verification commands + raw output (paste exact terminal output, do not summarize):
+  ```
+  $ git status
+  On branch dev-claude
+  Your branch is up to date with 'origin/dev-claude'.
+  
+  nothing to commit, working tree clean
+  
+  $ git branch --show-current
+  dev-claude
+  
+  $ node --version
+  v24.14.1
+  
+  $ npm run db:up
+  > clawhost@0.1.0 db:up
+  > docker compose -f docker-compose.dev.yml up -d
+  
+  time="2026-04-22T18:48:31-04:00" level=warning msg="/home/mtldev/active-dev-projects/clawhost/docker-compose.dev.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+   Container clawhost-postgres-1 Running 
+  
+  $ grep -c 'sk-\.\.\.' tests/e2e/onboarding/wizard.spec.ts
+  6
+  
+  $ grep -c 'test-provider' tests/e2e/onboarding/wizard.spec.ts
+  1
+  
+  $ grep -c 'OpenAI' tests/e2e/dashboard/settings.spec.ts
+  1
+  
+  $ rm tests/e2e/onboarding/wizard.spec.ts
+  
+  $ rm tests/e2e/dashboard/settings.spec.ts
+  
+  $ npm run test:run
+  > clawhost@0.1.0 test:run
+  > vitest run
+  
+  The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+  
+  RUN  v4.1.2 /home/mtldev/active-dev-projects/clawhost
+  
+   ✓ tests/unit/lib/dokploy-api.test.ts (17 tests) 13ms
+   ✓ tests/unit/lib/workspace.test.ts (4 tests) 55ms
+   ✓ tests/integration/api/skills.test.ts (7 tests) 65ms
+   ✓ tests/integration/api/auth-register.test.ts (5 tests) 90ms
+   ✓ tests/integration/api/workspace-files.test.ts (3 tests) 93ms
+   ✓ tests/integration/api/instance.test.ts (6 tests) 93ms
+   ✓ tests/integration/api/workspace-file-download.test.ts (3 tests) 103ms
+  
+   Test Files  7 passed (7)
+        Tests  45 passed (45)
+     Start at  18:48:37
+     Duration  1.61s (transform 566ms, setup 1.56s, import 495ms, tests 512ms, environment 6.87s)
+  
+  
+  $ npm run build
+  > clawhost@0.1.0 build
+  > next build
+  
+     ▲ Next.js 15.5.14
+     - Environments: .env.local, .env
+     - Experiments (use with caution):
+       · serverActions
+  
+     Creating an optimized production build ...
+  The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+   ✓ Compiled successfully in 2.7s
+     Skipping validation of types
+     Skipping linting
+     Collecting page data ...
+     Generating static pages (0/12) ...
+     Generating static pages (3/12) 
+     Generating static pages (6/12) 
+     Generating static pages (9/12) 
+   ✓ Generating static pages (12/12)
+  [WS] Cleaning up connections...
+     Finalizing page optimization ...
+     Collecting build traces ...
+  [WS] Cleaning up connections...
+  
+  $ ls tests/e2e/onboarding/wizard.spec.ts
+  ls: cannot access 'tests/e2e/onboarding/wizard.spec.ts': No such file or directory
+  ```
+- Result: ✅ complete
+- Commit (if task completed): `PENDING_COMMIT`
+
+### Session end
+- Ending branch: `dev-claude`
+- Ending commit: `PENDING_COMMIT`
+- Tasks completed this session: `M0-6`
+- Next task to pick up: `M0-7`
+- Open blockers: none
+
+---

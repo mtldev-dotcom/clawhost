@@ -387,7 +387,7 @@ If all return 0, the specs may already be updated — STOP. Ask human to re-chec
 
 **Mark complete when:** All three verification items pass.
 
-- [ ] M0-6
+- [x] M0-6
 
 ---
 
