@@ -41,11 +41,7 @@ export async function approveChannelPairing(pairingCode: string) {
     throw new Error('Instance not deployed')
   }
 
-  if (!instance.channel) {
-    throw new Error('No channel configured')
-  }
-
-  await approvePairing(containerName, instance.channel, pairingCode)
+  await approvePairing(containerName, pairingCode)
 
   revalidatePath('/dashboard')
   return { success: true }

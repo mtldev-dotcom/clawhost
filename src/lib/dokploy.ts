@@ -252,11 +252,7 @@ export async function provisionInstance(user: User, instance: Instance) {
 
     // 4. Set the docker-compose content
     const composeYaml = buildComposeYaml({
-      slug,
-      subdomain,
-      channelToken: instance.channelToken ?? '',
-      aiApiKey: instance.aiApiKey ?? '',
-      aiProvider: instance.aiProvider ?? 'openai',
+      aiProvider: instance.aiProvider ?? 'openrouter',
       model: instance.activeModel ?? undefined,
     })
 
@@ -420,20 +416,16 @@ export async function getGatewayToken(containerName: string): Promise<string | n
   }
 }
 
-export async function approvePairing(containerName: string, channel: string, pairingCode: string) {
-  // Validate inputs
+export async function approvePairing(containerName: string, pairingCode: string) {
   if (!validateContainerName(containerName)) {
     throw new Error('Invalid container name')
   }
-  
-  if (!validateCommandArg(channel)) {
-    throw new Error('Invalid channel')
-  }
-  
+
   if (!validatePairingCode(pairingCode)) {
     throw new Error('Invalid pairing code format')
   }
 
+  const channel = 'telegram'
   console.log(`Approving pairing: ${channel} ${pairingCode}`)
 
   const { stdout, stderr } = await execDocker(
@@ -461,35 +453,25 @@ function getApiKeyEnvVar(provider: string | null | undefined) {
   }
 }
 
-function getEffectiveAiApiKey(provider: string | null | undefined, instanceKey?: string | null) {
-  if (instanceKey) return instanceKey
-
+function getEffectiveAiApiKey(provider: string | null | undefined) {
   switch (provider) {
     case 'openrouter':
       return env.OPENROUTER_API_KEY
     default:
-      return instanceKey || ''
+      return ''
   }
 }
 
-function buildComposeYaml({ slug, subdomain, channelToken, aiApiKey, aiProvider, model }: {
-  slug: string
-  subdomain: string
-  channelToken: string
-  aiApiKey: string
+function buildComposeYaml({ aiProvider, model }: {
   aiProvider: string
   model?: string
 }) {
   const aiKeyEnvVar = getApiKeyEnvVar(aiProvider)
-  const effectiveAiApiKey = getEffectiveAiApiKey(aiProvider, aiApiKey)
+  const effectiveAiApiKey = getEffectiveAiApiKey(aiProvider)
 
   const envVars = [
     `${aiKeyEnvVar}=${escapeEnvVar(effectiveAiApiKey)}`,
   ]
-
-  if (channelToken) {
-    envVars.push(`TELEGRAM_BOT_TOKEN=${escapeEnvVar(channelToken)}`)
-  }
 
   if (model) {
     envVars.push(`OPENCLAW_MODEL=${escapeEnvVar(model)}`)
@@ -589,7 +571,7 @@ async function provisionLocal(slug: string, instance: Instance) {
   await execAsync(`docker rm -f ${containerName} 2>/dev/null || true`)
 
   const apiKeyEnvVar = getApiKeyEnvVar(instance.aiProvider)
-  const effectiveAiApiKey = getEffectiveAiApiKey(instance.aiProvider, instance.aiApiKey)
+  const effectiveAiApiKey = getEffectiveAiApiKey(instance.aiProvider)
 
   // Use execSafe with array args instead of shell string
   const dockerArgs = [
@@ -642,23 +624,6 @@ async function provisionLocal(slug: string, instance: Instance) {
   }
 
   await new Promise(resolve => setTimeout(resolve, 3000))
-
-  // Add channel
-  if (instance.channel && instance.channelToken) {
-    const validChannels = ['telegram', 'discord', 'whatsapp']
-    if (validChannels.includes(instance.channel)) {
-      console.log(`[LOCAL] Adding channel: ${instance.channel}`)
-      try {
-        await execDocker(containerName, [
-          'node', '/app/openclaw.mjs', 'channels', 'add',
-          '--channel', instance.channel,
-          '--token', instance.channelToken
-        ])
-      } catch {
-        console.log('[LOCAL] Channel added (container may restart)')
-      }
-    }
-  }
 
   await new Promise(resolve => setTimeout(resolve, 2000))
 

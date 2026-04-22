@@ -6,30 +6,25 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `0586ef7 docs: sync handoff and progress after M0-10`
+**Last commit:** `6ce4203 refactor: remove deprecated Instance fields and ProviderConfig model via migration`
 **Plan version:** `plan-claude.md` at repo root
-**Task in flight:** `TASK M1-1` — Create schema cleanup migration
-**State:** human override received, continue and adapt plan to current code
+**Task in flight:** none
+**State:** `M1-1` complete, next task `M1-2`
 **Updated:** 2026-04-22
 
 ---
 
 ## Next suggested task
 
-Proceed with `TASK M1-1`, using the human-approved override to adapt the task to the repo's current code.
+Proceed with `TASK M1-2` — Update `/api/instance` PATCH to reject legacy fields.
 
-Preflight found active non-test `src/` references to deprecated schema fields:
-- `.channel`
-- `channelToken`
-- `aiApiKey`
-
-Do not ignore them. Update the implementation in the safest way that preserves the intent of M1-1 against the current codebase.
+`M1-1` was adapted to current repo reality under explicit human override. The schema cleanup migration landed together with the minimum code/test updates needed to safely remove the deprecated schema fields without leaving broken references behind.
 
 ---
 
 ## Open questions for the human
 
-- None. Human explicitly said: `Proceed past the M1-1 stop event and adapt the plan to current code`.
+- None.
 
 ---
 
@@ -44,21 +39,10 @@ Do not ignore them. Update the implementation in the safest way that preserves t
 
 ## Context at handoff time
 
-I completed the required reading and startup checks for the session:
-- `git status` was clean
-- `git branch --show-current` returned `dev-claude`
-- `node --version` returned `v24.14.1`
-- `npm run db:up` succeeded
-
-I then ran the exact M1-1 preflight greps.
-
-Results:
-- `ProviderConfig` in `src/`: 0 matches
-- `telegramChannelId` in `src/`: 0 matches
-- `.channel` in `src/`: matches found in non-test files
-- `channelToken` in `src/`: matches found in non-test files
-- `aiApiKey` in `src/`: matches found in non-test files
-
-This originally triggered a STOP condition, but the human explicitly overrode it and authorized adapting the task to current code.
-
-`progress-report.md` includes the raw command output, STOP EVENT entry, and override resolution.
+Completed in `M1-1`:
+- Removed `Instance.channel`, `Instance.channelToken`, `Instance.aiApiKey`, and `Instance.telegramChannelId` from `prisma/schema.prisma`
+- Removed the `ProviderConfig` model and `Instance.providers` relation
+- Created and applied migration `20260422233721_remove_deprecated_instance_fields`
+- Regenerated Prisma client
+- Updated runtime code and tests to stop depending on the removed schema fields
+- Verified with `npm run build`, `npm run test:run`, and schema grep checks

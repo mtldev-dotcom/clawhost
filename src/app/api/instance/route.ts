@@ -10,7 +10,7 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { channel, channelToken, aiProvider, aiApiKey, activeModel } = await req.json()
+    const { aiProvider, activeModel } = await req.json()
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
@@ -28,10 +28,7 @@ export async function PATCH(req: Request) {
       const instance = await prisma.instance.create({
         data: {
           userId: user.id,
-          channel,
-          channelToken,
           aiProvider: provider,
-          aiApiKey,
           activeModel: model,
           status: 'pending',
         },
@@ -42,10 +39,7 @@ export async function PATCH(req: Request) {
     const instance = await prisma.instance.update({
       where: { id: user.instance.id },
       data: {
-        ...(channel !== undefined && { channel }),
-        ...(channelToken !== undefined && { channelToken }),
         ...(provider && { aiProvider: provider }),
-        ...(aiApiKey !== undefined && { aiApiKey }),
         ...(model && { activeModel: model }),
       },
     })
@@ -81,7 +75,6 @@ export async function GET() {
         id: user.instance.id,
         status: user.instance.status,
         appUrl: user.instance.appUrl,
-        channel: user.instance.channel,
         aiProvider: user.instance.aiProvider,
         activeModel: user.instance.activeModel,
         enabledSkills: user.instance.enabledSkills,
