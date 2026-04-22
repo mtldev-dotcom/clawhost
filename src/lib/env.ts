@@ -15,6 +15,14 @@ const envSchema = z.object({
   // Encryption (for API keys at rest)
   ENCRYPTION_KEY: z.string().min(1),
 
+  // Platform LLM
+  OPENROUTER_API_KEY: z.string().min(1),
+  PLATFORM_DEFAULT_MODEL: z.string().default('openrouter/anthropic/claude-sonnet-4-6'),
+  PLATFORM_MONTHLY_CREDITS: z.coerce.number().int().positive().default(1000),
+
+  // Telegram
+  TELEGRAM_SHARED_BOT_USERNAME: z.string().min(1).optional(),
+
   // Stripe
   STRIPE_SECRET_KEY: z.string().startsWith('sk_'),
   STRIPE_WEBHOOK_SECRET: z.string().startsWith('whsec_'),
@@ -28,8 +36,8 @@ const envSchema = z.object({
 export type Env = z.infer<typeof envSchema>
 
 function getEnv(): Env {
-  // Skip validation during build
-  if (process.env.NEXT_PHASE === 'phase-production-build') {
+  // Skip strict validation during build and tests
+  if (process.env.NEXT_PHASE === 'phase-production-build' || process.env.NODE_ENV === 'test' || process.env.VITEST) {
     return process.env as unknown as Env
   }
   return envSchema.parse(process.env)

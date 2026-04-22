@@ -1,6 +1,7 @@
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
+import { env } from '@/lib/env'
 
 export async function PATCH(req: Request) {
   try {
@@ -16,31 +17,36 @@ export async function PATCH(req: Request) {
       include: { instance: true },
     })
 
-    if (!user?.instance) {
-      // Create instance if it doesn't exist
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    const provider = aiProvider || user.instance?.aiProvider || 'openrouter'
+    const model = activeModel || user.instance?.activeModel || env.PLATFORM_DEFAULT_MODEL
+
+    if (!user.instance) {
       const instance = await prisma.instance.create({
         data: {
-          userId: user!.id,
+          userId: user.id,
           channel,
           channelToken,
-          aiProvider,
+          aiProvider: provider,
           aiApiKey,
-          activeModel,
+          activeModel: model,
           status: 'pending',
         },
       })
       return NextResponse.json({ instance })
     }
 
-    // Update existing instance
     const instance = await prisma.instance.update({
       where: { id: user.instance.id },
       data: {
-        ...(channel && { channel }),
-        ...(channelToken && { channelToken }),
-        ...(aiProvider && { aiProvider }),
-        ...(aiApiKey && { aiApiKey }),
-        ...(activeModel && { activeModel }),
+        ...(channel !== undefined && { channel }),
+        ...(channelToken !== undefined && { channelToken }),
+        ...(provider && { aiProvider: provider }),
+        ...(aiApiKey !== undefined && { aiApiKey }),
+        ...(model && { activeModel: model }),
       },
     })
 
@@ -77,6 +83,7 @@ export async function GET() {
         appUrl: user.instance.appUrl,
         channel: user.instance.channel,
         aiProvider: user.instance.aiProvider,
+        activeModel: user.instance.activeModel,
         enabledSkills: user.instance.enabledSkills,
         createdAt: user.instance.createdAt,
         updatedAt: user.instance.updatedAt,

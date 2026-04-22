@@ -8,18 +8,25 @@ datasource db {
 }
 
 model User {
-  id               String    @id @default(cuid())
-  email            String    @unique
-  name             String?
-  passwordHash     String?
-  stripeCustomerId String?   @unique
-  locale           String    @default("en") // 'en' or 'fr'
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  instance         Instance?
-  workspace        Workspace?
-  accounts         Account[]
-  sessions         Session[]
+  id                    String              @id @default(cuid())
+  email                 String              @unique
+  name                  String?
+  passwordHash          String?
+  stripeCustomerId      String?             @unique
+  locale                String              @default("en") // 'en' or 'fr'
+  subscriptionStatus    SubscriptionStatus  @default(inactive)
+  creditsBalance        Int                 @default(0)
+  lifetimeCreditsGranted Int                @default(0)
+  telegramUserId        String?             @unique
+  telegramUsername      String?
+  telegramLinkedAt      DateTime?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  instance              Instance?
+  workspace             Workspace?
+  accounts              Account[]
+  sessions              Session[]
+  telegramLinkTokens    TelegramLinkToken[]
 }
 
 model Workspace {
@@ -55,28 +62,41 @@ model Page {
 }
 
 model Instance {
-  id               String           @id @default(cuid())
-  userId           String           @unique
-  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status           InstanceStatus   @default(pending)
-  appUrl           String?
-  dokployProjectId String?
-  dokployAppId     String?
-  channel          String?
-  channelToken     String?
-  aiProvider       String?
-  aiApiKey         String?
-  activeModel      String?          // Currently active model (e.g., "openai/gpt-4o")
-  agentLocale      String           @default("en") // Agent communication language
-  enabledSkills    String[]         @default([])
-  stripeSubId      String?          @unique
-  stripePriceId    String?
-  gatewayToken     String?          // OpenClaw gateway authentication token
-  containerHost    String?          // Container hostname for internal WS connection
-  gatewayPort      Int              @default(18789)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  providers        ProviderConfig[]
+  id                String           @id @default(cuid())
+  userId            String           @unique
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status            InstanceStatus   @default(pending)
+  appUrl            String?
+  dokployProjectId  String?
+  dokployAppId      String?
+  channel           String?
+  channelToken      String?
+  aiProvider        String?
+  aiApiKey          String?
+  activeModel       String?          // Currently active model (e.g., "openai/gpt-4o")
+  agentLocale       String           @default("en") // Agent communication language
+  enabledSkills     String[]         @default([])
+  stripeSubId       String?          @unique
+  stripePriceId     String?
+  telegramChannelId String?
+  gatewayToken      String?          // OpenClaw gateway authentication token
+  containerHost     String?          // Container hostname for internal WS connection
+  gatewayPort       Int              @default(18789)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  providers         ProviderConfig[]
+}
+
+model TelegramLinkToken {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token      String   @unique
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([userId, expiresAt])
 }
 
 model ProviderConfig {
@@ -98,6 +118,13 @@ enum InstanceStatus {
   provisioning
   active
   failed
+  cancelled
+}
+
+enum SubscriptionStatus {
+  inactive
+  active
+  past_due
   cancelled
 }
 

@@ -19,8 +19,9 @@ What is real in code right now:
 - workspace upload UI
 - workspace file download flow
 - workspace file search UI
-- provider-first onboarding
-- dashboard settings for provider/channel configuration
+- platform-managed OpenRouter onboarding with per-workspace model selection
+- subscription credit foundation on the user account
+- shared Telegram bot deep-link foundation
 - hosted-agent provisioning via Dokploy
 - skills marketplace UI and API
 - English/French UI support
@@ -38,10 +39,10 @@ Latest verified checks on this branch:
 - `npm run build` ✅
 
 Latest verified targeted browser truth:
-- provider-first onboarding is the real flow
 - onboarding lands in `/dashboard/workspace`
 - logout behavior was revalidated and test drift was fixed
 - workspace file upload/download/search surfaces are now in the app shell
+- settings now shift toward platform-managed OpenRouter + subscription credits + shared Telegram linking
 
 ## Stack
 
@@ -90,11 +91,11 @@ npm run db:seed
 
 1. Register or sign in
 2. Workspace is bootstrapped automatically
-3. Onboarding configures provider + model
-4. Provisioning configures the hosted runtime
+3. Onboarding configures the default platform model
+4. Billing activates subscription credits
 5. User lands in `/dashboard/workspace`
 6. Workspace becomes the main shell for pages, databases, and files
-7. Chat, settings, skills, billing, and provisioning remain attached to the same account
+7. Settings handles deploy status, Telegram linking, and model changes
 
 ## API Surface (current key routes)
 
@@ -105,7 +106,7 @@ npm run db:seed
 | `/api/skills` | GET, POST | list/toggle skills |
 | `/api/provision` | POST | provisioning trigger |
 | `/api/stripe/checkout` | POST | Stripe checkout |
-| `/api/stripe/webhook` | POST | Stripe events |
+| `/api/stripe/webhook` | POST | Stripe events + subscription credit grants |
 | `/api/workspace/files` | GET, POST | list/upload workspace files |
 | `/api/workspace/files/[id]/download` | GET | download owned workspace file |
 

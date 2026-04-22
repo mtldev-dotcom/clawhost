@@ -450,6 +450,28 @@ export async function approvePairing(containerName: string, channel: string, pai
   return { success: true }
 }
 
+function getApiKeyEnvVar(provider: string | null | undefined) {
+  switch (provider) {
+    case 'anthropic':
+      return 'ANTHROPIC_API_KEY'
+    case 'openrouter':
+      return 'OPENROUTER_API_KEY'
+    default:
+      return 'OPENAI_API_KEY'
+  }
+}
+
+function getEffectiveAiApiKey(provider: string | null | undefined, instanceKey?: string | null) {
+  if (instanceKey) return instanceKey
+
+  switch (provider) {
+    case 'openrouter':
+      return env.OPENROUTER_API_KEY
+    default:
+      return instanceKey || ''
+  }
+}
+
 function buildComposeYaml({ slug, subdomain, channelToken, aiApiKey, aiProvider, model }: {
   slug: string
   subdomain: string
@@ -458,12 +480,16 @@ function buildComposeYaml({ slug, subdomain, channelToken, aiApiKey, aiProvider,
   aiProvider: string
   model?: string
 }) {
-  const aiKeyEnvVar = aiProvider === 'anthropic' ? 'ANTHROPIC_API_KEY' : 'OPENAI_API_KEY'
+  const aiKeyEnvVar = getApiKeyEnvVar(aiProvider)
+  const effectiveAiApiKey = getEffectiveAiApiKey(aiProvider, aiApiKey)
 
   const envVars = [
-    `TELEGRAM_BOT_TOKEN=${escapeEnvVar(channelToken)}`,
-    `${aiKeyEnvVar}=${escapeEnvVar(aiApiKey)}`,
+    `${aiKeyEnvVar}=${escapeEnvVar(effectiveAiApiKey)}`,
   ]
+
+  if (channelToken) {
+    envVars.push(`TELEGRAM_BOT_TOKEN=${escapeEnvVar(channelToken)}`)
+  }
 
   if (model) {
     envVars.push(`OPENCLAW_MODEL=${escapeEnvVar(model)}`)
@@ -562,21 +588,15 @@ async function provisionLocal(slug: string, instance: Instance) {
   // Stop & remove existing container
   await execAsync(`docker rm -f ${containerName} 2>/dev/null || true`)
 
-  const getApiKeyEnvVar = (provider: string | null) => {
-    switch (provider) {
-      case 'anthropic': return 'ANTHROPIC_API_KEY'
-      case 'openrouter': return 'OPENROUTER_API_KEY'
-      default: return 'OPENAI_API_KEY'
-    }
-  }
   const apiKeyEnvVar = getApiKeyEnvVar(instance.aiProvider)
+  const effectiveAiApiKey = getEffectiveAiApiKey(instance.aiProvider, instance.aiApiKey)
 
   // Use execSafe with array args instead of shell string
   const dockerArgs = [
     'run', '-d',
     '--name', containerName,
     '-p', `${port}:18789`,
-    '-e', `${apiKeyEnvVar}=${instance.aiApiKey || ''}`,
+    '-e', `${apiKeyEnvVar}=${effectiveAiApiKey}`,
     OPENCLAW_IMAGE
   ]
 

@@ -24,6 +24,17 @@ This roadmap is intentionally shorter and closer to the current app truth.
 - [ ] live Stripe payment → provisioning proof
 - [ ] settle the canonical provisioning trigger
 - [ ] settle the final route truth between workspace/chat/dashboard
+- [ ] finish shared Telegram bot account-link consumption flow
+- [ ] verify subscription credit refill logic against real Stripe events
+
+### Messaging and billing pivot
+- [x] platform-managed OpenRouter env foundation
+- [x] user credit balance schema foundation
+- [x] shared Telegram deep-link token foundation
+- [ ] consume Telegram `/start <token>` and persist linked Telegram identity
+- [ ] route shared-bot messages into the correct user/runtime
+- [ ] decide when credits decrement, and prove it with metering
+- [ ] keep user-supplied provider keys as optional advanced mode later, not primary onboarding
 
 ## Near Term
 
