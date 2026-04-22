@@ -1056,3 +1056,77 @@
 - Open blockers: none
 
 ---
+## Session 2026-04-22 23:22 UTC — OpenClaw subagent
+**Starting branch:** `dev-claude`
+**Starting commit:** `2f17d14 docs: sync handoff and progress after M0-8`
+**Plan version:** `plan-claude.md @ 2f17d14`
+
+### Task: M0-9 — Add GitHub Actions CI workflow
+- Started: 23:22 UTC
+- Files touched: `.github/workflows/ci.yml`, `progress-report.md`, `plan-claude.md`, `docs/HANDOFF.md`
+- Steps run (literal copy from plan-claude.md):
+  1. Create the directory if it does not exist:
+     ```bash
+     mkdir -p .github/workflows
+     ```
+  2. Create `.github/workflows/ci.yml` with the exact content below.
+  3. Run `npm run lint` locally to confirm no config issues.
+- Verification commands + raw output (paste exact terminal output, do not summarize):
+  ```
+  $ git status && git branch --show-current && node --version && npm run db:up
+  On branch dev-claude
+  Your branch is up to date with 'origin/dev-claude'.
+  
+  nothing to commit, working tree clean
+  dev-claude
+  v24.14.1
+  
+  > clawhost@0.1.0 db:up
+  > docker compose -f docker-compose.dev.yml up -d
+  
+  time="2026-04-22T19:22:05-04:00" level=warning msg="/home/mtldev/active-dev-projects/clawhost/docker-compose.dev.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+   Container clawhost-postgres-1 Running
+  
+  $ ls .github/workflows/ci.yml && npm run lint
+  .github/workflows/ci.yml
+  
+  > clawhost@0.1.0 lint
+  > eslint .
+  
+  
+  /home/mtldev/active-dev-projects/clawhost/eslint.config.mjs
+    12:1  warning  Assign array to a variable before exporting as module default  import/no-anonymous-default-export
+  
+  /home/mtldev/active-dev-projects/clawhost/src/app/api/provision/route.ts
+    15:11  warning  'clientIP' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  
+  /home/mtldev/active-dev-projects/clawhost/src/app/chat/page.tsx
+    7:10  warning  'Card' is defined but never used  @typescript-eslint/no-unused-vars
+  
+  /home/mtldev/active-dev-projects/clawhost/src/components/dashboard/SkillCard.tsx
+    48:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  
+  /home/mtldev/active-dev-projects/clawhost/src/lib/crypto.ts
+    86:11  warning  'salt' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  
+  /home/mtldev/active-dev-projects/clawhost/src/lib/dokploy.ts
+    391:55  warning  'mcpConfig' is defined but never used  @typescript-eslint/no-unused-vars
+    475:29  warning  'slug' is defined but never used       @typescript-eslint/no-unused-vars
+    475:35  warning  'subdomain' is defined but never used  @typescript-eslint/no-unused-vars
+  
+  /home/mtldev/active-dev-projects/clawhost/tests/e2e/onboarding/model-select.spec.ts
+    14:86  warning  'request' is defined but never used  @typescript-eslint/no-unused-vars
+  
+  ✖ 9 problems (0 errors, 9 warnings)
+  ```
+- Result: ✅ complete
+- Commit (if task completed): `PENDING`
+
+### Session end
+- Ending branch: `dev-claude`
+- Ending commit: `PENDING`
+- Tasks completed this session: `M0-9`
+- Next task to pick up: `M0-10`
+- Open blockers: none
+
+---

@@ -645,7 +645,7 @@ jobs:
 
 **Mark complete when:** Both verification items pass.
 
-- [ ] M0-9
+- [x] M0-9
 
 ---
 

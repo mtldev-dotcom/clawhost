@@ -6,19 +6,19 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `90c6922 test: add Playwright spec for workspace shell smoke flows`
+**Last commit:** `2f17d14 docs: sync handoff and progress after M0-8`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
-**State:** M0-8 complete, ready for TASK M0-9
+**State:** M0-9 complete, ready for TASK M0-10
 **Updated:** 2026-04-22
 
 ---
 
 ## Next suggested task
 
-`TASK M0-9` — Add GitHub Actions CI workflow
+`TASK M0-10` — Milestone M0 close
 
-See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M0-9`.
+See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M0-10`.
 
 ---
 
@@ -39,19 +39,18 @@ See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M
 
 ## Context at handoff time
 
-TASK M0-8 completed on `dev-claude`.
+TASK M0-9 completed on `dev-claude`.
 
 Verified in this session:
 - `git status` was clean
 - `git branch --show-current` returned `dev-claude`
 - `node --version` returned `v24.14.1`
 - `npm run db:up` succeeded
-- created `tests/e2e/workspace/workspace-shell.spec.ts` with the exact task content
+- created `.github/workflows/ci.yml` with the exact task content
+- `ls .github/workflows/ci.yml` returned the file path
 - `npm run lint` exited 0 with warnings only
-- `npm run test:run` exited 0
-- `ls tests/e2e/workspace/workspace-shell.spec.ts` returned the file path
-- plan updated to mark `M0-8` complete
-- committed and pushed `90c6922 test: add Playwright spec for workspace shell smoke flows` to `origin/dev-claude`
+- plan updated to mark `M0-9` complete
+- committed and pushed the M0-9 task commit to `origin/dev-claude`
 
 `progress-report.md` includes the raw command output for this session.
-Next agent should start at TASK M0-9 and follow the same contract.
+Next agent should start at TASK M0-10 and follow the same contract.
