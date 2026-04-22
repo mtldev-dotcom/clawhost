@@ -1,5 +1,12 @@
 # Architecture
 
+## Source of Truth Rule
+
+This file is the architecture truth source for ClawHost.
+
+When product flow, service boundaries, or runtime behavior changes, update this file in the same work.
+Also keep `AGENTS.md`, `docs/WORKFLOW.md`, `docs/DEVELOPMENT.md`, `ADHD.md`, and the Clawhost Notion project page aligned.
+
 ## System Overview
 
 ```
@@ -98,21 +105,38 @@ Manages OpenClaw instances on Dokploy:
 
 ### User Registration
 ```
-Browser → /api/auth/register → Hash password → Create User → Return success
+Browser → /api/auth/register → Password policy validation → Hash password → Create User → Return success
 ```
 
-### Subscription Flow
+### Current Local Onboarding Shape
 ```
-Dashboard → /api/stripe/checkout → Stripe Checkout → Payment
+Login/Register → /onboarding
     ↓
-Stripe Webhook → /api/stripe/webhook → Create Instance → Provision
+Choose AI provider + submit API key test
     ↓
-Dokploy API → Create Project → Deploy Container → Update DB
+Choose active model
+    ↓
+Save instance config via /api/instance
+    ↓
+Trigger /api/provision
+    ↓
+Redirect to /chat
+```
+
+Note: older tests still assumed a channel-first onboarding wizard. The current UI is provider-first, so any onboarding/dashboard changes must keep tests and docs in sync.
+
+### Subscription Flow (target launch path)
+```
+Landing/Dashboard → /api/stripe/checkout → Stripe Checkout → Payment
+    ↓
+Stripe Webhook → /api/stripe/webhook → Create/advance Instance → Provision
+    ↓
+Dokploy API → Create Project → Deploy Container → Update DB → Chat/dashboard ready
 ```
 
 ### Skill Activation
 ```
-Skills Page → /api/skills (POST) → Update enabledSkills → Redeploy Instance
+Skills Page → /api/skills (POST) → Update enabledSkills → Redeploy or refresh Instance config
 ```
 
 ## Security Considerations
@@ -159,6 +183,7 @@ Skills Page → /api/skills (POST) → Update enabledSkills → Redeploy Instanc
 - Single Next.js instance
 - Single PostgreSQL database
 - Dokploy manages container orchestration
+- Documentation + Notion planning are part of delivery, not optional side work
 
 ### Future Scaling
 - Add Redis for session caching

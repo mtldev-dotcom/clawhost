@@ -1,5 +1,8 @@
 # AGENT: Stripe
 
+## Status
+✅ **Configured in production** - Webhook endpoint is live and configured with Stripe
+
 ## Your job
 Set up Stripe checkout + subscription webhook that triggers provisioning.
 
@@ -56,9 +59,10 @@ export async function POST() {
 
 ## Create `src/app/api/stripe/webhook/route.ts`
 ```typescript
+import Stripe from 'stripe'
 import { stripe } from '@/lib/stripe'
 import { prisma } from '@/lib/prisma'
-import { provisionInstance } from '@/lib/dokploy'
+import { provisionInstance, deprovisionInstance } from '@/lib/dokploy'
 import { NextResponse } from 'next/server'
 import { env } from '@/lib/env'
 import { headers } from 'next/headers'
@@ -75,7 +79,7 @@ export async function POST(req: Request) {
   }
 
   if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as Stripe.CheckoutSession
+    const session = event.data.object as Stripe.Checkout.Session
     const userId = session.metadata?.userId
     if (!userId) return NextResponse.json({ error: 'No userId' }, { status: 400 })
 

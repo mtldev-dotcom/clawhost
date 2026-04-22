@@ -26,7 +26,7 @@ Multi-tenant SaaS that gives users a hosted AI agent instance with custom subdom
 - [x] Deploy frontend to Dokploy (instead of Cloud Run)
 - [x] Deploy PostgreSQL to Dokploy (instead of Cloud SQL)
 - [x] Delete old Cloud Run + Cloud SQL (saves ~$25/mo)
-- [ ] Configure Stripe webhook in production
+- [x] Configure Stripe webhook in production
 - [ ] Test full user signup → payment → provision flow end to end
 - [ ] Verify chat flow against a real OpenClaw gateway instance
 - [ ] Clean up lint/test workflow so it stays green without manual babysitting

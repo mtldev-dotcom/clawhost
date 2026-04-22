@@ -4,6 +4,12 @@ Thanks for your interest in contributing! This guide will help you get started.
 
 ## Development Setup
 
+Before changing code, read:
+
+- `AGENTS.md`
+- `docs/WORKFLOW.md`
+- the relevant feature docs
+
 1. Fork and clone the repo
 2. Follow the [Quick Start](../README.md#quick-start) guide
 3. Create a branch for your feature: `git checkout -b feature/my-feature`
@@ -51,10 +57,12 @@ src/
 ### Adding a New Feature
 
 1. Check existing issues/discussions first
-2. Create an issue describing the feature
+2. Read the current code path and docs before changing architecture
 3. Implement with tests if applicable
-4. Update documentation
-5. Submit PR
+4. Update documentation in the same pass
+5. Update `ADHD.md` if the current state changed
+6. Update Notion if project status, launch stage, or next actions changed
+7. Submit PR
 
 ### Bug Fixes
 
@@ -80,6 +88,8 @@ src/
 - [ ] Code follows project style
 - [ ] Self-reviewed the changes
 - [ ] Updated documentation if needed
+- [ ] Updated `ADHD.md` if repo truth changed
+- [ ] Updated Notion if status/roadmap/tasks changed
 - [ ] No console.log or debug code
 - [ ] Tested locally
 
@@ -91,6 +101,11 @@ Major changes should be discussed in issues first. Consider:
 - Security implications
 - Backwards compatibility
 - Maintainability
+
+## Truth Source Policy
+
+This repo treats docs and planning as first-class product assets.
+If code, tests, docs, and Notion disagree, fix the disagreement before calling the work done.
 
 ## Getting Help
 
