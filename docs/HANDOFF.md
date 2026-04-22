@@ -6,19 +6,19 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `HEAD fix: remove broken updateChannelConfig re-export from dashboard/actions`
+**Last commit:** `HEAD chore: delete dead dashboard UI components (AiSetup, ChannelSetup, ChatInterface, InstanceCard)`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
-**State:** M0-2 complete, ready for TASK M0-3
+**State:** M0-3 complete, ready for TASK M0-4
 **Updated:** 2026-04-22
 
 ---
 
 ## Next suggested task
 
-`TASK M0-3` — Delete dead UI components (AiSetup, ChannelSetup, ChatInterface, InstanceCard)
+`TASK M0-4` — Delete dead API routes (test-provider, approve-pairing)
 
-See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M0-3`.
+See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M0-4`.
 
 ---
 
@@ -39,16 +39,21 @@ See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M
 
 ## Context at handoff time
 
-TASK M0-2 completed on `dev-claude`.
+TASK M0-3 completed on `dev-claude`.
 
 Verified in this session:
 - `git status` was clean
 - branch was `dev-claude`
 - `node --version` returned `v24.14.1`
 - `npm run db:up` succeeded against local Docker Postgres
-- preflight grep matched exactly: `9:export { updateChannelConfig, deployInstance } from './settings/actions'`
+- preflight greps for `AiSetup`, `ChannelSetup`, `ChatInterface`, and `InstanceCard` returned only self-references in their own component files
+- deleted `src/components/dashboard/AiSetup.tsx`
+- deleted `src/components/dashboard/ChannelSetup.tsx`
+- deleted `src/components/dashboard/ChatInterface.tsx`
+- deleted `src/components/dashboard/InstanceCard.tsx`
 - `npm run build` exited 0
-- `grep -r "updateChannelConfig" src/` returned 0 lines
+- `npm run test:run` exited 0
+- `ls src/components/dashboard/AiSetup.tsx` returned `No such file or directory`
 
 `progress-report.md` includes the raw command output for this session.
-Next agent should start at TASK M0-3 and follow the same contract.
+Next agent should start at TASK M0-4 and follow the same contract.

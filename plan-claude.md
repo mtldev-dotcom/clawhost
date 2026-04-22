@@ -261,7 +261,7 @@ If any grep returns a match in a different file → STOP. That component is stil
 
 **Mark complete when:** All three verification items pass.
 
-- [ ] M0-3
+- [x] M0-3
 
 ---
 

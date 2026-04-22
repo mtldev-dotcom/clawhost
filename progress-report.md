@@ -352,3 +352,158 @@
 - Open blockers: none
 
 ---
+
+## Session 2026-04-22 22:31 UTC — OpenClaw subagent
+**Starting branch:** `dev-claude`
+**Starting commit:** `eabb23d fix: remove broken updateChannelConfig re-export from dashboard/actions`
+**Plan version:** `plan-claude.md @ eabb23d`
+
+### Task: M0-3 — Delete dead UI components (AiSetup, ChannelSetup, ChatInterface, InstanceCard)
+- Started: 22:31 UTC
+- Files touched: `src/components/dashboard/AiSetup.tsx` (deleted), `src/components/dashboard/ChannelSetup.tsx` (deleted), `src/components/dashboard/ChatInterface.tsx` (deleted), `src/components/dashboard/InstanceCard.tsx` (deleted), `progress-report.md`, `plan-claude.md`, `docs/HANDOFF.md`
+- Steps run (literal copy from plan-claude.md):
+  1. Run all four preflight greps. Confirm each returns only self-references.
+  2. Delete the four files:
+     ```bash
+     rm src/components/dashboard/AiSetup.tsx
+     rm src/components/dashboard/ChannelSetup.tsx
+     rm src/components/dashboard/ChatInterface.tsx
+     rm src/components/dashboard/InstanceCard.tsx
+     ```
+  3. Run `npm run build`.
+  4. Run `npm run test:run`.
+- Verification commands + raw output (paste exact terminal output, do not summarize):
+  ```
+  $ git status
+  On branch dev-claude
+  Your branch is up to date with 'origin/dev-claude'.
+  
+  nothing to commit, working tree clean
+  
+  $ git branch --show-current
+  dev-claude
+  
+  $ node --version
+  v24.14.1
+  
+  $ npm run db:up
+  > clawhost@0.1.0 db:up
+  > docker compose -f docker-compose.dev.yml up -d
+  
+  time="2026-04-22T18:31:45-04:00" level=warning msg="/home/mtldev/active-dev-projects/clawhost/docker-compose.dev.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+   Container clawhost-postgres-1 Running
+  
+  $ grep -r "AiSetup" src/ --include="*.tsx" --include="*.ts"
+  src/components/dashboard/AiSetup.tsx:interface AiSetupProps {
+  src/components/dashboard/AiSetup.tsx:export function AiSetup({ currentProvider, currentApiKey, onUpdate }: AiSetupProps) {
+  
+  $ grep -r "ChannelSetup" src/ --include="*.tsx" --include="*.ts"
+  src/components/dashboard/ChannelSetup.tsx:interface ChannelSetupProps {
+  src/components/dashboard/ChannelSetup.tsx:export function ChannelSetup({ currentChannel, currentToken, onUpdate }: ChannelSetupProps) {
+  
+  $ grep -r "ChatInterface" src/ --include="*.tsx" --include="*.ts"
+  src/components/dashboard/ChatInterface.tsx:interface ChatInterfaceProps {
+  src/components/dashboard/ChatInterface.tsx:export function ChatInterface({ instanceStatus, activeModel, translations: t }: ChatInterfaceProps) {
+  
+  $ grep -r "InstanceCard" src/ --include="*.tsx" --include="*.ts"
+  src/components/dashboard/InstanceCard.tsx:interface InstanceCardProps {
+  src/components/dashboard/InstanceCard.tsx:export function InstanceCard({ instance }: InstanceCardProps) {
+  
+  $ npm run build
+  > clawhost@0.1.0 build
+  > next build
+  
+     ▲ Next.js 15.5.14
+     - Environments: .env.local, .env
+     - Experiments (use with caution):
+       · serverActions
+  
+     Creating an optimized production build ...
+   ✓ Compiled successfully in 3.0s
+     Skipping validation of types
+     Skipping linting
+     Collecting page data ...
+     Generating static pages (0/14) ...
+     Generating static pages (3/14) 
+     Generating static pages (6/14) 
+     Generating static pages (10/14) 
+   ✓ Generating static pages (14/14)
+  [WS] Cleaning up connections...
+     Finalizing page optimization ...
+     Collecting build traces ...
+  [WS] Cleaning up connections...
+  [WS] Cleaning up connections...
+  
+  Route (app)                                 Size  First Load JS
+  ┌ ƒ /                                    2.11 kB         128 kB
+  ├ ƒ /_not-found                            993 B         103 kB
+  ├ ƒ /api/auth/[...nextauth]                160 B         102 kB
+  ├ ƒ /api/auth/register                     160 B         102 kB
+  ├ ƒ /api/chat/history                      160 B         102 kB
+  ├ ƒ /api/chat/send                         160 B         102 kB
+  ├ ƒ /api/instance                          160 B         102 kB
+  ├ ƒ /api/onboarding/approve-pairing        160 B         102 kB
+  ├ ƒ /api/onboarding/test-provider          160 B         102 kB
+  ├ ƒ /api/provision                         160 B         102 kB
+  ├ ƒ /api/skills                            160 B         102 kB
+  ├ ƒ /api/stripe/checkout                   160 B         102 kB
+  ├ ƒ /api/stripe/webhook                    160 B         102 kB
+  ├ ƒ /api/user/locale                       160 B         102 kB
+  ├ ƒ /api/workspace/files                   160 B         102 kB
+  ├ ƒ /api/workspace/files/[id]/download     160 B         102 kB
+  ├ ƒ /chat                                3.64 kB         126 kB
+  ├ ƒ /dashboard                             160 B         102 kB
+  ├ ƒ /dashboard/settings                  3.88 kB         114 kB
+  ├ ƒ /dashboard/skills                       2 kB         104 kB
+  ├ ƒ /dashboard/workspace                  2.7 kB         116 kB
+  ├ ƒ /login                                  2 kB         130 kB
+  ├ ƒ /onboarding                          3.44 kB         113 kB
+  └ ƒ /register                            2.15 kB         130 kB
+  + First Load JS shared by all             102 kB
+    ├ chunks/255-38b49df12a94ee57.js         46 kB
+    ├ chunks/4bd1b696-c023c6e3521b1417.js  54.2 kB
+    └ other shared chunks (total)          1.93 kB
+  
+  
+  ƒ Middleware                             45.7 kB
+  
+  ƒ  (Dynamic)  server-rendered on demand
+  
+  $ npm run test:run
+  > clawhost@0.1.0 test:run
+  > vitest run
+  
+  
+  [1m[46m RUN [49m[22m [36mv4.1.2 [39m[90m/home/mtldev/active-dev-projects/clawhost[39m
+  
+  The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+   [32m✓[39m tests/unit/lib/dokploy-api.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+   [32m✓[39m tests/unit/lib/workspace.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 79[2mms[22m[39m
+   [32m✓[39m tests/integration/api/skills.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 89[2mms[22m[39m
+   [32m✓[39m tests/integration/api/auth-register.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 112[2mms[22m[39m
+   [32m✓[39m tests/integration/api/instance.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 115[2mms[22m[39m
+   [32m✓[39m tests/integration/api/workspace-file-download.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 141[2mms[22m[39m
+   [32m✓[39m tests/integration/api/workspace-files.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 110[2mms[22m[39m
+  
+  [2m Test Files [22m [1m[32m7 passed[39m[22m[90m (7)[39m
+  [2m      Tests [22m [1m[32m45 passed[39m[22m[90m (45)[39m
+  [2m   Start at [22m 18:32:33
+  [2m   Duration [22m 2.10s[2m (transform 807ms, setup 2.00s, import 705ms, tests 663ms, environment 8.77s)[22m
+  
+  $ ls src/components/dashboard/AiSetup.tsx
+  ls: cannot access 'src/components/dashboard/AiSetup.tsx': No such file or directory
+  
+  $ git log -1 --oneline
+  eabb23d fix: remove broken updateChannelConfig re-export from dashboard/actions
+  ```
+- Result: ✅ complete
+- Commit (if task completed): PENDING
+
+### Session end
+- Ending branch: `dev-claude`
+- Ending commit: PENDING
+- Tasks completed this session: `M0-3`
+- Next task to pick up: `M0-4`
+- Open blockers: none
+
+---
