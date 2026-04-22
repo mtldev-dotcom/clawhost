@@ -497,11 +497,11 @@
   eabb23d fix: remove broken updateChannelConfig re-export from dashboard/actions
   ```
 - Result: ✅ complete
-- Commit (if task completed): PENDING
+- Commit (if task completed): `242b292 chore: delete dead dashboard UI components (AiSetup, ChannelSetup, ChatInterface, InstanceCard)`
 
 ### Session end
 - Ending branch: `dev-claude`
-- Ending commit: PENDING
+- Ending commit: `242b292 chore: delete dead dashboard UI components (AiSetup, ChannelSetup, ChatInterface, InstanceCard)`
 - Tasks completed this session: `M0-3`
 - Next task to pick up: `M0-4`
 - Open blockers: none

@@ -6,7 +6,7 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `HEAD chore: delete dead dashboard UI components (AiSetup, ChannelSetup, ChatInterface, InstanceCard)`
+**Last commit:** `242b292 chore: delete dead dashboard UI components (AiSetup, ChannelSetup, ChatInterface, InstanceCard)`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
 **State:** M0-3 complete, ready for TASK M0-4
@@ -54,6 +54,7 @@ Verified in this session:
 - `npm run build` exited 0
 - `npm run test:run` exited 0
 - `ls src/components/dashboard/AiSetup.tsx` returned `No such file or directory`
+- committed and pushed `242b292` to `origin/dev-claude`
 
 `progress-report.md` includes the raw command output for this session.
 Next agent should start at TASK M0-4 and follow the same contract.
