@@ -628,11 +628,11 @@
   ls: cannot access 'src/app/api/onboarding/': No such file or directory
   ```
 - Result: ✅ complete
-- Commit (if task completed): PENDING
+- Commit (if task completed): `df0ed4b chore: delete dead onboarding API routes (test-provider, approve-pairing)`
 
 ### Session end
 - Ending branch: `dev-claude`
-- Ending commit: PENDING
+- Ending commit: `df0ed4b chore: delete dead onboarding API routes (test-provider, approve-pairing)`
 - Tasks completed this session: `M0-4`
 - Next task to pick up: `M0-5`
 - Open blockers: none

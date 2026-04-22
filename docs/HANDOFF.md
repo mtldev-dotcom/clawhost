@@ -6,7 +6,7 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `PENDING`
+**Last commit:** `df0ed4b chore: delete dead onboarding API routes (test-provider, approve-pairing)`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
 **State:** M0-4 complete, ready for TASK M0-5
@@ -53,7 +53,7 @@ Verified in this session:
 - removed the now-empty parent directory `src/app/api/onboarding/`
 - `npm run build` exited 0
 - `ls src/app/api/onboarding/` returned `No such file or directory`
-- committed and pushed `PENDING` to `origin/dev-claude`
+- committed and pushed `df0ed4b` to `origin/dev-claude`
 
 `progress-report.md` includes the raw command output for this session.
 Next agent should start at TASK M0-5 and follow the same contract.
