@@ -6,7 +6,7 @@ import { approvePairing, getGatewayToken } from '@/lib/dokploy'
 import { revalidatePath } from 'next/cache'
 
 // Re-export settings actions for backward compatibility
-export { updateChannelConfig, deployInstance } from './settings/actions'
+export { deployInstance } from './settings/actions'
 
 export async function getInstanceStatus() {
   const session = await auth()

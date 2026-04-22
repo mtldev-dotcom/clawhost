@@ -6,19 +6,19 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `PENDING chore: verify M0-1 baseline checks pass`
+**Last commit:** `HEAD fix: remove broken updateChannelConfig re-export from dashboard/actions`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
-**State:** M0-1 complete, ready for TASK M0-2
+**State:** M0-2 complete, ready for TASK M0-3
 **Updated:** 2026-04-22
 
 ---
 
 ## Next suggested task
 
-`TASK M0-2` — Fix broken re-export in dashboard/actions.ts
+`TASK M0-3` — Delete dead UI components (AiSetup, ChannelSetup, ChatInterface, InstanceCard)
 
-See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M0-2`.
+See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M0-3`.
 
 ---
 
@@ -39,15 +39,16 @@ See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M
 
 ## Context at handoff time
 
-TASK M0-1 baseline verification passed on `dev-claude`.
+TASK M0-2 completed on `dev-claude`.
 
 Verified in this session:
 - `git status` was clean
 - branch was `dev-claude`
 - `node --version` returned `v24.14.1`
 - `npm run db:up` succeeded against local Docker Postgres
-- `npm run lint` exited 0 with warnings only
-- `npm run test:run` exited 0 with 45/45 tests passing
+- preflight grep matched exactly: `9:export { updateChannelConfig, deployInstance } from './settings/actions'`
+- `npm run build` exited 0
+- `grep -r "updateChannelConfig" src/` returned 0 lines
 
 `progress-report.md` includes the raw command output for this session.
-Next agent should start at TASK M0-2 and follow the same contract.
+Next agent should start at TASK M0-3 and follow the same contract.

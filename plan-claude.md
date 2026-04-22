@@ -216,7 +216,7 @@ If it returns anything different → STOP. Context has changed. Ask human.
 
 **Mark complete when:** Both verification items pass.
 
-- [ ] M0-2
+- [x] M0-2
 
 ---
 
