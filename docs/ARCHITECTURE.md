@@ -189,6 +189,8 @@ GET /api/workspace/files lists folders + files for the authenticated user
 POST /api/workspace/files accepts multipart upload, writes bytes to the storage root, and creates a WorkspaceFile record
     ↓
 Workspace shell refreshes and exposes the uploaded file in the root file list
+    ↓
+GET `/api/workspace/files/[id]/download` returns owned file bytes back to the browser
 ```
 
 ### Skill Activation

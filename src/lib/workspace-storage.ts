@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
 const MAX_INLINE_TEXT_BYTES = 100 * 1024
@@ -36,6 +36,11 @@ export async function storeWorkspaceFile({
     relativePath,
     safeName: `${safeName}${extension}`,
   }
+}
+
+export async function readWorkspaceFile(workspaceId: string, storageKey: string) {
+  const absolutePath = path.join(getWorkspaceStorageRoot(), workspaceId, storageKey)
+  return readFile(absolutePath)
 }
 
 export function extractInlineTextContent(file: File, text: string) {

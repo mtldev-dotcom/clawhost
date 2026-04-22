@@ -20,6 +20,7 @@ Merged app in progress: PageBase-style workspace product on top of ClawHost host
 - Workspace file-system foundation is now started with real root folders (Inbox, Projects, Notes)
 - Authenticated `/api/workspace/files` GET/POST routes now exist for listing and uploading workspace files
 - Workspace shell now includes its first real file upload UI wired to the workspace files API
+- Workspace files now support authenticated download via `/api/workspace/files/[id]/download`
 - Channel setup now lives in dashboard settings
 - Custom subdomain per user
 - AI provider config (OpenAI/Anthropic/OpenRouter)
@@ -126,6 +127,8 @@ If any of those drift from code, fix them.
 > 2026-04-22: Workspace file API cut landed. `/api/workspace/files` now supports authenticated listing and multipart uploads, backed by a local storage boundary and a new migration for workspace folders/files.
 
 > 2026-04-22: Workspace upload UI landed. Users can now submit the first file directly from the workspace shell into the new workspace-files API instead of this work living only in backend code.
+
+> 2026-04-22: Workspace download route landed. Uploaded files can now be pulled back out through an authenticated download endpoint, and the workspace shell exposes a direct download link for listed files.
 
 > 2026-04-22: Overnight launch-readiness pass. Targeted Playwright auth/signup/logout/onboarding/settings slice now passes 20/20 after fixing stale channel-first specs, callbackUrl handling, clean Playwright server boot, and logout truth. Current verified flow is provider-first onboarding -> `/chat`, with channel config in dashboard settings and logout landing on `/login`.
 

@@ -310,6 +310,12 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
                             {file.createdBy} • {Math.max(1, Math.round(file.sizeBytes / 1024))} KB
                           </p>
                         </div>
+                        <a
+                          href={`/api/workspace/files/${file.id}/download`}
+                          className="text-xs font-medium text-foreground underline-offset-4 hover:underline"
+                        >
+                          Download
+                        </a>
                       </div>
                     ))
                   ) : (
