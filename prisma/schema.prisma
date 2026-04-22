@@ -38,6 +38,9 @@ model Instance {
   enabledSkills    String[]         @default([])
   stripeSubId      String?          @unique
   stripePriceId    String?
+  gatewayToken     String?          // OpenClaw gateway authentication token
+  containerHost    String?          // Container hostname for internal WS connection
+  gatewayPort      Int              @default(18789)
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   providers        ProviderConfig[]

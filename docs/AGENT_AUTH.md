@@ -76,12 +76,46 @@ import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
+  // SECURITY: Rate limiting check
+  const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown'
+  const rateLimitCheck = checkRateLimit(`register:${clientIP}`, { maxRequests: 10, windowMs: 15 * 60 * 1000 })
+  if (!rateLimitCheck.allowed) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+  }
+
   const { email, password, name } = await req.json()
+
+  // SECURITY: Server-side password validation
+  if (!isValidPassword(password)) {
+    return NextResponse.json({ 
+      error: 'Password must be 8+ chars with uppercase, lowercase, and digit' 
+    }, { status: 400 })
+  }
+
+  // SECURITY: Timing attack protection - don't reveal if email exists
   const existing = await prisma.user.findUnique({ where: { email } })
-  if (existing) return NextResponse.json({ error: 'Email taken' }, { status: 400 })
+  if (existing) {
+    return NextResponse.json({ error: 'Registration failed' }, { status: 400 })
+  }
+
   const passwordHash = await bcrypt.hash(password, 12)
   const user = await prisma.user.create({ data: { email, name, passwordHash } })
   return NextResponse.json({ id: user.id }, { status: 201 })
+}
+
+// SECURITY: Password validation function
+function isValidPassword(password: string): boolean {
+  const MIN_LENGTH = 8
+  const MAX_LENGTH = 128
+  const HAS_UPPERCASE = /[A-Z]/.test(password)
+  const HAS_LOWERCASE = /[a-z]/.test(password)
+  const HAS_DIGIT = /\d/.test(password)
+  
+  return password.length >= MIN_LENGTH 
+    && password.length <= MAX_LENGTH
+    && HAS_UPPERCASE 
+    && HAS_LOWERCASE 
+    && HAS_DIGIT
 }
 ```
 

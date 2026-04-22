@@ -1,5 +1,7 @@
 {
-  "model": "claude-opus-4-5",
+  "env": {
+    "NODE_ENV": "development"
+  },
   "permissions": {
     "allow": [
       "Bash(npm:*)",
@@ -10,10 +12,12 @@
       "Bash(cat:*)",
       "Bash(curl:*)",
       "Read(**)",
-      "Write(**)"
+      "Write(**)",
+      "Bash(wc -l /d/DEV-D/clawhost/src/**/*.ts /d/DEV-D/clawhost/src/**/*.tsx)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\Admin_7530\\.claude\\plans"
     ]
   },
-  "env": {
-    "NODE_ENV": "development"
-  }
+  "model": "claude-opus-4-5"
 }

@@ -75,7 +75,8 @@
     "pendingMessage": "Configure your agent in Settings and deploy it to start chatting.",
     "provisioningMessage": "Your agent is being set up. This usually takes 1-2 minutes.",
     "failedMessage": "Agent setup failed. Please check Settings and try redeploying.",
-    "cancelledMessage": "Your agent has been cancelled."
+    "cancelledMessage": "Your agent has been cancelled.",
+    "welcomeMessage": "Your agent is ready. Say hello! 👋"
   },
   "settings": {
     "title": "Settings",

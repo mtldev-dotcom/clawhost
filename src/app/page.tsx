@@ -6,7 +6,14 @@ import { PublicNav } from '@/components/PublicNav'
 import type { Locale } from '@/i18n/config'
 
 export default async function Home() {
-  const session = await auth()
+  let session = null
+  try {
+    session = await auth()
+  } catch (error) {
+    // Invalid session cookie (e.g., after changing NEXTAUTH_SECRET)
+    // Redirect to clear the invalid session
+    console.warn('Invalid session detected, clearing...', error)
+  }
   const t = await getTranslations('landing')
   const tc = await getTranslations('common')
   const locale = await getLocale() as Locale

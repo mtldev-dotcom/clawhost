@@ -120,17 +120,38 @@ Skills Page → /api/skills (POST) → Update enabledSkills → Redeploy Instanc
 ### Authentication
 - Passwords hashed with bcrypt (12 rounds)
 - JWT sessions (no server-side session storage)
-- Middleware protects routes
+- Middleware protects routes with `auth()` checks
+- Server-side password validation enforced (8+ chars, upper/lower/digit required)
 
 ### API Security
-- All mutations require authentication
-- Stripe webhooks verified with signature
-- Environment variables validated at runtime
+- All mutations require authentication via `auth()` before processing
+- Stripe webhooks verified with signature validation
+- Environment variables validated at runtime via Zod schema
+- Rate limiting on sensitive endpoints:
+  - Auth: 10 requests per 15 minutes per IP
+  - Provisioning: 5 requests per hour per user
+- Returns sanitized error messages (no internal details leaked)
 
 ### Secrets Management
 - API keys stored in environment variables
-- User API keys (AI providers) stored in DB
-- Consider encryption at rest for sensitive fields
+- User AI API keys (OpenAI, Anthropic, etc.) encrypted at rest using AES-256-GCM
+- Encryption key derived via scrypt from `ENCRYPTION_KEY` env var
+- Masked keys shown in logs (`sk-...XXXX`)
+- Hardcoded values extracted to environment variables
+
+### Shell Command Security
+- All Docker commands use `spawn()` with array arguments (not string interpolation)
+- Input validation for:
+  - Container names: alphanumeric + hyphens only
+  - Command arguments: strict allowlist pattern
+  - Pairing codes: alphanumeric, 4-32 characters
+  - Environment variables: newline/null byte removal
+- No shell injection vulnerabilities
+
+### Infrastructure Security
+- Prisma query logging disabled in production
+- GCP project/zone configurable via environment variables
+- Docker socket mount required for production provisioning
 
 ## Scaling Considerations
 
