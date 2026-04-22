@@ -1,5 +1,3 @@
-import { env } from '@/lib/env'
-
 export const platformModels = [
   {
     id: 'openrouter/anthropic/claude-sonnet-4-6',
@@ -18,8 +16,10 @@ export const platformModels = [
   },
 ] as const
 
+export const DEFAULT_PLATFORM_MODEL = 'openrouter/anthropic/claude-sonnet-4-6'
+
 export function getDefaultPlatformModel() {
-  return env.PLATFORM_DEFAULT_MODEL
+  return DEFAULT_PLATFORM_MODEL
 }
 
 export function isSupportedPlatformModel(model: string) {
