@@ -25,7 +25,7 @@ describe('POST /api/auth/register', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email: 'new@example.com',
-        password: 'password123',
+        password: 'SecurePass123',
         name: 'New User',
       }),
     })
@@ -43,7 +43,7 @@ describe('POST /api/auth/register', () => {
     const request = new Request('http://localhost/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: 'password123' }),
+      body: JSON.stringify({ password: 'SecurePass123' }),
     })
 
     const response = await POST(request)
@@ -79,7 +79,7 @@ describe('POST /api/auth/register', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email: 'existing@example.com',
-        password: 'password123',
+        password: 'SecurePass123',
       }),
     })
 
@@ -87,6 +87,29 @@ describe('POST /api/auth/register', () => {
     const data = await response.json()
 
     expect(response.status).toBe(400)
-    expect(data.error).toBe('Email taken')
+    expect(data.error).toBe('Registration failed')
+  })
+
+  it('rejects weak passwords with validation details', async () => {
+    const { POST } = await import('@/app/api/auth/register/route')
+
+    const request = new Request('http://localhost/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: 'weak@example.com',
+        password: 'password123',
+        name: 'Weak User',
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(400)
+    expect(data.error).toBe('Password does not meet requirements')
+    expect(data.details).toContain(
+      'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+    )
   })
 })

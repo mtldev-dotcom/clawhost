@@ -1,4 +1,9 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
+
+async function waitForHydration(page: Page) {
+  await page.waitForLoadState('domcontentloaded')
+  await page.waitForTimeout(5000)
+}
 
 test.describe('Login Flow', () => {
   const testEmail = `login-test-${Date.now()}@example.com`
@@ -17,6 +22,7 @@ test.describe('Login Flow', () => {
 
   test('successful login redirects to dashboard', async ({ page }) => {
     await page.goto('/login')
+    await waitForHydration(page)
 
     await page.fill('input[type="email"]', testEmail)
     await page.fill('input[type="password"]', testPassword)
@@ -28,6 +34,7 @@ test.describe('Login Flow', () => {
 
   test('shows error for invalid credentials', async ({ page }) => {
     await page.goto('/login')
+    await waitForHydration(page)
 
     await page.fill('input[type="email"]', testEmail)
     await page.fill('input[type="password"]', 'WrongPassword!')
@@ -39,6 +46,7 @@ test.describe('Login Flow', () => {
 
   test('shows error for non-existent user', async ({ page }) => {
     await page.goto('/login')
+    await waitForHydration(page)
 
     await page.fill('input[type="email"]', 'nonexistent@example.com')
     await page.fill('input[type="password"]', 'SomePassword123!')
@@ -56,6 +64,7 @@ test.describe('Login Flow', () => {
     await expect(page).toHaveURL(/\/login\?callbackUrl/)
 
     // Login
+    await waitForHydration(page)
     await page.fill('input[type="email"]', testEmail)
     await page.fill('input[type="password"]', testPassword)
     await page.click('button[type="submit"]')
@@ -66,6 +75,7 @@ test.describe('Login Flow', () => {
 
   test('link to register page works', async ({ page }) => {
     await page.goto('/login')
+    await waitForHydration(page)
 
     await page.click('a[href="/register"]')
     await expect(page).toHaveURL('/register')

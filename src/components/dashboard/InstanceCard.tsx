@@ -75,7 +75,7 @@ export function InstanceCard({ instance }: InstanceCardProps) {
         {instance.status === 'provisioning' && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <RefreshCw className="h-4 w-4 animate-spin" />
-            <span>Setting up your agent. This usually takes 1-2 minutes...</span>
+            <span>Setting up your agent. This usually takes 1 to 2 minutes. If it stays here, refresh and check Settings.</span>
           </div>
         )}
 
@@ -116,7 +116,7 @@ export function InstanceCard({ instance }: InstanceCardProps) {
 
         {instance.status === 'failed' && (
           <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-            Something went wrong while setting up your agent. Please contact support.
+            Something went wrong while setting up your agent. Check Settings, then try redeploying. If it keeps failing, contact support.
           </div>
         )}
 

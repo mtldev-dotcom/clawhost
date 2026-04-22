@@ -2,7 +2,8 @@ import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { SettingsClient } from './client'
-import { getMessages } from 'next-intl/server'
+import { platformModels } from '@/lib/platform'
+import { env } from '@/lib/env'
 
 export default async function SettingsPage() {
   const session = await auth()
@@ -11,65 +12,34 @@ export default async function SettingsPage() {
     redirect('/login')
   }
 
-  const [instance, messages] = await Promise.all([
-    prisma.instance.findUnique({
-      where: { userId: session.user.id },
-      include: {
-        providers: true,
-      },
-    }),
-    getMessages(),
-  ])
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    include: { instance: true },
+  })
 
-  if (!instance) {
-    redirect('/onboarding')
-  }
-
-  const m = messages as {
-    settings: {
-      title: string
-      instanceStatus: string
-      runningAt: string
-      configureFirst: string
-      aiProviders: string
-      channel: string
-      addProvider: string
-      saveProvider: string
-      testKey: string
-      providerSaved: string
-      providerDeleted: string
-      keyValid: string
-      keyInvalid: string
-      switchedTo: string
-      channelSaved: string
-      deploymentStarted: string
-    }
-    providers: Record<string, { label: string; description: string }>
-    channels: Record<string, { label: string; placeholder: string }>
-    common: {
-      save: string
-      cancel: string
-      delete: string
-      deploy: string
-      redeploy: string
-      deploying: string
-      active: string
-      valid: string
-      invalid: string
-    }
-  }
-
-  const translations = {
-    settings: m.settings,
-    providers: m.providers,
-    channels: m.channels,
-    common: m.common,
+  if (!user) {
+    redirect('/login')
   }
 
   return (
-    <div className="mx-auto max-w-3xl py-8 px-4 lg:max-w-5xl lg:px-8">
-      <h1 className="mb-8 text-3xl font-bold">{translations.settings.title}</h1>
-      <SettingsClient instance={instance} providers={instance.providers} translations={translations} />
+    <div className="mx-auto max-w-5xl px-4 py-8 lg:px-8">
+      <h1 className="mb-8 text-3xl font-bold">Settings</h1>
+      <SettingsClient
+        user={{
+          email: user.email,
+          subscriptionStatus: user.subscriptionStatus,
+          creditsBalance: user.creditsBalance,
+          lifetimeCreditsGranted: user.lifetimeCreditsGranted,
+          telegramUsername: user.telegramUsername,
+          telegramLinkedAt: user.telegramLinkedAt?.toISOString() ?? null,
+        }}
+        instance={{
+          status: user.instance?.status ?? 'pending',
+          appUrl: user.instance?.appUrl ?? null,
+          activeModel: user.instance?.activeModel ?? env.PLATFORM_DEFAULT_MODEL,
+        }}
+        models={platformModels}
+      />
     </div>
   )
 }

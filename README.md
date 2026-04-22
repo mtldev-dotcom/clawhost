@@ -1,154 +1,134 @@
 # ClawHost
 
-Multi-tenant SaaS platform for hosting personal AI agent instances. Users subscribe, get a custom subdomain, connect messaging channels (Telegram/Discord/WhatsApp), and extend their agent with skills from the marketplace.
+ClawHost is being rebuilt into a workspace-first AI product.
 
-## Features
+The current direction is:
+- **PageBase-style workspace UX** as the product face
+- **ClawHost hosted-agent infrastructure** as the backend spine
 
-- **Instant Provisioning** - Hosted OpenClaw instances deployed via Dokploy
-- **Custom Subdomains** - Each user gets `username.nickybruno.com`
-- **Channel Integration** - Connect Telegram, Discord, or WhatsApp
-- **AI Provider Choice** - Bring your own OpenAI, Anthropic, or OpenRouter key
-- **Multi-Provider Support** - Save multiple API keys and switch between models
-- **Skills Marketplace** - Extend your agent with MCP-based integrations (Gmail, Calendar, Notion, GitHub, etc.)
-- **Bilingual UI** - Full English and French support with language switcher
-- **Stripe Subscriptions** - $9/month with automatic provisioning on payment
+A user signs up, gets a workspace, creates pages and lightweight databases, starts building a file layer, and then connects chat, skills, billing, and provisioning from the same app.
 
-## Tech Stack
+## Current Product Truth
 
-| Layer | Technology |
-|-------|------------|
-| Framework | Next.js 15 (App Router) |
-| Language | TypeScript |
-| Database | PostgreSQL + Prisma ORM |
-| Auth | NextAuth v5 (Auth.js) |
-| Payments | Stripe Subscriptions |
-| Provisioning | Dokploy REST API / Local Docker |
-| Styling | Tailwind CSS + shadcn/ui |
-| i18n | next-intl (English/French) |
-| Deployment | Hetzner VPS via Dokploy |
+What is real in code right now:
+- authenticated workspace bootstrap with a root Home page
+- typed workspace pages: standard, database, board, dashboard, capture
+- database page fields, rows, and simple table rendering
+- workspace file-system foundation with root folders: Inbox, Projects, Notes
+- authenticated workspace file list/upload API
+- workspace upload UI
+- workspace file download flow
+- workspace file search UI
+- platform-managed OpenRouter onboarding with per-workspace model selection
+- subscription credit foundation on the user account
+- shared Telegram bot deep-link foundation
+- hosted-agent provisioning via Dokploy
+- skills marketplace UI and API
+- English/French UI support
 
-## Quick Start
+What is **not** fully proven yet:
+- end-to-end Stripe payment → provisioning in real production conditions
+- final canonical post-onboarding route model between workspace/chat/dashboard
+- agent MCP hooks into the new workspace file layer
+- local Prisma apply for the newest workspace-files migration when the configured remote DB is unreachable
+
+## Verified Checks
+
+Latest verified checks on this branch:
+- `npm run test:run` ✅
+- `npm run build` ✅
+
+Latest verified targeted browser truth:
+- onboarding lands in `/dashboard/workspace`
+- logout behavior was revalidated and test drift was fixed
+- workspace file upload/download/search surfaces are now in the app shell
+- settings now shift toward platform-managed OpenRouter + subscription credits + shared Telegram linking
+
+## Stack
+
+- Next.js 15 (App Router)
+- TypeScript
+- PostgreSQL + Prisma
+- NextAuth v5
+- Stripe
+- Dokploy
+- Tailwind + shadcn/ui
+- next-intl
+
+## Local Setup
 
 ### Prerequisites
-
 - Node.js 18+
-- Docker & Docker Compose
-- Stripe CLI (for webhook testing)
-- PostgreSQL (or use Docker)
+- Docker
+- Git
 
-### Setup
-
+### Boot local dev
 ```bash
-# Clone the repo
 git clone https://github.com/mtldev-dotcom/clawhost.git
 cd clawhost
-
-# Install dependencies
 npm install
-
-# Copy environment variables
 cp .env.example .env.local
-# Edit .env.local with your values
-
-# Start PostgreSQL
 npm run db:up
-
-# Run migrations and seed
 npm run db:migrate
 npm run db:seed
-
-# Start development server
 npm run dev
 ```
 
-### Environment Variables
-
-See [.env.example](.env.example) for all required variables:
-
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `NEXTAUTH_SECRET` | Random secret for JWT signing |
-| `NEXTAUTH_URL` | App URL (http://localhost:3000) |
-| `STRIPE_SECRET_KEY` | Stripe secret key (sk_...) |
-| `STRIPE_WEBHOOK_SECRET` | Stripe webhook secret (whsec_...) |
-| `STRIPE_PRICE_ID` | Stripe price ID for subscription |
-| `DOKPLOY_URL` | Dokploy instance URL |
-| `DOKPLOY_API_KEY` | Dokploy API key |
-
-### Stripe Webhook Testing
-
+### Core commands
 ```bash
-# In a separate terminal
-npm run stripe:listen
-# Copy the webhook secret to .env.local
+npm run dev
+npm run lint
+npm run test:run
+npm run test:e2e
+npm run build
+npm run db:up
+npm run db:down
+npm run db:migrate
+npm run db:seed
 ```
 
-## Project Structure
+## Current App Shape
 
-```
-clawhost/
-├── prisma/
-│   ├── schema.prisma      # Database schema
-│   └── seed.ts            # Skills seed data
-├── src/
-│   ├── app/
-│   │   ├── (auth)/        # Login/Register pages
-│   │   ├── api/           # API routes
-│   │   ├── dashboard/     # User dashboard (Chat, Settings, Skills)
-│   │   └── onboarding/    # Post-payment setup
-│   ├── components/
-│   │   ├── ui/            # shadcn components
-│   │   └── dashboard/     # Dashboard components
-│   ├── i18n/
-│   │   ├── config.ts      # Locale configuration
-│   │   ├── request.ts     # next-intl request handler
-│   │   └── messages/      # en.json, fr.json
-│   └── lib/
-│       ├── auth.ts        # NextAuth config
-│       ├── prisma.ts      # Prisma client
-│       ├── stripe.ts      # Stripe client
-│       └── dokploy.ts     # Dokploy/Docker provisioning
-├── docs/                  # Documentation
-└── CLAUDE.md              # Claude Code instructions
-```
+1. Register or sign in
+2. Workspace is bootstrapped automatically
+3. Onboarding configures the default platform model
+4. Billing activates subscription credits
+5. User lands in `/dashboard/workspace`
+6. Workspace becomes the main shell for pages, databases, and files
+7. Settings handles deploy status, Telegram linking, and model changes
 
-## User Flow
+## API Surface (current key routes)
 
-1. **Register** - Create account with email/password
-2. **Subscribe** - Stripe checkout for $9/month
-3. **Onboard** - Choose channel + AI provider, enter tokens
-4. **Deploy** - Instance provisioned automatically
-5. **Extend** - Add skills from marketplace
+| Route | Methods | Purpose |
+|---|---|---|
+| `/api/auth/register` | POST | registration |
+| `/api/instance` | GET, PATCH | instance config |
+| `/api/skills` | GET, POST | list/toggle skills |
+| `/api/provision` | POST | provisioning trigger |
+| `/api/stripe/checkout` | POST | Stripe checkout |
+| `/api/stripe/webhook` | POST | Stripe events + subscription credit grants |
+| `/api/workspace/files` | GET, POST | list/upload workspace files |
+| `/api/workspace/files/[id]/download` | GET | download owned workspace file |
 
-## API Routes
+## Docs Map
 
-| Route | Method | Description |
-|-------|--------|-------------|
-| `/api/auth/*` | * | NextAuth handlers |
-| `/api/auth/register` | POST | User registration |
-| `/api/stripe/checkout` | POST | Create checkout session |
-| `/api/stripe/webhook` | POST | Handle Stripe events |
-| `/api/provision` | POST | Trigger instance provisioning |
-| `/api/instance` | GET/PATCH | Get/update instance config |
-| `/api/skills` | GET/POST | List skills / toggle skill |
+Live docs:
+- `AGENTS.md` — repo execution contract
+- `ADHD.md` — short current-state truth
+- `docs/INDEX.md` — docs map
+- `docs/ARCHITECTURE.md` — product/system truth
+- `docs/WORKFLOW.md` — execution + done rules
+- `docs/DEVELOPMENT.md` — local dev truth
+- `docs/LOCAL_TESTING_GUIDE.md` — verification truth
+- `docs/DEPLOYMENT.md` — current deployment truth
+- `docs/ROADMAP.md` — active roadmap
+- `docs/CONTRIBUTING.md` — contribution rules
+- `SECURITY_FIXES.md` — security status summary
 
-## Documentation
+Archived legacy docs live under:
+- `docs/archive/2026-04-22-legacy/`
 
-- [Contributing](docs/CONTRIBUTING.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Development](docs/DEVELOPMENT.md)
-- [Deployment (Dokploy)](docs/DEPLOYMENT.md)
-- [Deployment (GCP)](docs/DEPLOYMENT_GCP.md)
+## Repo Rule
 
-## Known Issues
-
-- **Production Build**: Next.js 15 has a [known bug](https://github.com/vercel/next.js/issues/56481) with next-auth that causes error page prerendering to fail. Development mode works correctly. Workaround: deploy with `next start` after building with errors ignored, or wait for upstream fix.
-
-## License
-
-MIT
-
-## Contributing
-
-See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.
+If code, tests, docs, and planning disagree, the repo is lying.
+Fix the disagreement, not the wording.

@@ -2,99 +2,30 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Loader2, Check, X } from 'lucide-react'
-
-type AiProvider = 'openai' | 'anthropic' | 'openrouter'
-
-const providerModels: Record<AiProvider, { id: string; name: string }[]> = {
-  openai: [
-    { id: 'openai/gpt-4o', name: 'GPT-4o' },
-    { id: 'openai/gpt-4-turbo', name: 'GPT-4 Turbo' },
-    { id: 'openai/gpt-3.5-turbo', name: 'GPT-3.5 Turbo' },
-  ],
-  anthropic: [
-    { id: 'anthropic/claude-sonnet-4-6', name: 'Claude Sonnet 4.6' },
-    { id: 'anthropic/claude-opus-4-6', name: 'Claude Opus 4.6' },
-    { id: 'anthropic/claude-haiku-4-5', name: 'Claude Haiku 4.5' },
-  ],
-  openrouter: [
-    { id: 'openrouter/anthropic/claude-sonnet-4-6', name: 'Claude Sonnet (OpenRouter)' },
-    { id: 'openrouter/openai/gpt-4o', name: 'GPT-4o (OpenRouter)' },
-  ],
-}
+import { Check, Loader2, MessageSquare, Sparkles } from 'lucide-react'
+import { platformModels } from '@/lib/platform'
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const t = useTranslations('onboarding')
-  const tc = useTranslations('common')
-  const tp = useTranslations('providers')
-
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
-  const [testing, setTesting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [apiKeyValid, setApiKeyValid] = useState<boolean | null>(null)
-
-  // Form state
-  const [aiProvider, setAiProvider] = useState<AiProvider | null>(null)
-  const [aiApiKey, setAiApiKey] = useState('')
-  const [selectedModel, setSelectedModel] = useState<string | null>(null)
-
-  const providers: { id: AiProvider }[] = [
-    { id: 'openai' },
-    { id: 'anthropic' },
-    { id: 'openrouter' },
-  ]
+  const [selectedModel, setSelectedModel] = useState<string>(platformModels[0].id)
 
   const totalSteps = 3
 
-  async function testApiKey() {
-    if (!aiProvider || !aiApiKey) return
-    setTesting(true)
-    setError(null)
-    setApiKeyValid(null)
-
-    try {
-      const res = await fetch('/api/onboarding/test-provider', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ provider: aiProvider, apiKey: aiApiKey }),
-      })
-      const data = await res.json()
-
-      if (data.valid) {
-        setApiKeyValid(true)
-        setStep(2)
-      } else {
-        setApiKeyValid(false)
-        setError(data.error || 'Invalid API key')
-      }
-    } catch {
-      setApiKeyValid(false)
-      setError('Failed to test API key')
-    } finally {
-      setTesting(false)
-    }
-  }
-
-  async function deployAgent() {
-    if (!selectedModel || !aiProvider || !aiApiKey) return
+  async function configureWorkspace() {
     setLoading(true)
     setError(null)
 
     try {
-      // Save instance config
       const instanceRes = await fetch('/api/instance', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          aiProvider,
-          aiApiKey,
+          aiProvider: 'openrouter',
           activeModel: selectedModel,
         }),
       })
@@ -104,160 +35,111 @@ export default function OnboardingPage() {
         throw new Error(data.error || 'Failed to save configuration')
       }
 
-      // Trigger provision
-      const provisionRes = await fetch('/api/provision', { method: 'POST' })
-
-      if (!provisionRes.ok) {
-        const data = await provisionRes.json()
-        throw new Error(data.error || 'Failed to start deployment')
-      }
-
-      setStep(3)
-      // Redirect to chat after short delay
-      setTimeout(() => router.push('/chat'), 2000)
+      setStep(2)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Deployment failed')
+      setError(err instanceof Error ? err.message : 'Failed to save configuration')
     } finally {
       setLoading(false)
     }
   }
 
+  function finish() {
+    setStep(3)
+    setTimeout(() => router.push('/dashboard/workspace'), 1200)
+  }
+
   return (
     <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-4">
-      <Card className="w-full max-w-lg">
+      <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle>
-            {step === 1 && 'Configure AI Provider'}
-            {step === 2 && 'Select Model'}
-            {step === 3 && 'Success!'}
+            {step === 1 && 'Choose your default model'}
+            {step === 2 && 'Telegram is next'}
+            {step === 3 && 'Workspace ready'}
           </CardTitle>
+          <CardDescription>
+            ClawHost now uses a platform-managed OpenRouter key for v1. Users pick a model, subscribe, and use credits instead of pasting provider keys during setup.
+          </CardDescription>
           <div className="flex gap-2 mt-4">
             {Array.from({ length: totalSteps }, (_, i) => i + 1).map((s) => (
               <div
                 key={s}
-                className={`h-2 flex-1 rounded ${
-                  s <= step ? 'bg-black' : 'bg-gray-200'
-                }`}
+                className={`h-2 flex-1 rounded ${s <= step ? 'bg-black' : 'bg-gray-200'}`}
               />
             ))}
           </div>
         </CardHeader>
         <CardContent>
           {error && (
-            <div className="mb-4 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+            <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600">
               {error}
             </div>
           )}
 
-          {/* Step 1: Provider + API Key */}
           {step === 1 && (
             <div className="space-y-4">
-              <p className="text-gray-600">
-                Select your AI provider and enter your API key
-              </p>
+              <div className="rounded-lg border bg-muted/40 p-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2 font-medium text-foreground">
+                  <Sparkles className="h-4 w-4" />
+                  Platform-managed AI access
+                </div>
+                <p className="mt-2">
+                  For now, ClawHost uses your OpenRouter key from the app environment. Subscription credits control usage, and model choice stays per workspace.
+                </p>
+              </div>
+
               <div className="grid gap-3">
-                {providers.map((p) => (
+                {platformModels.map((model) => (
                   <button
-                    key={p.id}
-                    onClick={() => {
-                      setAiProvider(p.id)
-                      setApiKeyValid(null)
-                      setAiApiKey('')
-                    }}
-                    className={`p-4 border rounded-lg text-left hover:border-gray-400 transition ${
-                      aiProvider === p.id
-                        ? 'border-black bg-gray-50'
-                        : 'border-gray-200'
+                    key={model.id}
+                    onClick={() => setSelectedModel(model.id)}
+                    className={`rounded-lg border p-4 text-left transition hover:border-gray-400 ${
+                      selectedModel === model.id ? 'border-black bg-gray-50' : 'border-gray-200'
                     }`}
                   >
-                    <span className="font-medium">{tp(`${p.id}.label`)}</span>
-                    <span className="text-sm text-gray-500 ml-2">
-                      {tp(`${p.id}.description`)}
-                    </span>
+                    <div className="font-medium">{model.name}</div>
+                    <div className="mt-1 text-sm text-muted-foreground">{model.description}</div>
+                    <div className="mt-2 text-xs text-muted-foreground">{model.id}</div>
                   </button>
                 ))}
               </div>
-              {aiProvider && (
-                <div className="space-y-2">
-                  <Label htmlFor="aiApiKey">API Key</Label>
-                  <div className="relative">
-                    <Input
-                      id="aiApiKey"
-                      type="password"
-                      placeholder="sk-..."
-                      value={aiApiKey}
-                      onChange={(e) => {
-                        setAiApiKey(e.target.value)
-                        setApiKeyValid(null)
-                      }}
-                    />
-                    {apiKeyValid === true && (
-                      <Check className="absolute right-3 top-3 h-4 w-4 text-green-500" />
-                    )}
-                    {apiKeyValid === false && (
-                      <X className="absolute right-3 top-3 h-4 w-4 text-red-500" />
-                    )}
-                  </div>
-                </div>
-              )}
-              <Button
-                onClick={testApiKey}
-                disabled={!aiProvider || !aiApiKey || testing}
-                className="w-full"
-              >
-                {testing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Test & Continue
+
+              <Button onClick={configureWorkspace} disabled={loading} className="w-full">
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Save model and continue
               </Button>
             </div>
           )}
 
-          {/* Step 2: Model Selection & Deploy */}
-          {step === 2 && aiProvider && (
+          {step === 2 && (
             <div className="space-y-4">
-              <p className="text-gray-600">
-                Choose which model your agent will use
-              </p>
-              <div className="grid gap-3">
-                {providerModels[aiProvider].map((model) => (
-                  <button
-                    key={model.id}
-                    onClick={() => setSelectedModel(model.id)}
-                    className={`p-4 border rounded-lg text-left hover:border-gray-400 transition ${
-                      selectedModel === model.id
-                        ? 'border-black bg-gray-50'
-                        : 'border-gray-200'
-                    }`}
-                  >
-                    <span className="font-medium">{model.name}</span>
-                  </button>
-                ))}
+              <div className="rounded-lg border bg-muted/40 p-4">
+                <div className="flex items-center gap-2 font-medium">
+                  <MessageSquare className="h-4 w-4" />
+                  Shared Telegram bot flow
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Telegram account linking now happens through a shared bot with deep-link tokens. The full connect flow continues in Settings after checkout and deploy.
+                </p>
               </div>
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => setStep(1)}>
-                  {tc('back')}
+                  Back
                 </Button>
-                <Button
-                  onClick={deployAgent}
-                  disabled={!selectedModel || loading}
-                  className="flex-1"
-                >
-                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Deploy Agent
+                <Button onClick={finish} className="flex-1">
+                  Go to workspace
                 </Button>
               </div>
             </div>
           )}
 
-          {/* Step 3: Success */}
           {step === 3 && (
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
                 <Check className="h-8 w-8 text-green-600" />
               </div>
-              <h2 className="text-xl font-semibold">Your agent is ready!</h2>
-              <p className="text-gray-600">
-                Redirecting to your chat dashboard...
-              </p>
+              <h2 className="text-xl font-semibold">Your workspace is ready</h2>
+              <p className="text-gray-600">Redirecting to your workspace...</p>
             </div>
           )}
         </CardContent>

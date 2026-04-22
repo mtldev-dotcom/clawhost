@@ -8,7 +8,14 @@ export default async function AuthLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await auth()
+  let session = null
+
+  try {
+    session = await auth()
+  } catch (error) {
+    console.warn('AuthLayout session read failed, treating as signed out:', error)
+  }
+
   const locale = await getLocale() as Locale
 
   return (

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const t = useTranslations('auth')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -36,7 +37,8 @@ export default function LoginPage() {
         return
       }
 
-      router.push('/dashboard')
+      const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
+      router.push(callbackUrl)
       router.refresh()
     } catch {
       setError(t('somethingWrong'))
@@ -67,6 +69,7 @@ export default function LoginPage() {
                 type="email"
                 placeholder={t('emailPlaceholder')}
                 value={email}
+                name="email"
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
@@ -79,6 +82,7 @@ export default function LoginPage() {
                 type="password"
                 placeholder={t('passwordPlaceholder')}
                 value={password}
+                name="password"
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
