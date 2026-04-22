@@ -6,19 +6,19 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `764de6a test: add Playwright spec for current platform-model onboarding flow`
+**Last commit:** `PENDING`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
-**State:** M0-7 complete, ready for TASK M0-8
+**State:** M0-8 complete, ready for TASK M0-9
 **Updated:** 2026-04-22
 
 ---
 
 ## Next suggested task
 
-`TASK M0-8` — Add replacement Playwright spec: workspace shell smoke
+`TASK M0-9` — Add GitHub Actions CI workflow
 
-See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M0-8`.
+See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M0-9`.
 
 ---
 
@@ -39,19 +39,19 @@ See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M
 
 ## Context at handoff time
 
-TASK M0-7 completed on `dev-claude`.
+TASK M0-8 completed on `dev-claude`.
 
 Verified in this session:
 - `git status` was clean
 - `git branch --show-current` returned `dev-claude`
 - `node --version` returned `v24.14.1`
 - `npm run db:up` succeeded
-- created `tests/e2e/onboarding/model-select.spec.ts` with the exact task content
+- created `tests/e2e/workspace/workspace-shell.spec.ts` with the exact task content
 - `npm run lint` exited 0 with warnings only
 - `npm run test:run` exited 0
-- `ls tests/e2e/onboarding/model-select.spec.ts` returned the file path
-- plan updated to mark `M0-7` complete
-- committed and pushed `764de6a test: add Playwright spec for current platform-model onboarding flow` to `origin/dev-claude`
+- `ls tests/e2e/workspace/workspace-shell.spec.ts` returned the file path
+- plan updated to mark `M0-8` complete
+- committed and pushed `PENDING` to `origin/dev-claude`
 
 `progress-report.md` includes the raw command output for this session.
-Next agent should start at TASK M0-8 and follow the same contract.
+Next agent should start at TASK M0-9 and follow the same contract.

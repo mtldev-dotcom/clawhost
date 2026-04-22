@@ -551,7 +551,7 @@ test.describe('Workspace shell', () => {
 
 **Mark complete when:** All three verification items pass.
 
-- [ ] M0-8
+- [x] M0-8
 
 ---
 

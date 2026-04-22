@@ -960,3 +960,99 @@
 - Open blockers: none
 
 ---
+## Session 2026-04-22 23:17 UTC — OpenClaw subagent
+**Starting branch:** `dev-claude`
+**Starting commit:** `013ddba docs: sync handoff and progress after M0-7`
+**Plan version:** `plan-claude.md @ 013ddba`
+
+### Task: M0-8 — Add replacement Playwright spec: workspace shell smoke
+- Started: 23:17 UTC
+- Files touched: `tests/e2e/workspace/workspace-shell.spec.ts`, `progress-report.md`, `plan-claude.md`, `docs/HANDOFF.md`
+- Steps run (literal copy from plan-claude.md):
+  1. First create the directory if it does not exist:
+     ```bash
+     mkdir -p tests/e2e/workspace
+     ```
+  2. Create the file `tests/e2e/workspace/workspace-shell.spec.ts` with the exact content below.
+  3. Run `npm run lint`.
+  4. Run `npm run test:run`.
+- Verification commands + raw output (paste exact terminal output, do not summarize):
+  ```
+  $ git status && git branch --show-current && node --version && npm run db:up
+  On branch dev-claude
+  Your branch is up to date with 'origin/dev-claude'.
+  
+  nothing to commit, working tree clean
+  dev-claude
+  v24.14.1
+  
+  > clawhost@0.1.0 db:up
+  > docker compose -f docker-compose.dev.yml up -d
+  
+  time="2026-04-22T19:17:10-04:00" level=warning msg="/home/mtldev/active-dev-projects/clawhost/docker-compose.dev.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+   Container clawhost-postgres-1 Running
+  
+  $ npm run lint && npm run test:run && ls tests/e2e/workspace/workspace-shell.spec.ts
+  > clawhost@0.1.0 lint
+  > eslint .
+  
+  
+  /home/mtldev/active-dev-projects/clawhost/eslint.config.mjs
+    12:1  warning  Assign array to a variable before exporting as module default  import/no-anonymous-default-export
+  
+  /home/mtldev/active-dev-projects/clawhost/src/app/api/provision/route.ts
+    15:11  warning  'clientIP' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  
+  /home/mtldev/active-dev-projects/clawhost/src/app/chat/page.tsx
+    7:10  warning  'Card' is defined but never used  @typescript-eslint/no-unused-vars
+  
+  /home/mtldev/active-dev-projects/clawhost/src/components/dashboard/SkillCard.tsx
+    48:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  
+  /home/mtldev/active-dev-projects/clawhost/src/lib/crypto.ts
+    86:11  warning  'salt' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  
+  /home/mtldev/active-dev-projects/clawhost/src/lib/dokploy.ts
+    391:55  warning  'mcpConfig' is defined but never used  @typescript-eslint/no-unused-vars
+    475:29  warning  'slug' is defined but never used       @typescript-eslint/no-unused-vars
+    475:35  warning  'subdomain' is defined but never used  @typescript-eslint/no-unused-vars
+  
+  /home/mtldev/active-dev-projects/clawhost/tests/e2e/onboarding/model-select.spec.ts
+    14:86  warning  'request' is defined but never used  @typescript-eslint/no-unused-vars
+  
+  ✖ 9 problems (0 errors, 9 warnings)
+  
+  
+  > clawhost@0.1.0 test:run
+  > vitest run
+  
+  The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+  
+  [1m[46m RUN [49m[22m [36mv4.1.2 [39m[90m/home/mtldev/active-dev-projects/clawhost[39m
+  
+   [32m✓[39m tests/unit/lib/dokploy-api.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+   [32m✓[39m tests/unit/lib/workspace.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 66[2mms[22m[39m
+   [32m✓[39m tests/integration/api/skills.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 82[2mms[22m[39m
+   [32m✓[39m tests/integration/api/auth-register.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 86[2mms[22m[39m
+   [32m✓[39m tests/integration/api/workspace-file-download.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 106[2mms[22m[39m
+   [32m✓[39m tests/integration/api/instance.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 103[2mms[22m[39m
+   [32m✓[39m tests/integration/api/workspace-files.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 121[2mms[22m[39m
+  
+  [2m Test Files [22m [1m[32m7 passed[39m[22m[90m (7)[39m
+  [2m      Tests [22m [1m[32m45 passed[39m[22m[90m (45)[39m
+  [2m   Start at [22m 19:17:30
+  [2m   Duration [22m 1.84s[2m (transform 695ms, setup 1.65s, import 560ms, tests 578ms, environment 8.26s)[22m
+  
+  tests/e2e/workspace/workspace-shell.spec.ts
+  ```
+- Result: ✅ complete
+- Commit (if task completed): `PENDING`
+
+### Session end
+- Ending branch: `dev-claude`
+- Ending commit: `PENDING`
+- Tasks completed this session: `M0-8`
+- Next task to pick up: `M0-9`
+- Open blockers: none
+
+---
