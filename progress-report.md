@@ -739,11 +739,11 @@
   ls: cannot access 'src/types/': No such file or directory
   ```
 - Result: ✅ complete
-- Commit (if task completed): `PENDING_COMMIT`
+- Commit (if task completed): `a29b3a0 chore: remove orphaned src/types directory`
 
 ### Session end
 - Ending branch: `dev-claude`
-- Ending commit: `PENDING_COMMIT`
+- Ending commit: `a29b3a0 chore: remove orphaned src/types directory`
 - Tasks completed this session: `M0-5`
 - Next task to pick up: `M0-6`
 - Open blockers: none
@@ -950,11 +950,11 @@
   tests/e2e/onboarding/model-select.spec.ts
   ```
 - Result: ✅ complete
-- Commit (if task completed): `PENDING_COMMIT`
+- Commit (if task completed): `764de6a test: add Playwright spec for current platform-model onboarding flow`
 
 ### Session end
 - Ending branch: `dev-claude`
-- Ending commit: `PENDING_COMMIT`
+- Ending commit: `764de6a test: add Playwright spec for current platform-model onboarding flow`
 - Tasks completed this session: `M0-7`
 - Next task to pick up: `M0-8`
 - Open blockers: none

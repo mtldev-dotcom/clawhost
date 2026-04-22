@@ -6,7 +6,7 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `PENDING_COMMIT`
+**Last commit:** `764de6a test: add Playwright spec for current platform-model onboarding flow`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
 **State:** M0-7 complete, ready for TASK M0-8
@@ -51,6 +51,7 @@ Verified in this session:
 - `npm run test:run` exited 0
 - `ls tests/e2e/onboarding/model-select.spec.ts` returned the file path
 - plan updated to mark `M0-7` complete
+- committed and pushed `764de6a test: add Playwright spec for current platform-model onboarding flow` to `origin/dev-claude`
 
 `progress-report.md` includes the raw command output for this session.
 Next agent should start at TASK M0-8 and follow the same contract.
