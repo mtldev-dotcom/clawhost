@@ -183,7 +183,7 @@ Exit gate: `npm run lint && npm run test:run && npm run build` all pass clean.
 
 **Mark complete when:** All four verification items pass.
 
-- [ ] M0-1
+- [x] M0-1
 
 ---
 

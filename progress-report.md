@@ -138,3 +138,104 @@
 - Open blockers: none
 
 ---
+
+## Session 2026-04-22 22:22 UTC — OpenClaw subagent
+**Starting branch:** `dev-claude`
+**Starting commit:** `9b9a717 docs: establish cheap-model execution contract and agent workflow`
+**Plan version:** `plan-claude.md @ 9b9a717`
+
+### Task: M0-1 — Verify dev-claude branch baseline
+- Started: 22:22 UTC
+- Files touched: `progress-report.md`, `plan-claude.md`, `docs/HANDOFF.md`
+- Steps run (literal copy from plan-claude.md):
+  1. Run `git status`. Confirm output contains `nothing to commit, working tree clean`.
+  2. Run `git branch --show-current`. Confirm output is `dev-claude`.
+  3. Run `git log -1 --oneline`. Paste the output line into progress-report.md.
+  4. Run `npm run lint`. Paste the last 3 lines of output into progress-report.md.
+  5. Run `npm run test:run`. Paste the last 5 lines of output into progress-report.md.
+- Verification commands + raw output (paste exact terminal output, do not summarize):
+  ```
+  $ git status
+  On branch dev-claude
+  Your branch is up to date with 'origin/dev-claude'.
+  
+  nothing to commit, working tree clean
+  
+  $ git branch --show-current
+  dev-claude
+  
+  $ node --version
+  v24.14.1
+  
+  $ npm run db:up
+  > clawhost@0.1.0 db:up
+  > docker compose -f docker-compose.dev.yml up -d
+  time="2026-04-22T18:22:10-04:00" level=warning msg="/home/mtldev/active-dev-projects/clawhost/docker-compose.dev.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+   Container clawhost-postgres-1 Running
+  
+  $ git log -1 --oneline
+  9b9a717 docs: establish cheap-model execution contract and agent workflow
+  
+  $ npm run lint
+  > clawhost@0.1.0 lint
+  > eslint .
+  
+  /home/mtldev/active-dev-projects/clawhost/eslint.config.mjs
+    12:1  warning  Assign array to a variable before exporting as module default  import/no-anonymous-default-export
+  
+  /home/mtldev/active-dev-projects/clawhost/src/app/api/provision/route.ts
+    15:11  warning  'clientIP' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  
+  /home/mtldev/active-dev-projects/clawhost/src/app/chat/page.tsx
+    7:10  warning  'Card' is defined but never used  @typescript-eslint/no-unused-vars
+  
+  /home/mtldev/active-dev-projects/clawhost/src/components/dashboard/InstanceCard.tsx
+     7:48  warning  'Settings2' is defined but never used                    @typescript-eslint/no-unused-vars
+    33:10  warning  'openingDashboard' is assigned a value but never used    @typescript-eslint/no-unused-vars
+    42:9   warning  'openAgentDashboard' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  
+  /home/mtldev/active-dev-projects/clawhost/src/components/dashboard/SkillCard.tsx
+    48:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  
+  /home/mtldev/active-dev-projects/clawhost/src/lib/crypto.ts
+    86:11  warning  'salt' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  
+  /home/mtldev/active-dev-projects/clawhost/src/lib/dokploy.ts
+    391:55  warning  'mcpConfig' is defined but never used  @typescript-eslint/no-unused-vars
+    475:29  warning  'slug' is defined but never used       @typescript-eslint/no-unused-vars
+    475:35  warning  'subdomain' is defined but never used  @typescript-eslint/no-unused-vars
+  
+  ✖ 11 problems (0 errors, 11 warnings)
+  
+  $ npm run test:run
+  > clawhost@0.1.0 test:run
+  > vitest run
+  
+   RUN  v4.1.2 /home/mtldev/active-dev-projects/clawhost
+  
+   ✓ tests/unit/lib/dokploy-api.test.ts (17 tests) 12ms
+   ✓ tests/unit/lib/workspace.test.ts (4 tests) 61ms
+   ✓ tests/integration/api/auth-register.test.ts (5 tests) 79ms
+   ✓ tests/integration/api/skills.test.ts (7 tests) 79ms
+   ✓ tests/integration/api/workspace-files.test.ts (3 tests) 102ms
+   ✓ tests/integration/api/instance.test.ts (6 tests) 95ms
+   ✓ tests/integration/api/workspace-file-download.test.ts (3 tests) 109ms
+  
+   Test Files  7 passed (7)
+        Tests  45 passed (45)
+     Start at  18:22:13
+     Duration  1.60s (transform 635ms, setup 1.62s, import 519ms, tests 538ms, environment 6.92s)
+  
+  The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+  ```
+- Result: ✅ complete
+- Commit (if task completed): PENDING
+
+### Session end
+- Ending branch: `dev-claude`
+- Ending commit: PENDING
+- Tasks completed this session: `M0-1`
+- Next task to pick up: `M0-2`
+- Open blockers: none
+
+---

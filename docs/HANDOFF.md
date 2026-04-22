@@ -6,19 +6,19 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** _(filled in after the first task commit)_
+**Last commit:** `PENDING chore: verify M0-1 baseline checks pass`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
-**State:** ready — awaiting TASK M0-1
+**State:** M0-1 complete, ready for TASK M0-2
 **Updated:** 2026-04-22
 
 ---
 
 ## Next suggested task
 
-`TASK M0-1` — Set up dev-claude branch baseline.
+`TASK M0-2` — Fix broken re-export in dashboard/actions.ts
 
-See `plan-claude.md` → section "Milestone M0 — Clean foundation" → `TASK M0-1`.
+See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M0-2`.
 
 ---
 
@@ -39,8 +39,15 @@ See `plan-claude.md` → section "Milestone M0 — Clean foundation" → `TASK M
 
 ## Context at handoff time
 
-The `dev-claude` branch was just created off `master` after merging the `overnight/2026-04-22-launch-pass` branch. Old branches `overnight/2026-04-22-launch-pass` and `dev-V1` have been deleted both locally and on origin. `master` now contains the full workspace-first merge.
+TASK M0-1 baseline verification passed on `dev-claude`.
 
-The agent workflow contract (`AGENTS.md`, this file, `docs/AGENT_PIPELINE.md`, `docs/DECISIONS.md`, `docs/PROGRESS_LOG.md`, `progress-report.md`, `plan-claude.md`) was added in the same baseline commit on `dev-claude`.
+Verified in this session:
+- `git status` was clean
+- branch was `dev-claude`
+- `node --version` returned `v24.14.1`
+- `npm run db:up` succeeded against local Docker Postgres
+- `npm run lint` exited 0 with warnings only
+- `npm run test:run` exited 0 with 45/45 tests passing
 
-All subsequent tasks start at TASK M0-1 in `plan-claude.md`.
+`progress-report.md` includes the raw command output for this session.
+Next agent should start at TASK M0-2 and follow the same contract.
