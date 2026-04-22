@@ -638,3 +638,114 @@
 - Open blockers: none
 
 ---
+## Session 2026-04-22 22:44 UTC — OpenClaw subagent
+**Starting branch:** `dev-claude`
+**Starting commit:** `df0ed4b chore: delete dead onboarding API routes (test-provider, approve-pairing)`
+**Plan version:** `plan-claude.md @ df0ed4b`
+
+### Task: M0-5 — Delete dead src/types if orphaned
+- Started: 22:44 UTC
+- Files touched: `src/types/index.ts` (deleted), `src/types/next-auth.d.ts` (deleted), `progress-report.md`, `plan-claude.md`, `docs/HANDOFF.md`
+- Steps run (literal copy from plan-claude.md):
+  1. If output is `NO_TYPES_DIR` → skip to verification. This task is already done.
+  2. If `src/types/` exists, list its files:
+     ```bash
+     ls src/types/
+     ```
+  3. For each `.ts` file in `src/types/`, run:
+     ```bash
+     grep -r "from '@/types'" src/ --include="*.ts" --include="*.tsx"
+     grep -r "from '../types'" src/ --include="*.ts" --include="*.tsx"
+     ```
+  4. If grep returns 0 matches for all type imports → delete the directory:
+     ```bash
+     rm -rf src/types/
+     ```
+  5. If grep returns matches in files that still exist → leave `src/types/` in place. Note which types are still used in progress-report.md and mark the task complete.
+  6. Run `npm run build`.
+- Verification commands + raw output (paste exact terminal output, do not summarize):
+  ```
+  $ ls src/types/ 2>/dev/null || echo "NO_TYPES_DIR"
+  index.ts
+  next-auth.d.ts
+  
+  $ ls src/types/
+  index.ts
+  next-auth.d.ts
+  
+  $ grep -r "from '@/types'" src/ --include="*.ts" --include="*.tsx"
+  
+  $ grep -r "from '../types'" src/ --include="*.ts" --include="*.tsx"
+  
+  $ rm -rf src/types/ && npm run build
+  > clawhost@0.1.0 build
+  > next build
+  
+     ▲ Next.js 15.5.14
+     - Environments: .env.local, .env
+     - Experiments (use with caution):
+       · serverActions
+  
+     Creating an optimized production build ...
+   ✓ Compiled successfully in 2.6s
+     Skipping validation of types
+     Skipping linting
+     Collecting page data ...
+     Generating static pages (0/12) ...
+     Generating static pages (3/12) 
+     Generating static pages (6/12) 
+     Generating static pages (9/12) 
+   ✓ Generating static pages (12/12)
+  [WS] Cleaning up connections...
+     Finalizing page optimization ...
+     Collecting build traces ...
+  [WS] Cleaning up connections...
+  [WS] Cleaning up connections...
+  
+  Route (app)                                 Size  First Load JS
+  ┌ ƒ /                                    2.11 kB         128 kB
+  ├ ƒ /_not-found                            993 B         103 kB
+  ├ ƒ /api/auth/[...nextauth]                154 B         102 kB
+  ├ ƒ /api/auth/register                     154 B         102 kB
+  ├ ƒ /api/chat/history                      154 B         102 kB
+  ├ ƒ /api/chat/send                         154 B         102 kB
+  ├ ƒ /api/instance                          154 B         102 kB
+  ├ ƒ /api/provision                         154 B         102 kB
+  ├ ƒ /api/skills                            154 B         102 kB
+  ├ ƒ /api/stripe/checkout                   154 B         102 kB
+  ├ ƒ /api/stripe/webhook                    154 B         102 kB
+  ├ ƒ /api/user/locale                       154 B         102 kB
+  ├ ƒ /api/workspace/files                   154 B         102 kB
+  ├ ƒ /api/workspace/files/[id]/download     154 B         102 kB
+  ├ ƒ /chat                                3.64 kB         126 kB
+  ├ ƒ /dashboard                             154 B         102 kB
+  ├ ƒ /dashboard/settings                  3.88 kB         114 kB
+  ├ ƒ /dashboard/skills                       2 kB         104 kB
+  ├ ƒ /dashboard/workspace                  2.7 kB         116 kB
+  ├ ƒ /login                                  2 kB         130 kB
+  ├ ƒ /onboarding                          3.44 kB         113 kB
+  └ ƒ /register                            2.15 kB         130 kB
+  + First Load JS shared by all             102 kB
+    ├ chunks/255-38b49df12a94ee57.js         46 kB
+    ├ chunks/4bd1b696-c023c6e3521b1417.js  54.2 kB
+    └ other shared chunks (total)          1.93 kB
+  
+  
+  ƒ Middleware                             45.7 kB
+  
+  ƒ  (Dynamic)  server-rendered on demand
+  
+  $ ls src/types/
+  ls: cannot access 'src/types/': No such file or directory
+  ```
+- Result: ✅ complete
+- Commit (if task completed): `PENDING_COMMIT`
+
+### Session end
+- Ending branch: `dev-claude`
+- Ending commit: `PENDING_COMMIT`
+- Tasks completed this session: `M0-5`
+- Next task to pick up: `M0-6`
+- Open blockers: none
+
+---

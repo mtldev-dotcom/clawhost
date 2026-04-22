@@ -6,19 +6,19 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `df0ed4b chore: delete dead onboarding API routes (test-provider, approve-pairing)`
+**Last commit:** `PENDING_COMMIT`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
-**State:** M0-4 complete, ready for TASK M0-5
+**State:** M0-5 complete, ready for TASK M0-6
 **Updated:** 2026-04-22
 
 ---
 
 ## Next suggested task
 
-`TASK M0-5` — Delete dead src/types if orphaned
+`TASK M0-6` — Retire stale Playwright E2E specs
 
-See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M0-5`.
+See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M0-6`.
 
 ---
 
@@ -39,21 +39,16 @@ See `plan-claude.md` → section "Milestone M0 — Clean Foundation" → `TASK M
 
 ## Context at handoff time
 
-TASK M0-4 completed on `dev-claude`.
+TASK M0-5 completed on `dev-claude`.
 
 Verified in this session:
-- `git status` was clean
-- branch was `dev-claude`
-- `node --version` returned `v24.14.1`
-- `npm run db:up` succeeded against local Docker Postgres
-- preflight greps for `onboarding/test-provider` and `onboarding/approve-pairing` returned 0 matches in `src/`
-- test greps returned only stale Playwright references to `test-provider`, which the plan explicitly allows until M0-6
-- deleted `src/app/api/onboarding/test-provider/route.ts`
-- deleted `src/app/api/onboarding/approve-pairing/route.ts`
-- removed the now-empty parent directory `src/app/api/onboarding/`
+- `src/types/` existed with `index.ts` and `next-auth.d.ts`
+- `grep -r "from '@/types'" src/ --include="*.ts" --include="*.tsx"` returned 0 matches
+- `grep -r "from '../types'" src/ --include="*.ts" --include="*.tsx"` returned 0 matches
+- deleted orphaned `src/types/`
 - `npm run build` exited 0
-- `ls src/app/api/onboarding/` returned `No such file or directory`
-- committed and pushed `df0ed4b` to `origin/dev-claude`
+- `ls src/types/` returned `No such file or directory`
+- committed and pushed `PENDING_COMMIT` to `origin/dev-claude`
 
 `progress-report.md` includes the raw command output for this session.
-Next agent should start at TASK M0-5 and follow the same contract.
+Next agent should start at TASK M0-6 and follow the same contract.

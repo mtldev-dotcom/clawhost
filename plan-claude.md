@@ -347,7 +347,7 @@ ls src/types/ 2>/dev/null || echo "NO_TYPES_DIR"
 
 **Mark complete when:** Build passes regardless of whether types dir was deleted or kept.
 
-- [ ] M0-5
+- [x] M0-5
 
 ---
 
