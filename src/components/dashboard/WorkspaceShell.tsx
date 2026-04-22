@@ -12,6 +12,7 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Select } from '@/components/ui/select'
+import { WorkspaceFileUpload } from '@/components/dashboard/WorkspaceFileUpload'
 
 interface WorkspaceShellProps {
   workspaceName: string
@@ -296,9 +297,10 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
                 </div>
               </Card>
 
-              <Card className="p-4">
+              <Card className="p-4 space-y-4">
                 <p className="text-sm font-medium">Latest root files</p>
-                <div className="mt-4 space-y-2">
+                <WorkspaceFileUpload folders={rootFolders.map((folder) => ({ id: folder.id, name: folder.name }))} />
+                <div className="space-y-2">
                   {rootFiles.length > 0 ? (
                     rootFiles.map((file) => (
                       <div key={file.id} className="flex items-center justify-between rounded-md border px-3 py-2 text-sm">
@@ -311,7 +313,7 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-muted-foreground">No uploaded files yet. Upload + MCP write surfaces are the next real cut.</p>
+                    <p className="text-sm text-muted-foreground">No uploaded files yet. This panel can upload the first one now, and download/search are next.</p>
                   )}
                 </div>
               </Card>

@@ -214,6 +214,7 @@ After signing in with any valid account:
 11. Confirm the workspace shows bootstrapped root folders for the file-system layer (Inbox, Projects, Notes)
 12. POST a small text file to `/api/workspace/files` and confirm it returns a created file record
 13. GET `/api/workspace/files` and confirm the uploaded file appears in the response
+14. Upload a small file from the workspace UI and confirm the file list refreshes in the shell
 
 ### Test 6: Complete End-to-End User Flow (Sign Up → Chat via Telegram)
 
