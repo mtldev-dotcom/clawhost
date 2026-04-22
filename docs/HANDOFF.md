@@ -6,7 +6,7 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `PENDING`
+**Last commit:** `90c6922 test: add Playwright spec for workspace shell smoke flows`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
 **State:** M0-8 complete, ready for TASK M0-9
@@ -51,7 +51,7 @@ Verified in this session:
 - `npm run test:run` exited 0
 - `ls tests/e2e/workspace/workspace-shell.spec.ts` returned the file path
 - plan updated to mark `M0-8` complete
-- committed and pushed `PENDING` to `origin/dev-claude`
+- committed and pushed `90c6922 test: add Playwright spec for workspace shell smoke flows` to `origin/dev-claude`
 
 `progress-report.md` includes the raw command output for this session.
 Next agent should start at TASK M0-9 and follow the same contract.

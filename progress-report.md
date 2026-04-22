@@ -1046,11 +1046,11 @@
   tests/e2e/workspace/workspace-shell.spec.ts
   ```
 - Result: ✅ complete
-- Commit (if task completed): `PENDING`
+- Commit (if task completed): `90c6922 test: add Playwright spec for workspace shell smoke flows`
 
 ### Session end
 - Ending branch: `dev-claude`
-- Ending commit: `PENDING`
+- Ending commit: `90c6922 test: add Playwright spec for workspace shell smoke flows`
 - Tasks completed this session: `M0-8`
 - Next task to pick up: `M0-9`
 - Open blockers: none
