@@ -7,6 +7,17 @@ This file is the architecture truth source for ClawHost.
 When product flow, service boundaries, or runtime behavior changes, update this file in the same work.
 Also keep `AGENTS.md`, `docs/WORKFLOW.md`, `docs/DEVELOPMENT.md`, `ADHD.md`, and the Clawhost Notion project page aligned.
 
+## Merge Direction
+
+ClawHost is now being refactored toward a merged product shape:
+
+- **PageBase-style workspace UX** becomes the primary user-facing shell
+- **ClawHost platform services** remain the backend spine for auth, billing, provisioning, provider config, channels, and skills
+
+Short version:
+- workspace, pages, databases, and the AI companion become the product face
+- hosted agent infrastructure stays underneath as platform internals
+
 ## System Overview
 
 ```
@@ -62,6 +73,8 @@ Stores all application data:
 
 **Models:**
 - `User` - Account info, Stripe customer ID, locale preference
+- `Workspace` - User-owned workspace shell for the merged app
+- `Page` - Workspace page tree foundation, starting with a root Home page
 - `Instance` - Provisioned OpenClaw instances, active model, agent locale
 - `ProviderConfig` - Multiple AI provider API keys per instance
 - `Skill` - Available MCP integrations
@@ -108,30 +121,59 @@ Manages OpenClaw instances on Dokploy:
 Browser → /api/auth/register → Password policy validation → Hash password → Create User → Return success
 ```
 
-### Current Local Onboarding Shape
+### Current Local App Shape
 ```
-Login/Register → /onboarding
+Login/Register
     ↓
-Choose AI provider + submit API key test
+Workspace bootstrap ensures one workspace + Home page
     ↓
-Choose active model
+/dashboard/workspace becomes the new app shell center
     ↓
-Save instance config via /api/instance
+Onboarding still configures provider + model
     ↓
-Trigger /api/provision
+/api/provision still deploys the hosted agent runtime
     ↓
-Redirect to /chat
+/dashboard/workspace is now the post-onboarding landing surface
+    ↓
+/chat remains the direct agent conversation surface inside the same app shell
 ```
 
 Note: older tests still assumed a channel-first onboarding wizard. The current UI is provider-first, so any onboarding/dashboard changes must keep tests and docs in sync.
 
-### Subscription Flow (target launch path)
+### Subscription Flow (current code truth, still partially ambiguous)
 ```
 Landing/Dashboard → /api/stripe/checkout → Stripe Checkout → Payment
     ↓
-Stripe Webhook → /api/stripe/webhook → Create/advance Instance → Provision
+Stripe Webhook → /api/stripe/webhook → Create/advance Instance → Provision attempt
     ↓
-Dokploy API → Create Project → Deploy Container → Update DB → Chat/dashboard ready
+Dokploy API / local Docker → Update DB → Runtime fields stored
+```
+
+Important note:
+- current code still supports a second provisioning path from onboarding/settings after provider configuration
+- that means payment-triggered provisioning vs onboarding-triggered provisioning is not fully settled product truth yet
+
+### Workspace Foundation
+```
+Signed-in user → ensure workspace exists
+    ↓
+Create default workspace if missing
+    ↓
+Create root Home page if missing
+    ↓
+Bootstrap root workspace folders (Inbox, Projects, Notes)
+    ↓
+Render page tree in /dashboard/workspace
+    ↓
+Allow root-level and child page creation inside the merged app shell
+    ↓
+Allow page type selection at creation time (standard, database, board, dashboard, capture)
+    ↓
+Allow selected page title + notes editing backed by `Page.content`
+    ↓
+Allow database pages to carry starter schema primitives (fields + rows, with richer views next) inside `Page.content`
+    ↓
+Start the file-system layer with `WorkspaceFolder` + `WorkspaceFile` foundations for uploads, search, and agent write access
 ```
 
 ### Skill Activation
@@ -158,8 +200,8 @@ Skills Page → /api/skills (POST) → Update enabledSkills → Redeploy or refr
 
 ### Secrets Management
 - API keys stored in environment variables
-- User AI API keys (OpenAI, Anthropic, etc.) encrypted at rest using AES-256-GCM
-- Encryption key derived via scrypt from `ENCRYPTION_KEY` env var
+- Crypto helpers exist in `src/lib/crypto.ts` using AES-256-GCM with a key derived from `ENCRYPTION_KEY`
+- Current provider-key save paths still need explicit end-to-end verification before claiming encrypted-at-rest behavior as launch truth
 - Masked keys shown in logs (`sk-...XXXX`)
 - Hardcoded values extracted to environment variables
 

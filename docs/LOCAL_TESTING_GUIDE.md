@@ -21,7 +21,7 @@ Also read `../AGENTS.md` and `./WORKFLOW.md` before changing or expanding the te
 git checkout dev-V1
 # or your current working branch
 
-git pull --ff-only origin master
+git pull --ff-only
 ```
 
 ---
@@ -108,6 +108,11 @@ npm run dev
 
 The app will be available at: **http://localhost:3000**
 
+Current merged-app routes worth checking:
+- `/dashboard/workspace` for the new workspace shell and page editing
+- `/chat` for direct hosted-agent chat
+- `/dashboard/settings` for provider/channel/deploy config
+
 ---
 
 ## Step 6: Test Security Features
@@ -192,7 +197,23 @@ console.log('Match:', testKey === decrypted);
 
 ---
 
-### Test 5: Complete End-to-End User Flow (Sign Up → Chat via Telegram)
+### Test 5: Workspace Bootstrap Smoke Test
+
+After signing in with any valid account:
+
+1. Open `http://localhost:3000/dashboard/workspace`
+2. Expected: the app creates or reuses one default workspace automatically
+3. Expected: a root `Home` page exists behind the scenes
+4. Create a standard page from the workspace sidebar form
+5. Create a database page from the same form
+6. Open the database page and add a field
+7. Add a row and confirm it renders in the table
+8. Rename it and save notes/description in the editor
+9. Create a subpage under it
+10. Archive the child page and confirm it disappears from the active tree
+11. Confirm the workspace shows bootstrapped root folders for the file-system layer (Inbox, Projects, Notes)
+
+### Test 6: Complete End-to-End User Flow (Sign Up → Chat via Telegram)
 
 This test covers the entire user journey from registration to chatting with your OpenClaw agent on Telegram.
 
@@ -247,45 +268,32 @@ curl -X POST http://localhost:3000/api/auth/register \
 
 **Prerequisite:** You must be logged in. Visit http://localhost:3000/onboarding
 
-**B1. Step 1 — Connect Telegram Bot**
+**B1. Step 1 — Configure AI Provider**
 
-1. Create a test bot via [@BotFather](https://t.me/BotFather) on Telegram:
-   - Send `/newbot`
-   - Follow prompts, get your bot token (e.g., `123456789:ABCdefGHIjklMNOpqrsTUVwxyz`)
-2. Enter the token in the **"Bot Token"** field
-3. Click **"Verify & Continue"**
-4. **Expected:** Bot token verified, bot username displayed (e.g., `@my_test_bot`), advances to Step 2
-
-**B2. Step 2 — Configure AI Provider**
-
-1. Select a provider:
-   - **OpenAI** — Enter your OpenAI API key (`sk-proj-...`)
+1. Open http://localhost:3000/onboarding after signup/login
+2. Select a provider:
+   - **OpenAI** — Enter your OpenAI API key (`sk-...`)
    - **Anthropic** — Enter your Anthropic API key (`sk-ant-...`)
-   - **OpenRouter** — Enter your OpenRouter API key (`sk-or-...`)
-2. Click **"Test & Continue"**
-3. **Expected:** Green checkmark ✓ appears, advances to Step 3
+   - **OpenRouter** — Enter your OpenRouter API key
+3. Click **"Test & Continue"**
+4. **Expected:** Provider key test succeeds and the flow advances to model selection
 
-**B3. Step 3 — Select Model**
+**B2. Step 2 — Select Model**
 
-1. Choose a model from the list (e.g., `GPT-4o` for OpenAI)
-2. Click **"Deploy Agent"**
-3. **Expected:** Deploys container, advances to Step 4 (pairing code screen)
+1. Choose a model from the list (for example `GPT-4o`)
+2. **Expected:** The deploy button becomes enabled only after a model is selected
 
-**B4. Step 4 — Authorize via Telegram Pairing**
+**B3. Step 3 — Deploy Agent**
 
-1. Open Telegram on your phone/desktop
-2. Find your bot (e.g., `@my_test_bot`)
-3. Send any message (e.g., `hello`)
-4. The bot replies with a **pairing code** (e.g., `93KKNB9G`)
-5. Copy the code and paste it into the **"Pairing Code"** field
-6. Click **"Complete Setup"**
-7. **Expected:** Success screen with checkmark, auto-redirects to `/dashboard` after 2 seconds
+1. Click **"Deploy Agent"**
+2. **Expected:** Success screen appears
+3. **Expected:** Auto-redirects to `/chat` after the success state
 
-**B5. Step 5 — Setup Complete**
+**B4. Current onboarding truth**
 
-1. You arrive at the dashboard
-2. **Expected:** Chat interface loads, model indicator shows your selected model
-3. Status shows **"active"**
+- Onboarding is now **provider-first**
+- Telegram/channel setup is **not** part of onboarding anymore
+- Pairing and channel updates happen later in **Dashboard Settings**
 
 ---
 
@@ -293,11 +301,11 @@ curl -X POST http://localhost:3000/api/auth/register \
 
 **C1. Check Instance Status**
 
-1. Go to http://localhost:3000/dashboard
+1. Go to http://localhost:3000/dashboard/settings
 2. **Expected:**
-   - Chat interface is visible
-   - Model name shown in header bar
-   - No error messages
+   - **Instance Status** card is visible
+   - current status is shown (`pending`, `provisioning`, `active`, `failed`, etc.)
+   - provider and channel tabs are available
 
 **C2. Instance Not Ready (Negative Test)**
 
@@ -437,7 +445,7 @@ curl -X POST http://localhost:3000/api/provision \
   -H "Cookie: your-session-cookie-here"
 ```
 
-Or use the UI: Go to `/dashboard/settings` → Deploy
+Or use the UI: go to `/dashboard/settings` and click **Deploy**
 
 **E5. Verify Container is Running**
 

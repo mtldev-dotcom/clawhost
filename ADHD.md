@@ -1,23 +1,30 @@
-# ⚡ ClawHost / NestAI — ADHD.md
-> *Last updated: 2026-04-21*
+# ⚡ ClawHost — ADHD.md
+> *Last updated: 2026-04-22*
 
 ---
 
 ## 🧠 What Is This?
-Multi-tenant SaaS that gives users a hosted AI agent instance with custom subdomain, channels, and skills marketplace.
+Merged app in progress: PageBase-style workspace product on top of ClawHost hosted-agent infrastructure.
 
 ---
 
 ## ✅ What It Does (Right Now)
 - User registration + Stripe subscription ($9/mo)
-- Auto-provisions OpenClaw instance via Dokploy
-- Custom subdomain per user (user.nestai.app)
+- Signed-in users now auto-bootstrap into a workspace with a root Home page
+- `/dashboard/workspace` is the new product-shell center
+- Provider-first onboarding (provider key -> model -> deploy)
+- Onboarding success now redirects to `/dashboard/workspace`
+- Page types are now real in the workspace create flow (Standard, Database, Board, Dashboard, Capture)
+- Database pages now support starter schema primitives (fields) inside `Page.content`
+- Database pages now support simple row creation and a rendered table view inside the workspace shell
+- Workspace file-system foundation is now started with real root folders (Inbox, Projects, Notes)
+- Channel setup now lives in dashboard settings
+- Custom subdomain per user
 - AI provider config (OpenAI/Anthropic/OpenRouter)
-- Channel setup (Telegram/Discord/WhatsApp)
 - Skills marketplace with MCP integrations
 - Bilingual UI (EN/FR)
 - Chat UI + chat API routes landed in code
-- Security hardening landed: rate limiting, encrypted key storage helpers, stronger registration password policy
+- Security hardening landed: rate limiting, crypto helpers, stronger registration password policy
 - Local dev now runs safely on localhost + local Postgres
 
 ---
@@ -27,14 +34,16 @@ Multi-tenant SaaS that gives users a hosted AI agent instance with custom subdom
 - [x] Deploy PostgreSQL to Dokploy (instead of Cloud SQL)
 - [x] Delete old Cloud Run + Cloud SQL (saves ~$25/mo)
 - [x] Configure Stripe webhook in production
-- [ ] Test full user signup → payment → provision flow end to end
+- [x] Realign the launch-critical auth/onboarding/settings E2E slice with the actual UI
+- [ ] Test full user signup -> payment -> provision flow end to end
 - [ ] Verify chat flow against a real OpenClaw gateway instance
-- [ ] Clean up lint/test workflow so it stays green without manual babysitting
+- [ ] Prove provisioning against a safe live or local runtime
+- [ ] Reduce remaining lint warnings and route drift
 
 ---
 
 ## 🎯 What We Want
-> One-click AI agent hosting. User pays, picks their channels and API keys, gets a live agent in seconds. Extend it with marketplace skills. No devops required.
+> One app. User gets a workspace first, then layers in AI chat, databases, channels, skills, billing, and hosted-agent power without feeling like they entered a second product.
 
 ---
 
@@ -55,7 +64,7 @@ Multi-tenant SaaS that gives users a hosted AI agent instance with custom subdom
 ## 🔧 Systems & Infra
 - **Repo:** `github.com/mtldev-dotcom/clawhost`
 - **Local:** `localhost:3000` (Next.js) + Docker PostgreSQL (`nestai-db`)
-- **Production:** `https://nestai.nickybruno.com`
+- **Production:** canonical public hostname still needs final cleanup, do not treat legacy NestAI hostnames as settled product truth
 - **Dokploy Panel:** `http://35.202.32.236:3000`
 - **GCP DB:** `35.202.32.236:5432/nestai`
 - **Deploy:** Dokploy (frontend + DB + user instances)
@@ -102,6 +111,20 @@ Multi-tenant SaaS that gives users a hosted AI agent instance with custom subdom
 If any of those drift from code, fix them.
 
 ## 🗒️ Nick's Notes
+> 2026-04-22: Started the merge cut. Added workspace + page foundation to the main schema, auto-bootstrap for signed-in users, a new `/dashboard/workspace` shell, and workspace-first nav so the product starts moving from ClawHost platform UX toward PageBase product UX.
+
+> 2026-04-22: Follow-up cut landed. Onboarding now routes into the workspace shell instead of chat, and selected workspace pages now support title + notes editing backed by `Page.content`.
+
+> 2026-04-22: Phase 2 workspace cut landed. Users can now create typed pages from the workspace shell, and database pages now carry starter schema primitives (fields) instead of being dead placeholders.
+
+> 2026-04-22: Database follow-up landed. Database pages now support basic row creation and a first rendered table view, so the workspace is starting to behave like a product instead of a shell.
+
+> 2026-04-22: Step 2.1 workspace-files foundation started. Schema now includes workspace folders/files, root folders auto-bootstrap in the workspace, and the shell now exposes that file layer so the next cuts can add real upload/list/search behavior.
+
+> 2026-04-22: Overnight launch-readiness pass. Targeted Playwright auth/signup/logout/onboarding/settings slice now passes 20/20 after fixing stale channel-first specs, callbackUrl handling, clean Playwright server boot, and logout truth. Current verified flow is provider-first onboarding -> `/chat`, with channel config in dashboard settings and logout landing on `/login`.
+
+> 2026-04-22: Revenue and provisioning were audited. They are real in code, but still only partially proven end to end. Biggest open product question is whether provisioning should happen immediately after payment or only after onboarding/settings config is complete.
+
 > 2026-04-21: Local eval pass done. Pulled latest master, merged `dev-laptop`, deleted that branch, created `dev-V1`, installed deps, started Docker Postgres, ran Prisma migrations + seed, and booted app at `http://localhost:3000`.
 
 > 2026-04-21: Real checks run. Updated stale auth tests to match the stronger password policy and generic duplicate-email behavior. Result: `npm run test:run` now passes cleanly, 35/35.

@@ -1,9 +1,13 @@
 # ClawHost
 
-Multi-tenant SaaS platform for hosting personal AI agent instances. Users subscribe, get a custom subdomain, connect messaging channels (Telegram/Discord/WhatsApp), and extend their agent with skills from the marketplace.
+ClawHost is now being reshaped into a PageBase-style workspace product on top of the existing hosted-agent platform. Users sign up, get a workspace, organize pages and databases, then connect chat, channels, skills, billing, and provisioning from the same app.
 
 ## Features
 
+- **Workspace Foundation** - Signed-in users now auto-bootstrap into a workspace with a root Home page
+- **Typed Pages** - Create Standard, Database, Board, Dashboard, and Capture pages from the workspace shell
+- **Database Primitives** - Database pages now store starter field schema and simple rows inside `Page.content`
+- **Workspace Files Foundation** - Root workspace folders now bootstrap automatically as the first cut of the file system layer
 - **Instant Provisioning** - Hosted OpenClaw instances deployed via Dokploy
 - **Custom Subdomains** - Each user gets `username.nickybruno.com`
 - **Channel Integration** - Connect Telegram, Discord, or WhatsApp
@@ -11,7 +15,7 @@ Multi-tenant SaaS platform for hosting personal AI agent instances. Users subscr
 - **Multi-Provider Support** - Save multiple API keys and switch between models
 - **Skills Marketplace** - Extend your agent with MCP-based integrations (Gmail, Calendar, Notion, GitHub, etc.)
 - **Bilingual UI** - Full English and French support with language switcher
-- **Stripe Subscriptions** - $9/month with automatic provisioning on payment
+- **Stripe Subscriptions** - $9/month billing flow is wired, but end-to-end payment to provisioning is not fully proven yet
 
 ## Tech Stack
 
@@ -76,7 +80,7 @@ See [.env.example](.env.example) for all required variables:
 | `NEXTAUTH_SECRET` | Random secret for JWT signing |
 | `NEXTAUTH_URL` | App URL (http://localhost:3000) |
 | `NEXT_PUBLIC_APP_URL` | Public app URL (http://localhost:3000) |
-| `ENCRYPTION_KEY` | 32-byte secret for encrypting stored provider keys |
+| `ENCRYPTION_KEY` | 32-byte secret for crypto helpers; current provider-key write paths still need end-to-end verification |
 | `STRIPE_SECRET_KEY` | Stripe secret key (sk_...) |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook secret (whsec_...) |
 | `STRIPE_PRICE_ID` | Stripe price ID for subscription |
@@ -107,12 +111,18 @@ As of 2026-04-21, this repo was verified locally with:
 Current verified checks:
 
 - `npm run test:run` -> 35/35 tests passing
-- `npx playwright test tests/e2e/auth/signup.spec.ts --project=chromium` -> 5/5 passing
-- `npm run test:e2e` -> 11/20 passing, 9 failing
-- `npm run build` -> succeeds with NextAuth/Edge runtime warnings
 - `npm run lint` -> passes with warnings only
+- `npx playwright test tests/e2e/auth/login.spec.ts tests/e2e/auth/signup.spec.ts tests/e2e/auth/logout.spec.ts tests/e2e/onboarding/wizard.spec.ts tests/e2e/dashboard/settings.spec.ts --project=chromium --workers=2` -> 20/20 passing
 
-Main current gap: the onboarding/dashboard E2E tests are stale versus the current provider-first onboarding UI, so the launch-critical flow still needs revalidation against the real product behavior.
+Current verified E2E truth:
+
+- onboarding is provider-first, not channel-first
+- signup redirects to `/onboarding`
+- onboarding success now redirects to `/dashboard/workspace`
+- channel setup lives in dashboard settings, not onboarding
+- logout currently returns users to `/login`
+
+Main current gap: the launch-critical auth/onboarding/settings slice is now green, but the revenue path and provisioning path are still only partially proven without live Stripe and provisioning runtime validation.
 
 ## Governance and Truth Sources
 
@@ -140,7 +150,7 @@ clawhost/
 │   ├── app/
 │   │   ├── (auth)/        # Login/Register pages
 │   │   ├── api/           # API routes
-│   │   ├── dashboard/     # User dashboard (Chat, Settings, Skills)
+│   │   ├── dashboard/     # User app shell (Workspace, Settings, Skills)
 │   │   └── onboarding/    # Post-payment setup
 │   ├── components/
 │   │   ├── ui/            # shadcn components
@@ -161,10 +171,10 @@ clawhost/
 ## User Flow
 
 1. **Register** - Create account with email/password
-2. **Subscribe** - Stripe checkout for $9/month
-3. **Onboard** - Configure provider credentials in the current onboarding flow
-4. **Deploy** - Instance is configured/provisioned and routed to chat/dashboard
-5. **Extend** - Add skills from marketplace
+2. **Bootstrap workspace** - The app now ensures a default workspace and Home page for signed-in users
+3. **Onboard** - Configure provider credentials in the provider-first onboarding flow
+4. **Deploy** - Instance is configured/provisioned and routed into `/dashboard/workspace`
+5. **Extend** - Add typed pages, shape database fields, add simple rows, begin the workspace file layer, then connect skills, channels, and hosted-agent features from the same account
 
 ## API Routes
 
@@ -177,6 +187,7 @@ clawhost/
 | `/api/provision` | POST | Trigger instance provisioning |
 | `/api/instance` | GET/PATCH | Get/update instance config |
 | `/api/skills` | GET/POST | List skills / toggle skill |
+| `/dashboard/workspace` | GET | Authenticated workspace shell with default page tree |
 
 ## Documentation
 

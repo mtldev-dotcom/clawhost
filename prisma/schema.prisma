@@ -17,8 +17,41 @@ model User {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   instance         Instance?
+  workspace        Workspace?
   accounts         Account[]
   sessions         Session[]
+}
+
+model Workspace {
+  id        String            @id @default(cuid())
+  userId    String            @unique
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String            @default("My Workspace")
+  pages     Page[]
+  folders   WorkspaceFolder[]
+  files     WorkspaceFile[]
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+}
+
+model Page {
+  id          String     @id @default(cuid())
+  workspaceId String
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  parentId    String?
+  parent      Page?      @relation("PageTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Page[]     @relation("PageTree")
+  title       String
+  pageType    PageType   @default(standard)
+  status      PageStatus @default(active)
+  position    Int        @default(0)
+  content     Json?
+  isRoot      Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([workspaceId, status, position])
+  @@index([parentId, position])
 }
 
 model Instance {
@@ -68,6 +101,24 @@ enum InstanceStatus {
   cancelled
 }
 
+enum PageType {
+  standard
+  database
+  board
+  dashboard
+  capture
+}
+
+enum PageStatus {
+  active
+  archived
+}
+
+enum WorkspaceActor {
+  user
+  agent
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -100,6 +151,44 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model WorkspaceFolder {
+  id          String            @id @default(cuid())
+  workspaceId String
+  workspace   Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name        String
+  parentId    String?
+  parent      WorkspaceFolder?  @relation("WorkspaceFolderTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children    WorkspaceFolder[] @relation("WorkspaceFolderTree")
+  files       WorkspaceFile[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([workspaceId, parentId])
+}
+
+model WorkspaceFile {
+  id          String           @id @default(cuid())
+  workspaceId String
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  folderId    String?
+  folder      WorkspaceFolder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  name        String
+  path        String
+  mimeType    String
+  sizeBytes   Int
+  content     String?
+  storageKey  String
+  createdBy   WorkspaceActor
+  description String?
+  indexed     Boolean          @default(false)
+  deletedAt   DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([workspaceId, folderId, deletedAt])
+  @@index([workspaceId, deletedAt])
 }
 
 model Skill {
