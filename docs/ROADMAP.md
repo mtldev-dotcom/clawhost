@@ -58,7 +58,9 @@
 - [x] Workspace folder/file schema foundation
 - [x] Authenticated workspace files list/upload API foundation
 - [ ] Workspace file upload UI
-- [ ] File download/delete/search
+- [ ] File delete
+- [x] File download
+- [x] File search foundation
 - [ ] Agent MCP workspace read/write hooks
 
 ## Phase 3: Advanced Features

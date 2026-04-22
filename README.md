@@ -11,6 +11,7 @@ ClawHost is now being reshaped into a PageBase-style workspace product on top of
 - **Workspace Files API** - Authenticated listing and multipart upload route now exist at `/api/workspace/files`
 - **Workspace Upload UI** - The workspace shell now exposes the first upload form wired into the new file API
 - **Workspace File Download** - Listed workspace files now expose an authenticated download path
+- **Workspace File Search** - The workspace shell now exposes the first search UI against the files API
 - **Instant Provisioning** - Hosted OpenClaw instances deployed via Dokploy
 - **Custom Subdomains** - Each user gets `username.nickybruno.com`
 - **Channel Integration** - Connect Telegram, Discord, or WhatsApp

@@ -191,6 +191,8 @@ POST /api/workspace/files accepts multipart upload, writes bytes to the storage 
 Workspace shell refreshes and exposes the uploaded file in the root file list
     ↓
 GET `/api/workspace/files/[id]/download` returns owned file bytes back to the browser
+    ↓
+Workspace shell can search files through `GET /api/workspace/files?search=...` and download matching results
 ```
 
 ### Skill Activation

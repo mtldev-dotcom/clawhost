@@ -130,6 +130,8 @@ If any of those drift from code, fix them.
 
 > 2026-04-22: Workspace download route landed. Uploaded files can now be pulled back out through an authenticated download endpoint, and the workspace shell exposes a direct download link for listed files.
 
+> 2026-04-22: Local Prisma apply for the workspace-files migration is currently blocked by environment reachability. The repo `.env` points at PostgreSQL on `35.202.32.236:5432`, and that database was unreachable during `npx prisma migrate dev --skip-generate`.
+
 > 2026-04-22: Overnight launch-readiness pass. Targeted Playwright auth/signup/logout/onboarding/settings slice now passes 20/20 after fixing stale channel-first specs, callbackUrl handling, clean Playwright server boot, and logout truth. Current verified flow is provider-first onboarding -> `/chat`, with channel config in dashboard settings and logout landing on `/login`.
 
 > 2026-04-22: Revenue and provisioning were audited. They are real in code, but still only partially proven end to end. Biggest open product question is whether provisioning should happen immediately after payment or only after onboarding/settings config is complete.

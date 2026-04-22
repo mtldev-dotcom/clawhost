@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Select } from '@/components/ui/select'
 import { WorkspaceFileUpload } from '@/components/dashboard/WorkspaceFileUpload'
+import { WorkspaceFileSearch } from '@/components/dashboard/WorkspaceFileSearch'
 
 interface WorkspaceShellProps {
   workspaceName: string
@@ -300,6 +301,7 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
               <Card className="p-4 space-y-4">
                 <p className="text-sm font-medium">Latest root files</p>
                 <WorkspaceFileUpload folders={rootFolders.map((folder) => ({ id: folder.id, name: folder.name }))} />
+                <WorkspaceFileSearch />
                 <div className="space-y-2">
                   {rootFiles.length > 0 ? (
                     rootFiles.map((file) => (

@@ -216,6 +216,7 @@ After signing in with any valid account:
 13. GET `/api/workspace/files` and confirm the uploaded file appears in the response
 14. Upload a small file from the workspace UI and confirm the file list refreshes in the shell
 15. Use the download link from the workspace file list and confirm the same file is returned
+16. Search for the uploaded file by name or description from the workspace UI and confirm it appears in results
 
 ### Test 6: Complete End-to-End User Flow (Sign Up → Chat via Telegram)
 
