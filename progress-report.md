@@ -1693,3 +1693,138 @@
 - Open blockers: none
 
 ---
+
+## Session 2026-04-22 23:49 UTC — OpenClaw subagent clawhost-m1-2
+**Starting branch:** `dev-claude`
+**Starting commit:** `d7cef83 fix: sync npm lockfile for CI and correct M1-1 commit records`
+**Plan version:** plan-claude.md @ `d7cef83`
+
+### Task: M1-2 — Update /api/instance PATCH to reject legacy fields
+- Started: 23:49 UTC
+- Files touched: `plan-claude.md`, `progress-report.md`, `docs/HANDOFF.md`
+- Steps run (literal copy from plan-claude.md):
+  1. Open `src/app/api/instance/route.ts`.
+  2. In the `PATCH` handler, find the destructure:
+     ```typescript
+     const { channel, channelToken, aiProvider, aiApiKey, activeModel } = await req.json()
+     ```
+     Change it to:
+     ```typescript
+     const { aiProvider, activeModel } = await req.json()
+     ```
+  3. Remove any references to `channel`, `channelToken`, `aiApiKey` in the create/update data objects in that function.
+  4. Run `npm run build`.
+  5. Run `npm run test:run`.
+- Verification commands + raw output (paste exact terminal output, do not summarize):
+  ```
+  $ git status
+  On branch dev-claude
+  Your branch is up to date with 'origin/dev-claude'.
+  
+  nothing to commit, working tree clean
+  
+  $ git branch --show-current
+  dev-claude
+  
+  $ node --version
+  v24.14.1
+  
+  $ npm run db:up
+  > clawhost@0.1.0 db:up
+  > docker compose -f docker-compose.dev.yml up -d
+  
+  time="2026-04-22T19:49:38-04:00" level=warning msg="/home/mtldev/active-dev-projects/clawhost/docker-compose.dev.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+   Container clawhost-postgres-1 Running
+  
+  $ npm run build
+  > clawhost@0.1.0 build
+  > next build
+  
+     ▲ Next.js 15.5.14
+     - Environments: .env.local, .env
+     - Experiments (use with caution):
+       · serverActions
+  
+     Creating an optimized production build ...
+   ✓ Compiled successfully in 2.9s
+     Skipping validation of types
+     Skipping linting
+     Collecting page data ...
+     Generating static pages (0/12) ...
+     Generating static pages (3/12) 
+     Generating static pages (6/12) 
+     Generating static pages (9/12) 
+   ✓ Generating static pages (12/12)
+  [WS] Cleaning up connections...
+     Finalizing page optimization ...
+     Collecting build traces ...
+  [WS] Cleaning up connections...
+  [WS] Cleaning up connections...
+  
+  Route (app)                                 Size  First Load JS
+  ┌ ƒ /                                    2.11 kB         128 kB
+  ├ ƒ /_not-found                            993 B         103 kB
+  ├ ƒ /api/auth/[...nextauth]                154 B         102 kB
+  ├ ƒ /api/auth/register                     154 B         102 kB
+  ├ ƒ /api/chat/history                      154 B         102 kB
+  ├ ƒ /api/chat/send                         154 B         102 kB
+  ├ ƒ /api/instance                          154 B         102 kB
+  ├ ƒ /api/provision                         154 B         102 kB
+  ├ ƒ /api/skills                            154 B         102 kB
+  ├ ƒ /api/stripe/checkout                   154 B         102 kB
+  ├ ƒ /api/stripe/webhook                    154 B         102 kB
+  ├ ƒ /api/user/locale                       154 B         102 kB
+  ├ ƒ /api/workspace/files                   154 B         102 kB
+  ├ ƒ /api/workspace/files/[id]/download     154 B         102 kB
+  ├ ƒ /chat                                3.64 kB         126 kB
+  ├ ƒ /dashboard                             154 B         102 kB
+  ├ ƒ /dashboard/settings                  3.88 kB         114 kB
+  ├ ƒ /dashboard/skills                       2 kB         104 kB
+  ├ ƒ /dashboard/workspace                  2.7 kB         116 kB
+  ├ ƒ /login                                  2 kB         130 kB
+  ├ ƒ /onboarding                          3.44 kB         113 kB
+  └ ƒ /register                            2.15 kB         130 kB
+  + First Load JS shared by all             102 kB
+    ├ chunks/255-38b49df12a94ee57.js         46 kB
+    ├ chunks/4bd1b696-c023c6e3521b1417.js  54.2 kB
+    └ other shared chunks (total)          1.93 kB
+  
+  
+  ƒ Middleware                             45.7 kB
+  
+  ƒ  (Dynamic)  server-rendered on demand
+  
+  $ npm run test:run
+  > clawhost@0.1.0 test:run
+  > vitest run
+  
+  The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+  
+  [1m[46m RUN [49m[22m [36mv4.1.2 [39m[90m/home/mtldev/active-dev-projects/clawhost[39m
+  
+   [32m✓[39m tests/unit/lib/dokploy-api.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+   [32m✓[39m tests/integration/api/skills.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 94[2mms[22m[39m
+   [32m✓[39m tests/integration/api/workspace-files.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 112[2mms[22m[39m
+   [32m✓[39m tests/unit/lib/workspace.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 108[2mms[22m[39m
+   [32m✓[39m tests/integration/api/auth-register.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 120[2mms[22m[39m
+   [32m✓[39m tests/integration/api/instance.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 121[2mms[22m[39m
+   [32m✓[39m tests/integration/api/workspace-file-download.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 138[2mms[22m[39m
+  
+  [2m Test Files [22m [1m[32m7 passed[39m[22m[90m (7)[39m
+  [2m      Tests [22m [1m[32m45 passed[39m[22m[90m (45)[39m
+  [2m   Start at [22m 19:49:47
+  [2m   Duration [22m 1.85s[2m (transform 778ms, setup 1.92s, import 585ms, tests 708ms, environment 7.75s)[22m
+  
+  $ grep "channelToken" src/app/api/instance/route.ts
+  ```
+- Result: ✅ complete
+- Commit (if task completed): pending
+
+### Session end
+- Ending branch: `dev-claude`
+- Ending commit: pending
+- Tasks completed this session: `M1-2`
+- Next task to pick up: `M1-3`
+- Open blockers: none
+
+---

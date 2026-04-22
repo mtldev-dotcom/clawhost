@@ -769,7 +769,7 @@ For each grep: if it returns matches in non-test `src/` files → STOP. That fie
 
 **Mark complete when:** All three verification items pass.
 
-- [ ] M1-2
+- [x] M1-2
 
 ---
 
