@@ -6,7 +6,7 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** (pending — M1-5 close commit)
+**Last commit:** `60ce2a0 chore: close milestone M1 — schema cleanup verified`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
 **State:** `M1 complete`, next milestone `M2`

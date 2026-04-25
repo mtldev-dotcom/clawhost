@@ -1971,7 +1971,7 @@
   ƒ Middleware                             45.5 kB
   ```
 - Result: ✅ complete
-- Commit: (pending — this session)
+- Commit: 60ce2a0 chore: close milestone M1 — schema cleanup verified
 
 ### M1 — Schema Cleanup
 - Status: 🟢 done
