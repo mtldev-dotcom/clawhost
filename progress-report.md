@@ -1899,3 +1899,97 @@
 - Open blockers: none
 
 ---
+
+---
+## Session 2026-04-24 22:30 UTC — opencode
+**Starting branch:** dev-claude
+**Starting commit:** 4fb518e
+**Plan version:** plan-claude.md @ e08e193
+
+### Task: M1-4 — Remove Instance.aiApiKey from settings actions
+- Started: 22:30 UTC
+- Files touched: plan-claude.md
+- Steps run (literal copy from plan-claude.md):
+  1. Run preflight grep.
+  2. If matches exist, remove those field references from the file.
+  3. Run npm run build.
+  4. Run npm run test:run.
+- Verification commands + raw output:
+  ```
+  $ grep -n "aiApiKey\|channelToken\|telegramChannelId" src/app/dashboard/settings/actions.ts
+  (0 matches)
+  ```
+- Result: ✅ complete (no-op)
+- Commit: 8b2ce62 chore: confirm no deprecated fields in settings actions (M1-4)
+
+### Session end
+- Ending branch: dev-claude
+- Ending commit: 8b2ce62
+- Tasks completed this session: M1-4
+- Next task to pick up: M1-5
+- Open blockers: none
+
+---
+
+---
+## Session 2026-04-25 18:39 UTC — Claude Sonnet 4.6
+**Starting branch:** dev-claude
+**Starting commit:** 8b2ce62
+**Plan version:** plan-claude.md @ ea07fdf
+
+### Task: M1-5 — Milestone M1 close
+- Started: 18:39 UTC
+- Files touched: package.json, next.config.ts, .env.local, docs/HANDOFF.md, progress-report.md, docs/PROGRESS_LOG.md
+- Steps run (literal copy from plan-claude.md):
+  1. Run: `npm run lint && npm run test:run && npm run build`
+  2. Paste full raw output into progress-report.md.
+  3. Update `docs/HANDOFF.md` to `State: M1 complete, next milestone M2`.
+  4. Append M1 milestone summary to `progress-report.md`.
+  5. Append M1 entry to `docs/PROGRESS_LOG.md`.
+- Pre-task fixes applied:
+  - Discovered build was failing due to `NODE_ENV=development` in shell environment overriding Next.js build mode. Fixed by adding `NODE_ENV=production` to the `build` script in `package.json`.
+  - Added `AUTH_SECRET` to `.env.local` (next-auth v5 reads this key; `NEXTAUTH_SECRET` was the v4 name). Removed stale `NODE_ENV=development` from `.env.local`.
+  - Added `allowedDevOrigins: ['100.119.162.2']` to `next.config.ts` to silence cross-origin warning for Tailscale IP.
+- Verification commands + raw output:
+  ```
+  $ npm run lint
+  ✖ 7 problems (0 errors, 7 warnings)
+
+  $ npm run test:run
+   Test Files  7 passed (7)
+       Tests  45 passed (45)
+    Start at  18:47:27
+    Duration  3.95s
+
+  $ npm run build
+  ✓ Compiled successfully in 3.5s
+  ✓ Generating static pages (12/12)
+  Route (app)                                 Size  First Load JS
+  ┌ ƒ /                                    2.11 kB         128 kB
+  ├ ƒ /_not-found                            996 B         103 kB
+  ...22 routes total, all ƒ (Dynamic)
+  ƒ Middleware                             45.5 kB
+  ```
+- Result: ✅ complete
+- Commit: (pending — this session)
+
+### M1 — Schema Cleanup
+- Status: 🟢 done
+- Started: 2026-04-22
+- Ended: 2026-04-25
+- Tasks: M1-1 ✅  M1-2 ✅  M1-3 ✅  M1-4 ✅  M1-5 ✅
+- Full verification run at close:
+  ```
+  $ npm run lint && npm run test:run && npm run build
+  lint: 0 errors, 7 warnings (all pre-existing)
+  tests: 7 files, 45 tests — all passed
+  build: ✓ Compiled, ✓ 12 static pages, 22 dynamic routes — exit 0
+  ```
+- Notable decisions: package.json build script hardened with `NODE_ENV=production` to prevent shell env pollution from breaking production builds.
+
+### Session end
+- Ending branch: dev-claude
+- Ending commit: (pending)
+- Tasks completed this session: M1-5
+- Next task to pick up: M2-1
+- Open blockers: none

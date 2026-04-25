@@ -56,3 +56,22 @@ Format:
 **Verification:** `npm run lint && npm run test:run && npm run build` passed in one run at milestone close.
 
 **Open items:** Next up is `TASK M1-1` for schema cleanup.
+
+## 2026-04-25 — M1 close: Schema Cleanup
+
+**Summary:** Closed milestone M1 after removing all deprecated Instance fields (`aiApiKey`, `channelToken`, `telegramChannelId`) and the `ProviderConfig` model from the Prisma schema, API handlers, and seed data. Discovered and fixed a build regression caused by `NODE_ENV=development` leaking from the shell environment into `next build`.
+
+**What changed in the product:**
+- No user-visible changes. Internal schema is cleaner; dead columns removed from the DB model.
+
+**What changed in the codebase:**
+- Prisma migration removing `aiApiKey`, `channelToken`, `telegramChannelId` from `Instance` and dropping `ProviderConfig`
+- `src/app/api/instance/route.ts` PATCH handler cleaned of legacy field writes
+- `prisma/seed.ts` updated to remove deprecated field references
+- `package.json` build script hardened: `NODE_ENV=production next build` (prevents shell env pollution)
+- `next.config.ts`: added `allowedDevOrigins` for Tailscale IP dev access
+- `.env.local`: added `AUTH_SECRET` (next-auth v5 key name); removed `NODE_ENV=development` override
+
+**Verification:** `npm run lint && npm run test:run && npm run build` — lint 0 errors (7 warnings, all pre-existing), 7 test files / 45 tests passed, build compiled and generated 12 static pages cleanly.
+
+**Open items:** Next up is `TASK M2-1` — remove dev-grade copy from WorkspaceShell.

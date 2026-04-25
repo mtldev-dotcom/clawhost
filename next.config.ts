@@ -5,6 +5,7 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  allowedDevOrigins: ['100.119.162.2'],
   experimental: {
     serverActions: { allowedOrigins: ['localhost:3000', '100.119.162.2:3000'] },
   },

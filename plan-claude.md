@@ -845,7 +845,7 @@ If 0 matches → mark complete immediately.
 
 **Commit message:** `chore: close milestone M1 — schema cleanup verified`
 
-- [ ] M1-5
+- [x] M1-5
 
 ---
 
