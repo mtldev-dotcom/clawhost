@@ -825,7 +825,7 @@ If 0 matches → mark complete immediately.
 
 **Mark complete when:** Both verifications pass (or task was a no-op).
 
-- [ ] M1-4
+- [x] M1-4
 
 ---
 
