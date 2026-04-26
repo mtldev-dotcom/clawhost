@@ -345,8 +345,8 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
         ) : (
           <div className="flex min-h-[420px] flex-col items-center justify-center gap-6 text-center">
             <div>
-              <h2 className="text-xl font-semibold">Start your workspace</h2>
-              <p className="mt-2 max-w-sm text-sm text-muted-foreground">Create a page above, or pick a starter template to hit the ground running.</p>
+              <h2 className="text-xl font-semibold">Welcome to Foyer.</h2>
+              <p className="mt-2 max-w-sm text-sm text-muted-foreground">Pick a template to start. You can rename, edit, or delete any of these later.</p>
             </div>
             <div className="grid gap-3 w-full max-w-md sm:grid-cols-2">
               {templates.map((t) => {
