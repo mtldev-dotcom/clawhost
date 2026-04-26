@@ -1,12 +1,12 @@
 'use server'
 
-import { randomBytes } from 'node:crypto'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { provisionInstance } from '@/lib/dokploy'
 import { revalidatePath } from 'next/cache'
 import { env } from '@/lib/env'
 import { isSupportedPlatformModel } from '@/lib/platform'
+import { encrypt } from '@/lib/crypto'
 
 async function requireUser() {
   const session = await auth()
@@ -52,32 +52,61 @@ export async function savePlatformModel(model: string) {
   return { success: true }
 }
 
-export async function createTelegramConnectLink() {
+export async function saveTelegramBot(botToken: string, chatId: string) {
   const user = await requireUser()
 
-  if (!env.TELEGRAM_SHARED_BOT_USERNAME) {
-    throw new Error('TELEGRAM_SHARED_BOT_USERNAME is not configured')
+  const trimmedToken = botToken.trim()
+  const trimmedChatId = chatId.trim()
+
+  if (!trimmedToken || !trimmedChatId) {
+    throw new Error('Bot token and Chat ID are both required')
   }
 
-  await prisma.telegramLinkToken.deleteMany({
-    where: {
-      userId: user.id,
-      consumedAt: null,
-    },
-  })
+  // Validate bot token format: numeric_id:hash
+  if (!/^\d+:[A-Za-z0-9_-]{35,}$/.test(trimmedToken)) {
+    throw new Error('Invalid bot token format. It should look like: 1234567890:ABCdef...')
+  }
 
-  const token = randomBytes(24).toString('base64url')
-  await prisma.telegramLinkToken.create({
+  if (!/^-?\d+$/.test(trimmedChatId)) {
+    throw new Error('Chat ID must be a number (e.g. 123456789)')
+  }
+
+  // Verify token is real by calling Telegram getMe
+  const res = await fetch(`https://api.telegram.org/bot${trimmedToken}/getMe`)
+  if (!res.ok) {
+    throw new Error('Telegram rejected the bot token — make sure you copied it correctly from BotFather')
+  }
+  const data = await res.json()
+  const botUsername: string = data.result?.username ?? 'unknown'
+  const botId: string = String(data.result?.id ?? trimmedToken.split(':')[0])
+
+  await prisma.user.update({
+    where: { id: user.id },
     data: {
-      userId: user.id,
-      token,
-      expiresAt: new Date(Date.now() + 1000 * 60 * 15),
+      telegramBotToken: encrypt(trimmedToken),
+      telegramBotId: botId,
+      telegramChatId: trimmedChatId,
+      telegramUsername: botUsername,
+      telegramLinkedAt: new Date(),
     },
   })
 
-  return {
-    url: `https://t.me/${env.TELEGRAM_SHARED_BOT_USERNAME}?start=${token}`,
+  // Register webhook with Telegram (only works when app is on HTTPS)
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+  if (appUrl.startsWith('https')) {
+    await fetch(`https://api.telegram.org/bot${trimmedToken}/setWebhook`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: `${appUrl}/api/telegram/webhook`,
+        secret_token: user.id,
+        allowed_updates: ['message'],
+      }),
+    })
   }
+
+  revalidatePath('/dashboard/settings')
+  return { success: true, botUsername }
 }
 
 export async function deployInstance() {

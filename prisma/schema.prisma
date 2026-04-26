@@ -20,6 +20,9 @@ model User {
   telegramUserId        String?             @unique
   telegramUsername      String?
   telegramLinkedAt      DateTime?
+  telegramBotToken      String?
+  telegramBotId         String?
+  telegramChatId        String?
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
   instance              Instance?
@@ -62,29 +65,24 @@ model Page {
 }
 
 model Instance {
-  id                String           @id @default(cuid())
-  userId            String           @unique
-  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status            InstanceStatus   @default(pending)
-  appUrl            String?
-  dokployProjectId  String?
-  dokployAppId      String?
-  channel           String?
-  channelToken      String?
-  aiProvider        String?
-  aiApiKey          String?
-  activeModel       String?          // Currently active model (e.g., "openai/gpt-4o")
-  agentLocale       String           @default("en") // Agent communication language
-  enabledSkills     String[]         @default([])
-  stripeSubId       String?          @unique
-  stripePriceId     String?
-  telegramChannelId String?
-  gatewayToken      String?          // OpenClaw gateway authentication token
-  containerHost     String?          // Container hostname for internal WS connection
-  gatewayPort       Int              @default(18789)
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
-  providers         ProviderConfig[]
+  id               String         @id @default(cuid())
+  userId           String         @unique
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status           InstanceStatus @default(pending)
+  appUrl           String?
+  dokployProjectId String?
+  dokployAppId     String?
+  aiProvider       String?
+  activeModel      String?        // Currently active model (e.g., "openai/gpt-4o")
+  agentLocale      String         @default("en") // Agent communication language
+  enabledSkills    String[]       @default([])
+  stripeSubId      String?        @unique
+  stripePriceId    String?
+  gatewayToken     String?        // OpenClaw gateway authentication token
+  containerHost    String?        // Container hostname for internal WS connection
+  gatewayPort      Int            @default(18789)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 }
 
 model TelegramLinkToken {
@@ -97,20 +95,6 @@ model TelegramLinkToken {
   createdAt  DateTime @default(now())
 
   @@index([userId, expiresAt])
-}
-
-model ProviderConfig {
-  id         String   @id @default(cuid())
-  instanceId String
-  instance   Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  provider   String   // 'openai', 'anthropic', 'openrouter'
-  apiKey     String
-  isActive   Boolean  @default(false)
-  isValid    Boolean? // null = untested, true = valid, false = invalid
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@unique([instanceId, provider])
 }
 
 enum InstanceStatus {

@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [dev-claude, master]
+  pull_request:
+    branches: [dev-claude, master]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: clawhost
+          POSTGRES_PASSWORD: clawhost
+          POSTGRES_DB: clawhost
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://clawhost:clawhost@localhost:5432/clawhost
+      NEXTAUTH_SECRET: ci-secret-not-real
+      NEXTAUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      ENCRYPTION_KEY: ci-encryption-key-not-real-32b
+      OPENROUTER_API_KEY: sk-or-ci-not-real
+      STRIPE_SECRET_KEY: sk_test_ci_not_real
+      STRIPE_WEBHOOK_SECRET: whsec_ci_not_real
+      STRIPE_PRICE_ID: price_ci_not_real
+      PLATFORM_DEFAULT_MODEL: openrouter/anthropic/claude-sonnet-4-6
+      PLATFORM_MONTHLY_CREDITS: "1000"
+      NODE_ENV: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Prisma migrations
+        run: npx prisma migrate deploy
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run unit + integration tests
+        run: npm run test:run
+
+      - name: Build
+        run: npm run build

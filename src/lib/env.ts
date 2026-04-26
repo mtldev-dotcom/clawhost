@@ -17,11 +17,9 @@ const envSchema = z.object({
 
   // Platform LLM
   OPENROUTER_API_KEY: z.string().min(1),
-  PLATFORM_DEFAULT_MODEL: z.string().default('openrouter/anthropic/claude-sonnet-4-6'),
+  PLATFORM_DEFAULT_MODEL: z.string().default('openrouter/nvidia/nemotron-3-super-120b-a12b:free'),
   PLATFORM_MONTHLY_CREDITS: z.coerce.number().int().positive().default(1000),
 
-  // Telegram
-  TELEGRAM_SHARED_BOT_USERNAME: z.string().min(1).optional(),
 
   // Stripe
   STRIPE_SECRET_KEY: z.string().startsWith('sk_'),

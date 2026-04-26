@@ -52,7 +52,7 @@ describe('/api/instance', () => {
       const request = new Request('http://localhost/api/instance', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ channel: 'telegram' }),
+        body: JSON.stringify({ aiProvider: 'openrouter' }),
       })
 
       const response = await PATCH(request)
@@ -76,10 +76,8 @@ describe('/api/instance', () => {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          channel: 'telegram',
-          channelToken: 'token123',
-          aiProvider: 'openai',
-          aiApiKey: 'sk-test',
+          aiProvider: 'openrouter',
+          activeModel: 'openrouter/anthropic/claude-sonnet-4-6',
         }),
       })
 
@@ -99,7 +97,7 @@ describe('/api/instance', () => {
       prismaMock.user.findUnique.mockResolvedValue({ ...user, instance } as never)
       prismaMock.instance.update.mockResolvedValue({
         ...instance,
-        channel: 'discord',
+        aiProvider: 'anthropic',
       })
 
       const { PATCH } = await import('@/app/api/instance/route')
@@ -107,7 +105,7 @@ describe('/api/instance', () => {
       const request = new Request('http://localhost/api/instance', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ channel: 'discord' }),
+        body: JSON.stringify({ aiProvider: 'anthropic' }),
       })
 
       const response = await PATCH(request)

@@ -1,9 +1,20 @@
 import { PrismaClient } from '@prisma/client'
+import { deprovisionInstance } from '../src/lib/dokploy'
 
 const prisma = new PrismaClient()
 
 async function main() {
-  console.log('Deleting all users and related data...')
+  console.log('Deprovisioning containers and deleting all users...')
+
+  const instances = await prisma.instance.findMany()
+  for (const instance of instances) {
+    try {
+      await deprovisionInstance(instance)
+      console.log(`  - Deprovisioned container for instance ${instance.id}`)
+    } catch (err) {
+      console.warn(`  - Failed to deprovision instance ${instance.id}:`, err)
+    }
+  }
 
   // Delete in order to respect foreign keys
   const sessions = await prisma.session.deleteMany()
@@ -12,11 +23,8 @@ async function main() {
   const accounts = await prisma.account.deleteMany()
   console.log(`  - Deleted ${accounts.count} accounts`)
 
-  const providerConfigs = await prisma.providerConfig.deleteMany()
-  console.log(`  - Deleted ${providerConfigs.count} provider configs`)
-
-  const instances = await prisma.instance.deleteMany()
-  console.log(`  - Deleted ${instances.count} instances`)
+  const deletedInstances = await prisma.instance.deleteMany()
+  console.log(`  - Deleted ${deletedInstances.count} instances`)
 
   const users = await prisma.user.deleteMany()
   console.log(`  - Deleted ${users.count} users`)

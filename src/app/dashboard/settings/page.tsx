@@ -32,6 +32,7 @@ export default async function SettingsPage() {
           lifetimeCreditsGranted: user.lifetimeCreditsGranted,
           telegramUsername: user.telegramUsername,
           telegramLinkedAt: user.telegramLinkedAt?.toISOString() ?? null,
+          telegramChatId: user.telegramChatId ?? null,
         }}
         instance={{
           status: user.instance?.status ?? 'pending',

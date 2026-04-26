@@ -254,3 +254,74 @@ export async function archiveWorkspacePage(formData: FormData) {
 
   revalidateWorkspacePaths()
 }
+
+const TEMPLATES: Record<string, { title: string; pageType: string; content: object }> = {
+  'client-crm': {
+    title: 'Client CRM',
+    pageType: 'database',
+    content: {
+      text: 'Track your clients, contacts, and deal status in one place.',
+      database: {
+        fields: [
+          { id: 'name', name: 'Client Name', type: 'text' },
+          { id: 'status', name: 'Status', type: 'select' },
+          { id: 'email', name: 'Email', type: 'text' },
+          { id: 'value', name: 'Deal Value', type: 'number' },
+          { id: 'next', name: 'Next Action', type: 'text' },
+        ],
+        rows: [],
+      },
+    },
+  },
+  'weekly-ops': {
+    title: 'Weekly Ops Review',
+    pageType: 'standard',
+    content: { text: '## Week of [date]\n\n### What shipped\n-\n\n### Blockers\n-\n\n### Next week priorities\n1.\n2.\n3.' },
+  },
+  'meeting-notes': {
+    title: 'Meeting Notes',
+    pageType: 'capture',
+    content: { text: '## Meeting: [title]\n**Date:** \n**Attendees:** \n\n### Notes\n\n### Action items\n- [ ]' },
+  },
+}
+
+export async function createFromTemplate(formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  const templateKey = String(formData.get('template') || '').trim()
+  const template = TEMPLATES[templateKey]
+  if (!template) throw new Error('Unknown template')
+  const workspace = await getWorkspaceForUser(session.user.id)
+  if (!workspace.rootPage) throw new Error('Root page not found')
+  const siblingsCount = await prisma.page.count({
+    where: { workspaceId: workspace.id, parentId: workspace.rootPage.id, status: 'active' },
+  })
+  await prisma.page.create({
+    data: {
+      workspaceId: workspace.id,
+      parentId: workspace.rootPage.id,
+      title: template.title,
+      pageType: template.pageType as 'standard' | 'database' | 'board' | 'dashboard' | 'capture',
+      position: siblingsCount,
+      content: template.content,
+    },
+  })
+  revalidateWorkspacePaths()
+}
+
+export async function deleteWorkspaceFile(formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  const fileId = String(formData.get('fileId') || '').trim()
+  if (!fileId) throw new Error('File id is required')
+  const workspace = await getWorkspaceForUser(session.user.id)
+  const file = await prisma.workspaceFile.findFirst({
+    where: { id: fileId, workspaceId: workspace.id, deletedAt: null },
+  })
+  if (!file) throw new Error('File not found')
+  await prisma.workspaceFile.update({
+    where: { id: file.id },
+    data: { deletedAt: new Date() },
+  })
+  revalidateWorkspacePaths()
+}

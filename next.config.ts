@@ -5,6 +5,21 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          // TODO M5: add Content-Security-Policy after testing all third-party integrations
+        ],
+      },
+    ]
+  },
+  allowedDevOrigins: ['100.119.162.2'],
   experimental: {
     serverActions: { allowedOrigins: ['localhost:3000', '100.119.162.2:3000'] },
   },

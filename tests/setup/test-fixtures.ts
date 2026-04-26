@@ -1,4 +1,4 @@
-import type { User, Instance, ProviderConfig, Skill } from '@prisma/client'
+import type { User, Instance, Skill } from '@prisma/client'
 
 // Factory functions for test data
 export const createUser = (overrides?: Partial<User>): User => ({
@@ -20,15 +20,15 @@ export const createInstance = (overrides?: Partial<Instance>): Instance => ({
   appUrl: null,
   dokployProjectId: null,
   dokployAppId: null,
-  channel: null,
-  channelToken: null,
   aiProvider: null,
-  aiApiKey: null,
   activeModel: null,
   agentLocale: 'en',
   enabledSkills: [],
   stripeSubId: null,
   stripePriceId: null,
+  gatewayToken: null,
+  containerHost: null,
+  gatewayPort: 18789,
   createdAt: new Date('2024-01-01'),
   updatedAt: new Date('2024-01-01'),
   ...overrides,
@@ -37,26 +37,11 @@ export const createInstance = (overrides?: Partial<Instance>): Instance => ({
 export const createActiveInstance = (overrides?: Partial<Instance>): Instance =>
   createInstance({
     status: 'active',
-    channel: 'telegram',
-    channelToken: 'test-token',
-    aiProvider: 'openai',
-    aiApiKey: 'sk-test-key',
-    activeModel: 'openai/gpt-4o',
+    aiProvider: 'openrouter',
+    activeModel: 'openrouter/anthropic/claude-sonnet-4-6',
     appUrl: 'http://localhost:4000',
     ...overrides,
   })
-
-export const createProviderConfig = (overrides?: Partial<ProviderConfig>): ProviderConfig => ({
-  id: 'provider-1',
-  instanceId: 'instance-1',
-  provider: 'openai',
-  apiKey: 'sk-test-key',
-  isActive: false,
-  isValid: null,
-  createdAt: new Date('2024-01-01'),
-  updatedAt: new Date('2024-01-01'),
-  ...overrides,
-})
 
 export const createSkill = (overrides?: Partial<Skill>): Skill => ({
   id: 'skill-1',
