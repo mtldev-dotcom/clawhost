@@ -6,6 +6,7 @@ import { MessageSquare, Settings, Sparkles, Brain, Zap, LogOut, Files } from 'lu
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { CommandPalette } from '@/components/dashboard/CommandPalette'
 import type { Locale } from '@/i18n/config'
 
 interface DashboardHeaderProps {
@@ -93,6 +94,7 @@ export function DashboardHeader({ activeModel, instanceStatus, locale, translati
               {instanceStatus}
             </Badge>
           )}
+          <CommandPalette />
           <LanguageSwitcher currentLocale={locale} />
           <button
             onClick={() => {
