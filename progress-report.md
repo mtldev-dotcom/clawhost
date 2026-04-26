@@ -2204,3 +2204,116 @@
 - Tasks completed: PROD-DEBUG
 - Next task to pick up: TASK M5-1
 - Open blockers: Stripe webhook registration (manual step), Telegram re-save (manual step after deploy)
+
+---
+
+## Session 2026-04-26 — Claude Opus 4.5 (M5)
+
+**Starting branch:** `dev-claude`
+**Starting commit:** `843628d`
+**Plan version:** `plan-foyer.md` at repo root
+
+### Task: M5-1 — Inventory all ClawHost / clawhost references
+
+#### Grep outputs
+
+**grep -rn "ClawHost" src/ --include="*.ts" --include="*.tsx":**
+```
+src/components/PublicNav.tsx:21:            ClawHost
+src/app/layout.tsx:12:  title: 'ClawHost - Your AI. Running 24/7.',
+src/app/onboarding/page.tsx:61:            ClawHost now uses a platform-managed OpenRouter key for v1...
+src/app/onboarding/page.tsx:87:                  For now, ClawHost uses your OpenRouter key from the app environment...
+src/app/api/ai/command/route.ts:57:        'X-Title': 'ClawHost Workspace',
+src/app/dashboard/settings/client.tsx:91:              Platform-managed OpenRouter access now runs through your ClawHost subscription.
+src/app/dashboard/settings/client.tsx:110:              For v1, users do not paste their own LLM key. ClawHost uses the platform OpenRouter key...
+src/app/dashboard/settings/client.tsx:119:              Connect your own Telegram bot so ClawHost can send you notifications...
+src/app/dashboard/settings/client.tsx:212:            Deploy your ClawHost runtime with the saved default model.
+src/app/legal/privacy/page.tsx:6:      <p>ClawHost collects only what is necessary to provide the service.</p>
+src/app/legal/terms/page.tsx:6:      <p>By using ClawHost, you agree to use the service lawfully...
+src/app/legal/terms/page.tsx:8:      <p>ClawHost provides AI-powered workspace tools for business use...
+src/app/legal/terms/page.tsx:14:      <p>ClawHost is provided as-is. We are not liable for data loss...
+src/lib/dokploy.ts:234:      body: JSON.stringify({ name: `clawhost-${slug}`, description: `ClawHost for ${user.email}` }),
+```
+
+**grep -rn "ClawHost" public/ --include="*.html" --include="*.svg":**
+```
+(no output)
+```
+
+**grep -rn "ClawHost" --include="*.md" .:**
+```
+progress-report.md:1:# ClawHost Progress Report
+plan-claude.md:1:# ClawHost Build Plan (v1)
+plan-claude.md:863 / 871 / 881 / 1407 / 1941 / 1943 / 1949 / 1963 / 2127 / 2292 / 2328: (historical plan, various)
+plan-foyer.md: (multiple lines — instructions for rebrand)
+docs/PROGRESS_LOG.md:84: (historical log)
+ADHD.md:1, 7, 241: (project state doc)
+AGENTS.md:1, 25: (execution contract)
+docs/DECISIONS.md:24: (decision record)
+.claude/commands/deprovision.md:3, .claude/commands/provision.md:3: (Claude commands)
+docs/DEPLOYMENT.md:3, docs/ARCHITECTURE.md:3,7,122, docs/WORKFLOW.md:3, docs/AGENT_PIPELINE.md:3: (internal docs)
+README.md:1, 3, 7: (project README)
+```
+
+**grep -rn "clawhost" src/ --include="*.ts" --include="*.tsx":**
+```
+src/lib/dokploy.ts:234:      body: JSON.stringify({ name: `clawhost-${slug}`, description: `ClawHost for ${user.email}` }),
+src/lib/crypto.ts:30:  return scryptSync(keyString, 'clawhost-salt', KEY_LENGTH)
+src/app/legal/privacy/page.tsx:23:      <p>Privacy questions: privacy@clawhost.com</p>
+src/app/legal/terms/page.tsx:16:      <p>Questions? Email us at support@clawhost.com.</p>
+```
+
+**grep -rn "clawhost" --include="*.json" --include="*.yml" --include="*.yaml" .:**
+```
+package.json:2:  "name": "clawhost",
+.claude/settings.local.json:5-42: (various historical bash commands with old paths)
+.claude/settings.json:16: (historical bash command)
+docker-compose.dev.yml:10-11: POSTGRES_USER/PASSWORD: clawhost
+package-lock.json:2, 8: "name": "clawhost"
+.github/workflows/ci.yml:18-30: (CI postgres user/password/db: clawhost)
+```
+
+**grep -rn "support@clawhost|feedback@clawhost|privacy@clawhost":**
+```
+src/app/legal/privacy/page.tsx:23: privacy@clawhost.com
+src/app/legal/terms/page.tsx:16: support@clawhost.com
+```
+
+#### Classification
+
+**Bucket A — User-visible copy (rename to Foyer):**
+- src/components/PublicNav.tsx:21 — "ClawHost" in navigation
+- src/app/layout.tsx:12 — title metadata
+- src/app/onboarding/page.tsx:61, 87 — onboarding UI copy
+- src/app/api/ai/command/route.ts:57 — X-Title header (AI identity)
+- src/app/dashboard/settings/client.tsx:91, 110, 119, 212 — settings UI copy
+- src/app/legal/privacy/page.tsx:6, 23 — privacy page copy + email
+- src/app/legal/terms/page.tsx:6, 8, 14, 16 — ToS page copy + email
+
+**Bucket B — Doc / repo-internal (rename to Foyer):**
+- progress-report.md:1 — H1 title
+- plan-claude.md — historical plan (not user-visible, but rename where relevant)
+- ADHD.md:1, 7, 241 — project state doc
+- AGENTS.md:1, 25 — execution contract
+- docs/DECISIONS.md:24 — decision record
+- README.md:1, 3, 7 — project README
+- docs/DEPLOYMENT.md, docs/ARCHITECTURE.md, docs/WORKFLOW.md, docs/AGENT_PIPELINE.md, docs/PROGRESS_LOG.md — internal docs
+- .claude/commands/*.md — Claude commands
+- package.json:2 — package name (per M5-2)
+
+**Bucket C — Deprecated infrastructure (leave as-is per AGENTS.md §1):**
+- src/lib/dokploy.ts:234 — dormant Dokploy provisioning code
+- src/lib/crypto.ts:30 — internal crypto salt (not user-visible, keep)
+- .claude/settings.local.json — local Claude settings, historical paths
+- .claude/settings.json — local Claude settings
+- docker-compose.dev.yml:10-11 — local dev DB credentials
+- package-lock.json — will auto-update with package.json
+- .github/workflows/ci.yml:18-30 — CI DB credentials (local dev only)
+
+#### Verification
+- ✅ Inventory pasted into progress-report.md (this section)
+- ✅ Each match is classified A, B, or C
+- ✅ No file was modified in this task (read-only)
+
+- Result: ✅ complete
+
