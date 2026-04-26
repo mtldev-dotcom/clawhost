@@ -18,7 +18,7 @@ export function PublicNav({ isLoggedIn, locale }: PublicNavProps) {
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="flex justify-between h-16 items-center">
           <Link href="/" className="font-medium text-[18px] tracking-tight text-ink dark:text-chalk">
-            ClawHost
+            Foyer
           </Link>
           <div className="flex items-center gap-4">
             <LanguageSwitcher currentLocale={locale} />

@@ -88,7 +88,7 @@ export function SettingsClient({ user, instance, models }: SettingsClientProps) 
           <CardHeader>
             <CardTitle>Subscription and credits</CardTitle>
             <CardDescription>
-              Platform-managed OpenRouter access now runs through your ClawHost subscription.
+              Your Foyer subscription includes AI credits for workspace commands.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -107,7 +107,7 @@ export function SettingsClient({ user, instance, models }: SettingsClientProps) 
               <span className="font-semibold">{user.lifetimeCreditsGranted}</span>
             </div>
             <p className="text-xs text-muted-foreground">
-              For v1, users do not paste their own LLM key. ClawHost uses the platform OpenRouter key from env and gates usage with subscription credits.
+              Foyer manages AI access for you — no API keys to paste. Your credits are deducted per command.
             </p>
           </CardContent>
         </Card>
@@ -116,7 +116,7 @@ export function SettingsClient({ user, instance, models }: SettingsClientProps) 
           <CardHeader>
             <CardTitle>Telegram</CardTitle>
             <CardDescription>
-              Connect your own Telegram bot so ClawHost can send you notifications and updates.
+              Connect a Telegram bot so Foyer can send you notifications and updates.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
@@ -209,7 +209,7 @@ export function SettingsClient({ user, instance, models }: SettingsClientProps) 
         <CardHeader>
           <CardTitle>Hosted runtime</CardTitle>
           <CardDescription>
-            Deploy your ClawHost runtime with the saved default model.
+            Deploy your Foyer runtime with the saved default model.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

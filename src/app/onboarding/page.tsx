@@ -58,7 +58,7 @@ export default function OnboardingPage() {
             {step === 3 && 'Workspace ready'}
           </CardTitle>
           <CardDescription>
-            ClawHost now uses a platform-managed OpenRouter key for v1. Users pick a model, subscribe, and use credits instead of pasting provider keys during setup.
+            Foyer uses a platform-managed AI service. Pick your preferred model, subscribe, and use credits — no API keys to paste.
           </CardDescription>
           <div className="flex gap-2 mt-4">
             {Array.from({ length: totalSteps }, (_, i) => i + 1).map((s) => (
@@ -84,7 +84,7 @@ export default function OnboardingPage() {
                   Platform-managed AI access
                 </div>
                 <p className="mt-2">
-                  For now, ClawHost uses your OpenRouter key from the app environment. Subscription credits control usage, and model choice stays per workspace.
+                  Foyer handles all AI access for you. Your subscription credits control usage, and you can change your model any time in Settings.
                 </p>
               </div>
 

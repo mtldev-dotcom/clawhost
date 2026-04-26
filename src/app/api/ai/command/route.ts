@@ -54,14 +54,14 @@ export async function POST(req: Request) {
         'Authorization': `Bearer ${env.OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': env.NEXT_PUBLIC_APP_URL,
-        'X-Title': 'ClawHost Workspace',
+        'X-Title': 'Foyer',
       },
       body: JSON.stringify({
         model,
         messages: [
           {
             role: 'system',
-            content: `You are the AI assistant for a business workspace. You have access to the user's workspace pages below. When answering, reference specific pages when relevant. Be concise and actionable. Output plain text or markdown only.\n\nWORKSPACE CONTEXT:\n${contextBlock}`,
+            content: `You are the AI partner inside Foyer — a second brain and workspace for a solo professional. You have access to the user's workspace pages below. When answering, reference specific pages when relevant. Be concise, direct, and useful — like a thoughtful chief-of-staff. Output plain text or markdown only.\n\nWORKSPACE CONTEXT:\n${contextBlock}`,
           },
           { role: 'user', content: command },
         ],
