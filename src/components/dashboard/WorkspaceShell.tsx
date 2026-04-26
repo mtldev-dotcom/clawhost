@@ -114,7 +114,7 @@ function DatabasePageSection({ page }: { page: WorkspacePageNode }) {
 
         <form action={addDatabaseField} className="grid gap-3 rounded-lg border border-dashed p-4 md:grid-cols-[minmax(0,1fr)_180px_auto]">
           <input type="hidden" name="pageId" value={page.id} />
-          <Input name="fieldName" placeholder="Field name" />
+          <Input name="fieldName" placeholder="Field name" required />
           <Select name="fieldType" defaultValue="text" options={databaseFieldTypeOptions.map((option) => ({ value: option.value, label: option.label }))} />
           <Button type="submit" variant="outline">Add field</Button>
         </form>
@@ -212,13 +212,12 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
             <p className="text-sm text-muted-foreground">Workspace</p>
             <h1 className="text-lg font-semibold">{workspaceName}</h1>
           </div>
-          <Badge variant="secondary">Phase 2</Badge>
         </div>
 
         <div className="mt-4 space-y-4">
           <form action={createWorkspacePage} className="space-y-2">
             <input type="hidden" name="parentId" value={selectedPage?.id ?? ''} />
-            <Input name="title" placeholder={selectedPage ? `Add a subpage under ${selectedPage.title}` : 'Add a page'} />
+            <Input name="title" placeholder={selectedPage ? `Add a subpage under ${selectedPage.title}` : 'Add a page'} required />
             <Select
               name="pageType"
               defaultValue="standard"
@@ -250,9 +249,6 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
                   <h2 className="text-2xl font-semibold">{selectedPage.title}</h2>
                   <Badge variant="outline">{pageLabel(selectedPage.pageType)}</Badge>
                 </div>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Workspace-first product shell is now live here. Chat, skills, billing, and provisioning stay attached to the same account, but this becomes the center of the app.
-                </p>
               </div>
               {!selectedPage.isRoot && (
                 <form action={archiveWorkspacePage}>
@@ -265,31 +261,14 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
               )}
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
-              <Card className="p-4">
-                <p className="text-sm font-medium">Now in ClawHost</p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Auth, billing, provisioning, channels, AI provider config, and skills stay here as platform internals.
-                </p>
-              </Card>
-              <Card className="p-4">
-                <p className="text-sm font-medium">Now becoming PageBase</p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Workspace, page tree, databases, boards, dashboards, capture, and the AI companion become the product face.
-                </p>
-              </Card>
-              <PageTypeSummary pageType={selectedPage.pageType} />
-            </div>
+            <PageTypeSummary pageType={selectedPage.pageType} />
 
             {selectedPage.pageType === 'database' && <DatabasePageSection page={selectedPage} />}
 
             <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
               <Card className="p-4">
-                <p className="text-sm font-medium">Workspace files foundation</p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Step 2.1 is now started. The workspace is bootstrapping real root folders so file storage can become a first-class surface instead of living as a vague future idea.
-                </p>
-                <div className="mt-4 space-y-2">
+                <p className="text-sm font-medium">Folders</p>
+                <div className="mt-3 space-y-2">
                   {rootFolders.map((folder) => (
                     <div key={folder.id} className="rounded-md border px-3 py-2 text-sm">
                       📁 {folder.name}
@@ -331,7 +310,7 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
               <input type="hidden" name="pageId" value={selectedPage.id} />
               <div className="space-y-2">
                 <label htmlFor="title" className="text-sm font-medium">Title</label>
-                <Input id="title" name="title" defaultValue={selectedPage.title} />
+                <Input id="title" name="title" defaultValue={selectedPage.title} required />
               </div>
               <div className="space-y-2">
                 <label htmlFor="content" className="text-sm font-medium">
@@ -345,10 +324,7 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
                   className="min-h-[240px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 />
               </div>
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm text-muted-foreground">
-                  Phase 2 is now live: page types are real, and database pages can accumulate schema and rows inside the workspace instead of being static placeholders.
-                </p>
+              <div className="flex justify-end">
                 <Button type="submit">Save page</Button>
               </div>
             </form>
