@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Plus, Archive, TableProperties, Rows3 } from 'lucide-react'
-import { addDatabaseField, addDatabaseRow, createWorkspacePage, archiveWorkspacePage, updateWorkspacePage } from '@/app/dashboard/workspace/actions'
+import { addDatabaseField, addDatabaseRow, createWorkspacePage, archiveWorkspacePage, updateWorkspacePage, deleteWorkspaceFile } from '@/app/dashboard/workspace/actions'
 import { WorkspacePageTree } from '@/components/dashboard/WorkspacePageTree'
 import {
   databaseFieldTypeOptions,
@@ -248,12 +248,18 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
                             {file.createdBy} • {Math.max(1, Math.round(file.sizeBytes / 1024))} KB
                           </p>
                         </div>
-                        <a
-                          href={`/api/workspace/files/${file.id}/download`}
-                          className="text-xs font-medium text-foreground underline-offset-4 hover:underline"
-                        >
-                          Download
-                        </a>
+                        <div className="flex items-center gap-3">
+                          <a
+                            href={`/api/workspace/files/${file.id}/download`}
+                            className="text-xs font-medium text-foreground underline-offset-4 hover:underline"
+                          >
+                            Download
+                          </a>
+                          <form action={deleteWorkspaceFile} className="inline">
+                            <input type="hidden" name="fileId" value={file.id} />
+                            <button type="submit" className="text-xs text-muted-foreground hover:text-destructive">Delete</button>
+                          </form>
+                        </div>
                       </div>
                     ))
                   ) : (

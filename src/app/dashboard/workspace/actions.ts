@@ -254,3 +254,20 @@ export async function archiveWorkspacePage(formData: FormData) {
 
   revalidateWorkspacePaths()
 }
+
+export async function deleteWorkspaceFile(formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  const fileId = String(formData.get('fileId') || '').trim()
+  if (!fileId) throw new Error('File id is required')
+  const workspace = await getWorkspaceForUser(session.user.id)
+  const file = await prisma.workspaceFile.findFirst({
+    where: { id: fileId, workspaceId: workspace.id, deletedAt: null },
+  })
+  if (!file) throw new Error('File not found')
+  await prisma.workspaceFile.update({
+    where: { id: file.id },
+    data: { deletedAt: new Date() },
+  })
+  revalidateWorkspacePaths()
+}
