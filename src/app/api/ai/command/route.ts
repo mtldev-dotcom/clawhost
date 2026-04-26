@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { env } from '@/lib/env'
+import { checkAuthRateLimit, createRateLimitResponse } from '@/lib/rate-limit'
 import { getWorkspaceForUser } from '@/lib/workspace'
 import { retrieveWorkspaceContext } from '@/lib/workspace-context'
 import { prisma } from '@/lib/prisma'
@@ -10,6 +11,11 @@ export async function POST(req: Request) {
     const session = await auth()
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const rateLimitCheck = checkAuthRateLimit(`ai:${session.user.id}`)
+    if (!rateLimitCheck.allowed) {
+      return createRateLimitResponse(rateLimitCheck.resetAt)
     }
 
     const user = await prisma.user.findUnique({ where: { id: session.user.id } })
