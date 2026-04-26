@@ -20,9 +20,6 @@ const envSchema = z.object({
   PLATFORM_DEFAULT_MODEL: z.string().default('openrouter/nvidia/nemotron-3-super-120b-a12b:free'),
   PLATFORM_MONTHLY_CREDITS: z.coerce.number().int().positive().default(1000),
 
-  // Telegram
-  TELEGRAM_SHARED_BOT_USERNAME: z.string().min(1).optional(),
-  TELEGRAM_BOT_TOKEN: z.string().min(1).optional(),
 
   // Stripe
   STRIPE_SECRET_KEY: z.string().startsWith('sk_'),
