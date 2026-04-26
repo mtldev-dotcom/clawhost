@@ -1,22 +1,32 @@
 export const platformModels = [
   {
-    id: 'openrouter/anthropic/claude-sonnet-4-6',
-    name: 'Claude Sonnet 4.6',
-    description: 'Best default balance for product work and agent tasks.',
+    id: 'openrouter/nvidia/nemotron-3-super-120b-a12b:free',
+    name: 'Nemotron Super 120B',
+    description: 'NVIDIA free-tier flagship. Strong reasoning, no cost.',
   },
   {
-    id: 'openrouter/openai/gpt-4o',
-    name: 'GPT-4o',
-    description: 'Fast general-purpose model with strong multimodal support.',
+    id: 'openrouter/moonshotai/kimi-k2.6',
+    name: 'Kimi K2.6',
+    description: 'Moonshot long-context model. Strong for document-heavy workspaces.',
   },
   {
-    id: 'openrouter/google/gemini-2.5-pro',
-    name: 'Gemini 2.5 Pro',
-    description: 'Strong long-context reasoning for heavier tasks.',
+    id: 'openrouter/deepseek/deepseek-v4-pro',
+    name: 'DeepSeek V4 Pro',
+    description: 'Flagship DeepSeek model. Best quality for complex reasoning tasks.',
+  },
+  {
+    id: 'openrouter/deepseek/deepseek-v4-flash',
+    name: 'DeepSeek V4 Flash',
+    description: 'Fast and cheap. Good for repetitive agent tasks. ~$0.14/M tokens.',
+  },
+  {
+    id: 'openrouter/minimax/minimax-m2.7',
+    name: 'MiniMax M2.7',
+    description: 'Efficient mid-range model. Good balance of speed and capability.',
   },
 ] as const
 
-export const DEFAULT_PLATFORM_MODEL = 'openrouter/anthropic/claude-sonnet-4-6'
+export const DEFAULT_PLATFORM_MODEL = 'openrouter/nvidia/nemotron-3-super-120b-a12b:free'
 
 export function getDefaultPlatformModel() {
   return DEFAULT_PLATFORM_MODEL
