@@ -2181,3 +2181,26 @@
 - Tasks completed this session: M4-1, M4-2, M4-3, M4-4, M4-5, M4-6
 - Next task to pick up: M5-1
 - Open blockers: none
+
+---
+## Session 2026-04-25 — Claude Sonnet 4.6
+**Starting branch:** master
+**Starting commit:** bf929b5
+
+### Task: PROD-DEBUG — Fix production login failure
+
+- Files touched: `src/middleware.ts`, `src/app/(auth)/login/page.tsx`
+- Root cause: `getToken()` from `next-auth/jwt` (v4 API) cannot read NextAuth v5 JWE-encrypted session tokens. `isLoggedIn` was always `false` in middleware → every `/dashboard` request redirected to `/login` even after successful sign-in.
+- Secondary: `test@claw.dev` production user had an unknown bcrypt hash. Reset via direct psql.
+- Minor: `router.refresh()` after `router.push()` on success path caused double navigation, removed.
+- Verification: `curl` POST to `/api/auth/callback/credentials` → `302 Location: /dashboard` with `__Secure-authjs.session-token` cookie set. ✅
+- Result: ✅ complete
+- Commits:
+  - `4d3618e fix: use NextAuth v5 auth() in middleware to fix login redirect loop`
+
+### Session end
+- Ending branch: master
+- Ending commit: 4d3618e
+- Tasks completed: PROD-DEBUG
+- Next task to pick up: TASK M5-1
+- Open blockers: Stripe webhook registration (manual step), Telegram re-save (manual step after deploy)

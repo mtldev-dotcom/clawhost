@@ -5,12 +5,36 @@
 
 ---
 
-**Branch:** `dev-claude`
-**Last commit:** `4d2c239 feat: add ToS and Privacy links to register page`
+**Branch:** `master`
+**Last commit:** `4d3618e fix: use NextAuth v5 auth() in middleware to fix login redirect loop`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
-**State:** `M4 complete`, next milestone `M5`
+**State:** production live at `https://claw.nickybruno.com`, login fixed
 **Updated:** 2026-04-25
+
+---
+
+## What happened this session
+
+Two production bugs were diagnosed and fixed:
+
+1. **Login redirect loop (root cause):** Middleware was using `getToken()` from `next-auth/jwt` (v4 API). NextAuth v5 encrypts session tokens as JWE — `getToken` cannot decrypt them, so `isLoggedIn` was always `false`. Every `/dashboard` request redirected back to `/login` even after successful sign-in. Fixed by rewriting `src/middleware.ts` to use `auth()` from NextAuth v5 (`export default auth((req) => { ... })`).
+
+2. **Test user bad password hash:** The manually-created `test@claw.dev` user in production had a bcrypt hash from an unknown password. Reset to `Testing123!` directly via `psql` against `postgresql://clawhost:clawhost2026@5.161.238.111:5344/clawhost`.
+
+3. **Login form freeze (minor):** `router.refresh()` call after `router.push()` on the success path was causing a double navigation. Removed.
+
+The fix is deployed to `master` and pushed — Dokploy will auto-redeploy from the latest commit.
+
+---
+
+## Production state
+
+- URL: `https://claw.nickybruno.com`
+- DB: `postgresql://clawhost:clawhost2026@5.161.238.111:5344/clawhost` (external port 5344)
+- Test account: `test@claw.dev` / `Testing123!`
+- Dokploy app: `clawpagebase-frontend-wwtuj2`
+- Dokploy URL: `https://dokhost.nickybruno.com`
 
 ---
 
@@ -18,13 +42,14 @@
 
 Proceed with `TASK M5-1` — the first task of Milestone M5.
 
-M4 is fully closed. All 5 tasks + close task verified and committed in one session.
+After the Dokploy redeploy completes (~2-3 min), verify login works end-to-end in the browser, then continue with M5.
 
 ---
 
 ## Open questions for the human
 
-- None.
+- Stripe webhook needs to be registered at `https://claw.nickybruno.com/api/stripe/webhook` in the Stripe dashboard.
+- Telegram bot token needs to be re-saved in Settings (to register the webhook against the production HTTPS URL).
 
 ---
 
@@ -34,15 +59,3 @@ M4 is fully closed. All 5 tasks + close task verified and committed in one sessi
 - Do not batch tasks. One task at a time.
 - Do not run `npm install <package>` without a `docs/DECISIONS.md` entry first.
 - Do not invent tasks. Only execute tasks listed in `plan-claude.md`.
-
----
-
-## Context at handoff time
-
-M4 completed in one session (2026-04-25):
-- M4-1: Created `/status` health-check page (`src/app/status/page.tsx`) and API route (`src/app/api/status/route.ts`) — DB ping + credits aggregation
-- M4-2: Added rate limiting to `/api/ai/command` — `checkAuthRateLimit` + `createRateLimitResponse` from existing `src/lib/rate-limit.ts`
-- M4-3: Added security headers to `next.config.ts` — X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy
-- M4-4: Created legal stub pages — `src/app/legal/terms/page.tsx` and `src/app/legal/privacy/page.tsx`
-- M4-5: Added ToS + Privacy footer links to register page
-- M4-6: Full verification — lint 0 errors (7 warnings pre-existing), 47 tests, 27 routes built clean
