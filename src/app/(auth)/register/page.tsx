@@ -129,6 +129,12 @@ export default function RegisterPage() {
                 {t('signIn')}
               </Link>
             </p>
+            <p className="mt-6 text-center text-xs text-muted-foreground">
+              By registering you agree to our{' '}
+              <a href="/legal/terms" className="underline hover:text-foreground">Terms of Service</a>
+              {' '}and{' '}
+              <a href="/legal/privacy" className="underline hover:text-foreground">Privacy Policy</a>.
+            </p>
           </CardFooter>
         </form>
       </Card>
