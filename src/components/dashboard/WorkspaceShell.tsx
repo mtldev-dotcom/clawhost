@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Plus, Archive, TableProperties, Rows3 } from 'lucide-react'
-import { addDatabaseField, addDatabaseRow, createWorkspacePage, archiveWorkspacePage, updateWorkspacePage, deleteWorkspaceFile } from '@/app/dashboard/workspace/actions'
+import { addDatabaseField, addDatabaseRow, createWorkspacePage, archiveWorkspacePage, updateWorkspacePage, deleteWorkspaceFile, createFromTemplate } from '@/app/dashboard/workspace/actions'
 import { WorkspacePageTree } from '@/components/dashboard/WorkspacePageTree'
 import {
   databaseFieldTypeOptions,
@@ -294,8 +294,26 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
             </form>
           </div>
         ) : (
-          <div className="flex min-h-[420px] items-center justify-center text-center text-muted-foreground">
-            Pick a page or create one to start the workspace.
+          <div className="flex min-h-[420px] flex-col items-center justify-center gap-6 text-center">
+            <div>
+              <h2 className="text-xl font-semibold">Start your workspace</h2>
+              <p className="mt-2 max-w-sm text-sm text-muted-foreground">Create a page above, or pick a starter template to hit the ground running.</p>
+            </div>
+            <div className="grid w-full max-w-sm gap-3">
+              {[
+                { key: 'client-crm', label: 'Client CRM', desc: 'Track clients, deals, and next actions' },
+                { key: 'weekly-ops', label: 'Weekly Ops Review', desc: 'Ship notes and priorities every week' },
+                { key: 'meeting-notes', label: 'Meeting Notes', desc: 'Fast capture for meetings and calls' },
+              ].map((t) => (
+                <form key={t.key} action={createFromTemplate}>
+                  <input type="hidden" name="template" value={t.key} />
+                  <button type="submit" className="w-full rounded-lg border p-4 text-left transition hover:border-gray-400">
+                    <p className="font-medium">{t.label}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{t.desc}</p>
+                  </button>
+                </form>
+              ))}
+            </div>
           </div>
         )}
       </Card>
