@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { MessageSquare, Settings, Sparkles, Brain, Zap, LogOut, Files, Menu, X } from 'lucide-react'
+import { Settings, Sparkles, Brain, Zap, LogOut, Files, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
@@ -20,11 +20,10 @@ interface DashboardHeaderProps {
   }
 }
 
+// Deprecated routes /chat and /dashboard/skills hidden in M5-10. See docs/DECISIONS.md.
 const navItems = [
   { href: '/dashboard/workspace', labelKey: 'workspace' as const, icon: Files },
-  { href: '/chat', labelKey: 'chat' as const, icon: MessageSquare },
   { href: '/dashboard/settings', labelKey: 'settings' as const, icon: Settings },
-  { href: '/dashboard/skills', labelKey: 'skills' as const, icon: Sparkles },
 ]
 
 function modelShortName(model: string | null | undefined): string {
@@ -55,7 +54,7 @@ export function DashboardHeader({ activeModel, instanceStatus, locale, translati
         {/* Left: logo + desktop nav */}
         <div className="flex items-center gap-6">
           <Link href="/dashboard" className="text-xl font-bold">
-            PageBase
+            Foyer
           </Link>
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-1">
