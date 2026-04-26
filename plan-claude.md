@@ -884,7 +884,7 @@ Exit gate: Manual smoke-test of the five scenarios in LOCAL_TESTING_GUIDE.md pas
 
 **Mark complete when:** All four verification items pass.
 
-- [ ] M2-1
+- [x] M2-1
 
 ---
 
@@ -912,7 +912,7 @@ Exit gate: Manual smoke-test of the five scenarios in LOCAL_TESTING_GUIDE.md pas
 
 **Commit message:** `refactor: style workspace page content textarea for readability`
 
-- [ ] M2-2
+- [x] M2-2
 
 ---
 
@@ -941,7 +941,7 @@ Exit gate: Manual smoke-test of the five scenarios in LOCAL_TESTING_GUIDE.md pas
 
 **Commit message:** `feat: extract collapsible WorkspacePageTree client component`
 
-- [ ] M2-3
+- [x] M2-3
 
 ---
 
@@ -974,7 +974,7 @@ Exit gate: Manual smoke-test of the five scenarios in LOCAL_TESTING_GUIDE.md pas
 
 **Commit message:** `feat: add per-page hover archive button in workspace sidebar`
 
-- [ ] M2-4
+- [x] M2-4
 
 ---
 
@@ -1026,7 +1026,7 @@ Exit gate: Manual smoke-test of the five scenarios in LOCAL_TESTING_GUIDE.md pas
 
 **Commit message:** `feat: add workspace file soft-delete action and UI button`
 
-- [ ] M2-5
+- [x] M2-5
 
 ---
 
@@ -1063,7 +1063,7 @@ Exit gate: Manual smoke-test of the five scenarios in LOCAL_TESTING_GUIDE.md pas
 
 **Commit message:** `refactor: display model short-name in dashboard header`
 
-- [ ] M2-6
+- [x] M2-6
 
 ---
 
@@ -1169,7 +1169,7 @@ Exit gate: Manual smoke-test of the five scenarios in LOCAL_TESTING_GUIDE.md pas
 
 **Commit message:** `feat: add SMB starter templates to workspace empty state`
 
-- [ ] M2-7
+- [x] M2-7
 
 ---
 
@@ -1190,7 +1190,7 @@ Exit gate: Manual smoke-test of the five scenarios in LOCAL_TESTING_GUIDE.md pas
 
 **Commit message:** `chore: close milestone M2 — workspace polish verified`
 
-- [ ] M2-8
+- [x] M2-8
 
 ---
 

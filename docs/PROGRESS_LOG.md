@@ -75,3 +75,26 @@ Format:
 **Verification:** `npm run lint && npm run test:run && npm run build` — lint 0 errors (7 warnings, all pre-existing), 7 test files / 45 tests passed, build compiled and generated 12 static pages cleanly.
 
 **Open items:** Next up is `TASK M2-1` — remove dev-grade copy from WorkspaceShell.
+
+## 2026-04-25 — M2 close: Workspace Polish
+
+**Summary:** Closed milestone M2 in a single session. Scrubbed all dev-grade scaffold copy from the workspace shell, polished the textarea content area, extracted a collapsible page tree client component, added hover archive and file delete buttons, cleaned up the model indicator in the header, and added SMB starter templates to the empty state.
+
+**What changed in the product:**
+- Workspace shell no longer shows "Phase 2", "Now in ClawHost / Now becoming PageBase" or other internal build notes
+- Content textarea is taller (320px), non-resizable, and uses readable base font
+- Sidebar page tree is now collapsible — chevron rotates on expand
+- Non-root pages have a hover `×` archive button directly in the sidebar
+- Files in the workspace file list now have a Delete button (soft-delete)
+- Dashboard header model badge shows readable short-name (e.g. "Claude Sonnet 4 6") truncated at 120px
+- Empty workspace state shows three SMB starter templates: Client CRM, Weekly Ops Review, Meeting Notes
+
+**What changed in the codebase:**
+- `WorkspaceShell.tsx`: removed dev copy, styled textarea, added delete button, added template UI, removed unused Link import
+- `WorkspacePageTree.tsx`: new client component — collapsible tree with hover archive button
+- `DashboardHeader.tsx`: added `modelShortName` helper
+- `workspace/actions.ts`: added `deleteWorkspaceFile` and `createFromTemplate` server actions
+
+**Verification:** `npm run lint && npm run test:run && npm run build` — 0 errors, 45 tests, build clean.
+
+**Open items:** Next up is `TASK M3-1` — start of the AI Command Palette milestone.

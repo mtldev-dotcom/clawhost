@@ -1989,7 +1989,72 @@
 
 ### Session end
 - Ending branch: dev-claude
-- Ending commit: (pending)
+- Ending commit: ae0bec5
 - Tasks completed this session: M1-5
 - Next task to pick up: M2-1
+- Open blockers: none
+
+---
+
+---
+## Session 2026-04-25 20:00 UTC — Claude Sonnet 4.6
+**Starting branch:** dev-claude
+**Starting commit:** ae0bec5
+**Plan version:** plan-claude.md @ ad3a6c9
+
+### Task: M2-1 — Remove dev-grade copy from WorkspaceShell
+- Result: ✅ complete — Commit: 8aada46
+
+### Task: M2-2 — Style workspace page content textarea
+- Result: ✅ complete — Commit: 2bbd1f0
+
+### Task: M2-3 — Extract collapsible WorkspacePageTree client component
+- Result: ✅ complete — Commit: 8e3dbbc
+
+### Task: M2-4 — Add per-page hover archive button in sidebar
+- Result: ✅ complete — Commit: afa5d7a
+
+### Task: M2-5 — Add workspace file soft-delete action and UI button
+- Result: ✅ complete — Commit: 397e771
+
+### Task: M2-6 — Dashboard header model indicator cleanup
+- Result: ✅ complete — Commit: 26f7e48
+
+### Task: M2-7 — Add SMB starter templates to workspace empty state
+- Result: ✅ complete — Commit: f83bd2e
+
+### Task: M2-8 — Milestone M2 close
+- Verification commands + raw output:
+  ```
+  $ npm run lint
+  ✖ 7 problems (0 errors, 7 warnings) — all pre-existing after bonus Link import fix
+
+  $ npm run test:run
+   Test Files  7 passed (7)
+       Tests  45 passed (45)
+
+  $ npm run build
+  ✓ Compiled successfully
+  ✓ Generating static pages (12/12)
+  22 dynamic routes — all ƒ
+  ```
+- Result: ✅ complete
+
+### M2 — Workspace Polish
+- Status: 🟢 done
+- Started: 2026-04-25
+- Ended: 2026-04-25
+- Tasks: M2-1 ✅  M2-2 ✅  M2-3 ✅  M2-4 ✅  M2-5 ✅  M2-6 ✅  M2-7 ✅  M2-8 ✅
+- Full verification run at close:
+  ```
+  lint: 0 errors, 7 warnings (all pre-existing)
+  tests: 7 files, 45 tests — all passed
+  build: ✓ Compiled, ✓ 12 static pages — exit 0
+  ```
+
+### Session end
+- Ending branch: dev-claude
+- Ending commit: (pending — M2-8 close commit)
+- Tasks completed this session: M2-1, M2-2, M2-3, M2-4, M2-5, M2-6, M2-7, M2-8
+- Next task to pick up: M3-1
 - Open blockers: none
