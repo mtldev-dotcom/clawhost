@@ -1847,7 +1847,7 @@ Exit gate: Checklist below passes. `npm run lint && npm run test:run && npm run 
 
 **Commit message:** `feat: add /status health-check page and API route`
 
-- [ ] M4-1
+- [x] M4-1
 
 ---
 
@@ -1880,7 +1880,7 @@ Exit gate: Checklist below passes. `npm run lint && npm run test:run && npm run 
 
 **Commit message:** `sec: add rate limiting to AI command route`
 
-- [ ] M4-2
+- [x] M4-2
 
 ---
 
@@ -1918,7 +1918,7 @@ Exit gate: Checklist below passes. `npm run lint && npm run test:run && npm run 
 
 **Commit message:** `sec: add security headers to Next.js config`
 
-- [ ] M4-3
+- [x] M4-3
 
 ---
 
@@ -1990,7 +1990,7 @@ Exit gate: Checklist below passes. `npm run lint && npm run test:run && npm run 
 
 **Commit message:** `feat: add legal stub pages (ToS and Privacy)`
 
-- [ ] M4-4
+- [x] M4-4
 
 ---
 
@@ -2021,7 +2021,7 @@ Exit gate: Checklist below passes. `npm run lint && npm run test:run && npm run 
 
 **Commit message:** `feat: add ToS and Privacy links to register page`
 
-- [ ] M4-5
+- [x] M4-5
 
 ---
 
@@ -2042,7 +2042,7 @@ Exit gate: Checklist below passes. `npm run lint && npm run test:run && npm run 
 
 **Commit message:** `chore: close milestone M4 — production readiness verified`
 
-- [ ] M4-6
+- [x] M4-6
 
 ---
 

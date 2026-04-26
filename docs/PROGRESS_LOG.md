@@ -99,6 +99,29 @@ Format:
 
 **Open items:** Next up is `TASK M3-1` — start of the AI Command Palette milestone.
 
+## 2026-04-25 — M4 close: Production Readiness
+
+**Summary:** Closed milestone M4 in a single session. Added a `/status` health-check page and API route, wired rate limiting into the AI command route (using the existing `src/lib/rate-limit.ts`), added security response headers to all routes via `next.config.ts`, created legal stub pages for ToS and Privacy, and added footer links to the register page. Also replaced the platform model list (was 7 legacy models) with 5 curated OpenRouter models — Nemotron Super 120B free as the new default.
+
+**What changed in the product:**
+- `/status` page: app operational badge, DB operational badge, last-updated timestamp
+- AI command endpoint now returns 429 with Retry-After header if rate limit exceeded
+- All HTTP responses include X-Frame-Options: DENY, X-Content-Type-Options: nosniff, Referrer-Policy, Permissions-Policy
+- `/legal/terms` and `/legal/privacy` stub pages live and linked from register page
+- Platform model picker shows 5 models: Nemotron (free default), Kimi K2.6, DeepSeek V4 Pro, DeepSeek V4 Flash, MiniMax M2.7
+
+**What changed in the codebase:**
+- `src/app/api/status/route.ts` + `src/app/status/page.tsx`: new health-check surface
+- `src/app/api/ai/command/route.ts`: rate limit check added after auth, before credit check
+- `next.config.ts`: `headers()` function with 4 security headers
+- `src/app/legal/terms/page.tsx` + `src/app/legal/privacy/page.tsx`: new stub pages
+- `src/app/(auth)/register/page.tsx`: ToS + Privacy footer
+- `src/lib/platform.ts` + `src/lib/env.ts`: replaced model list, updated default
+
+**Verification:** `npm run lint && npm run test:run && npm run build` — 0 errors (7 pre-existing warnings), 47 tests, 27 routes clean.
+
+**Open items:** Next up is `TASK M5-1` — start of the Billing/Stripe milestone.
+
 ## 2026-04-25 — M3 close: AI Command Palette
 
 **Summary:** Closed milestone M3 in a single session. Added a Postgres GIN full-text search index on Page.title and Page.content, built a workspace context retrieval library, created the /api/ai/command route (auth + credit gate + FTS context + OpenRouter call + credit decrement), built the Cmd+K CommandPalette client component, wired it into the DashboardHeader, and added credit gate integration tests.

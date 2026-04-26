@@ -2125,3 +2125,59 @@
 - Tasks completed this session: M3-1, M3-2, M3-3, M3-4, M3-5, M3-6, M3-7
 - Next task to pick up: M4-1
 - Open blockers: none
+
+---
+
+## Session 2026-04-25 (continued) — Claude Sonnet (M4)
+
+**Starting branch:** `dev-claude`
+**Starting commit:** `a7be7e5 feat: replace platform models`
+**Plan version:** `plan-claude.md` at repo root
+
+### Task: M4-1 — Add /status health-check route
+- Result: ✅ complete
+- Commit: `4b5a967 feat: add /status health-check page and API route`
+
+### Task: M4-2 — Add rate limiting to /api/ai/command
+- Result: ✅ complete
+- Commit: `248f00f sec: add rate limiting to AI command route`
+
+### Task: M4-3 — Add CSP and security headers to Next.js config
+- Result: ✅ complete
+- Commit: `fa7782d sec: add security headers to Next.js config`
+
+### Task: M4-4 — Add legal stub pages (ToS and Privacy)
+- Result: ✅ complete
+- Commit: `59eb3d5 feat: add legal stub pages (ToS and Privacy)`
+
+### Task: M4-5 — Add footer links to auth pages and public pages
+- Result: ✅ complete
+- Commit: `4d2c239 feat: add ToS and Privacy links to register page`
+
+### Task: M4-6 — Milestone M4 close
+- Full verification run:
+  ```
+  lint: 0 errors, 7 warnings (all pre-existing)
+  tests: 8 files, 47 tests — all passed
+  build: ✓ Compiled, ✓ 27 routes — exit 0
+  ```
+- Result: ✅ complete
+
+### M4 — Production Readiness
+- Status: 🟢 done
+- Started: 2026-04-25
+- Ended: 2026-04-25
+- Tasks: M4-1 ✅  M4-2 ✅  M4-3 ✅  M4-4 ✅  M4-5 ✅  M4-6 ✅
+- Full verification run at close:
+  ```
+  lint: 0 errors, 7 warnings (all pre-existing)
+  tests: 8 files, 47 tests — all passed
+  build: ✓ Compiled, ✓ 27 routes — exit 0
+  ```
+
+### Session end
+- Ending branch: dev-claude
+- Ending commit: 4d2c239
+- Tasks completed this session: M4-1, M4-2, M4-3, M4-4, M4-5, M4-6
+- Next task to pick up: M5-1
+- Open blockers: none

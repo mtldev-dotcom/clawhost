@@ -6,19 +6,19 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `7a37860 test: add credit gate integration test for /api/ai/command`
+**Last commit:** `4d2c239 feat: add ToS and Privacy links to register page`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
-**State:** `M3 complete`, next milestone `M4`
+**State:** `M4 complete`, next milestone `M5`
 **Updated:** 2026-04-25
 
 ---
 
 ## Next suggested task
 
-Proceed with `TASK M4-1` — the first task of Milestone M4.
+Proceed with `TASK M5-1` — the first task of Milestone M5.
 
-M3 is fully closed. All 6 tasks + close task verified and committed in one session.
+M4 is fully closed. All 5 tasks + close task verified and committed in one session.
 
 ---
 
@@ -39,11 +39,10 @@ M3 is fully closed. All 6 tasks + close task verified and committed in one sessi
 
 ## Context at handoff time
 
-M3 completed in one session (2026-04-25):
-- M3-1: Added Postgres GIN full-text search index on Page.title + Page.content
-- M3-2: Created `src/lib/workspace-context.ts` — retrieves relevant pages via FTS or recency
-- M3-3: Created `src/app/api/ai/command/route.ts` — POST handler: auth, credit gate, context retrieval, OpenRouter call, credit decrement
-- M3-4: Created `src/components/dashboard/CommandPalette.tsx` — Cmd+K modal with quick commands and result display
-- M3-5: Wired `<CommandPalette />` into `DashboardHeader` (renders "Ask AI ⌘K" button)
-- M3-6: Added credit gate integration tests — 2 new tests (402 / 401 gates), 47 total passing
-- M3-7: Full verification pass — lint 0 errors (7 warnings), 47 tests pass, build clean
+M4 completed in one session (2026-04-25):
+- M4-1: Created `/status` health-check page (`src/app/status/page.tsx`) and API route (`src/app/api/status/route.ts`) — DB ping + credits aggregation
+- M4-2: Added rate limiting to `/api/ai/command` — `checkAuthRateLimit` + `createRateLimitResponse` from existing `src/lib/rate-limit.ts`
+- M4-3: Added security headers to `next.config.ts` — X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy
+- M4-4: Created legal stub pages — `src/app/legal/terms/page.tsx` and `src/app/legal/privacy/page.tsx`
+- M4-5: Added ToS + Privacy footer links to register page
+- M4-6: Full verification — lint 0 errors (7 warnings pre-existing), 47 tests, 27 routes built clean

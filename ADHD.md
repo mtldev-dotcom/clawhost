@@ -1,5 +1,5 @@
 # ⚡ ClawHost — ADHD.md
-> *Last updated: 2026-04-25 (M3 close)*
+> *Last updated: 2026-04-25 (M4 close)*
 
 ---
 
@@ -18,7 +18,7 @@ Merged app in progress: PageBase-style workspace product on top of ClawHost host
 - Workspace file layer is real with root folders: Inbox, Projects, Notes
 - Authenticated `/api/workspace/files` supports list + upload
 - Workspace UI supports file upload, download, and search
-- Settings page: model selection (7 models), deploy state, Telegram connect (broken locally — see Watch Out)
+- Settings page: model selection (5 models: Nemotron, Kimi K2.6, DeepSeek V4 Pro/Flash, MiniMax M2.7), deploy state, Telegram connect (broken locally — see Watch Out)
 - Workspace shell is clean — all dev-grade scaffold copy removed
 - Collapsible page tree sidebar with hover archive button per page
 - File list has soft-delete button
@@ -27,7 +27,11 @@ Merged app in progress: PageBase-style workspace product on top of ClawHost host
 - AI Command Palette live: Cmd+K (or "Ask AI" button in header) opens modal, queries workspace context via Postgres FTS, calls OpenRouter, returns answer
 - `/api/ai/command` route: auth + credit gate + context retrieval + model call + credit decrement (1 per call)
 - Workspace full-text search index on Page.title + content (Postgres GIN)
-- 7 platform models available: Claude Sonnet 4.6 (default), GPT-4o, Gemini 2.5 Pro, Mistral Small 4, Gemini 3.1 Flash Lite, DeepSeek V4 Flash, Qwen 3.5 Flash
+- 5 platform models: Nemotron Super 120B (default, free), Kimi K2.6, DeepSeek V4 Pro, DeepSeek V4 Flash, MiniMax M2.7
+- `/status` health-check page: app + DB status, credits granted last 24h
+- Security headers on all routes: X-Frame-Options DENY, X-Content-Type-Options, Referrer-Policy, Permissions-Policy
+- Legal stub pages live: `/legal/terms` and `/legal/privacy`
+- Register page links to ToS and Privacy Policy
 - Skills marketplace UI/API exists
 - Bilingual UI (EN/FR)
 - Chat UI + chat API routes exist in code
@@ -174,7 +178,7 @@ Merged app in progress: PageBase-style workspace product on top of ClawHost host
 ### 10. Settings → model selection ✅
 1. Open `/dashboard/settings`
 2. Confirm subscription + credits UI renders
-3. Change the default model (7 options: Sonnet, GPT-4o, Gemini Pro, Mistral Small, Gemini Flash Lite, DeepSeek Flash, Qwen Flash)
+3. Change the default model (5 options: Nemotron, Kimi K2.6, DeepSeek V4 Pro, DeepSeek V4 Flash, MiniMax M2.7)
 4. Save it
 5. Refresh and confirm the selection persisted
 
@@ -226,6 +230,8 @@ If any of those drift from code, fix them.
 ---
 
 ## 🗒️ Nick's Notes
+> 2026-04-25 (M4): Closed M4 (production readiness) in one session. Added /status health-check, rate limiting on AI command route, security headers (X-Frame-Options/DENY, X-Content-Type-Options, Referrer-Policy, Permissions-Policy), legal stub pages (ToS + Privacy), register page footer links. Replaced platform model list with 5 models (Nemotron free as default). 47 tests, 27 routes, lint clean.
+
 > 2026-04-25 (M3): Closed M3 (AI command palette) in one session. Added Postgres FTS index, workspace context retrieval library, /api/ai/command route with credit gate, CommandPalette Cmd+K component, wired into DashboardHeader. 47 tests pass.
 
 > 2026-04-25 (M2): Closed M2 (workspace polish) in one session. Scrubbed all dev-grade scaffold copy, extracted collapsible WorkspacePageTree client component, styled textarea, added hover archive + file delete buttons, cleaned model indicator header, added SMB starter templates to empty state.
