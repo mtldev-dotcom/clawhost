@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Select } from '@/components/ui/select'
 import { WorkspaceFileUpload } from '@/components/dashboard/WorkspaceFileUpload'
 import { WorkspaceFileSearch } from '@/components/dashboard/WorkspaceFileSearch'
+import { GreetingLine } from '@/components/dashboard/GreetingLine'
 
 interface WorkspaceShellProps {
   workspaceName: string
@@ -21,6 +22,7 @@ interface WorkspaceShellProps {
   selectedPageId?: string
   rootFolders: { id: string; name: string }[]
   rootFiles: { id: string; name: string; sizeBytes: number; createdBy: 'user' | 'agent' }[]
+  userName?: string
 }
 
 function pageLabel(pageType: WorkspacePageNode['pageType']) {
@@ -190,7 +192,7 @@ const templates = [
   { key: 'meeting-notes',   label: 'Meeting Notes',    desc: 'Fast capture for meetings and calls',          icon: NotebookPen },
 ]
 
-export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolders, rootFiles }: WorkspaceShellProps) {
+export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolders, rootFiles, userName }: WorkspaceShellProps) {
   const selectedPage = findSelectedPage(pages, selectedPageId)
   const selectedContent = selectedPage ? getWorkspacePageContent(selectedPage) : { text: '' }
 
@@ -231,6 +233,9 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
       </Card>
 
       <Card className="p-6">
+        {!selectedPage && pages.length > 0 && userName && (
+          <GreetingLine name={userName.split(' ')[0] || userName} />
+        )}
         {selectedPage ? (
           <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4">

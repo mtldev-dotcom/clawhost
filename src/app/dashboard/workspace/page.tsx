@@ -29,6 +29,7 @@ export default async function WorkspacePage({
       selectedPageId={resolvedSearchParams.page}
       rootFolders={fileState.folders}
       rootFiles={fileState.files}
+      userName={session.user.name ?? undefined}
     />
   )
 }
