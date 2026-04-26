@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import { Loader2, Wrench } from 'lucide-react'
+import { toast } from 'sonner'
 import { SkillCard } from '@/components/dashboard/SkillCard'
 import type { Skill } from '@prisma/client'
 
@@ -12,7 +14,6 @@ export default function SkillsPage() {
   const [skills, setSkills] = useState<Skill[]>([])
   const [enabledSkills, setEnabledSkills] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
   const fetchSkills = useCallback(async () => {
     try {
@@ -21,7 +22,7 @@ export default function SkillsPage() {
       const data = await res.json()
       setSkills(data)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load skills')
+      toast.error(err instanceof Error ? err.message : 'Failed to load skills')
     }
   }, [])
 
@@ -61,8 +62,7 @@ export default function SkillsPage() {
       const data: SkillsResponse = await res.json()
       setEnabledSkills(data.enabledSkills)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update skill')
-      setTimeout(() => setError(null), 3000)
+      toast.error(err instanceof Error ? err.message : 'Failed to update skill')
     }
   }
 
@@ -71,22 +71,18 @@ export default function SkillsPage() {
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     )
   }
 
   return (
     <div className="space-y-8">
-      {error && (
-        <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
-          {error}
-        </div>
-      )}
-
       {skills.length === 0 ? (
         <div className="rounded-lg border border-dashed border-gray-300 p-12 text-center">
-          <div className="text-4xl">🛠️</div>
+          <div className="flex justify-center">
+            <Wrench className="h-8 w-8 text-muted-foreground" />
+          </div>
           <h3 className="mt-4 text-lg font-medium text-gray-900">
             No skills available yet
           </h3>

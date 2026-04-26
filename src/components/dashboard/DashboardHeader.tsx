@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { MessageSquare, Settings, Sparkles, Brain, Zap, LogOut, Files } from 'lucide-react'
+import { MessageSquare, Settings, Sparkles, Brain, Zap, LogOut, Files, Menu, X } from 'lucide-react'
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
@@ -37,24 +38,27 @@ function modelShortName(model: string | null | undefined): string {
 
 export function DashboardHeader({ activeModel, instanceStatus, locale, translations }: DashboardHeaderProps) {
   const pathname = usePathname()
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   const getProviderIcon = (model: string | null | undefined) => {
     if (!model) return null
     if (model.includes('anthropic')) return Brain
     if (model.includes('openrouter')) return Zap
-    return Sparkles // OpenAI default
+    return Sparkles
   }
 
   const ProviderIcon = getProviderIcon(activeModel)
 
   return (
-    <header className="border-b bg-background">
+    <header className="border-b bg-background sticky top-0 z-40">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 lg:px-8">
+        {/* Left: logo + desktop nav */}
         <div className="flex items-center gap-6">
           <Link href="/dashboard" className="text-xl font-bold">
             PageBase
           </Link>
-          <nav className="flex items-center gap-1">
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
               const Icon = item.icon
               const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
@@ -69,17 +73,18 @@ export function DashboardHeader({ activeModel, instanceStatus, locale, translati
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-5 w-5" />
                   {translations.nav[item.labelKey]}
                 </Link>
               )
             })}
           </nav>
         </div>
-        <div className="flex items-center gap-4">
-          {/* Active model indicator */}
+
+        {/* Right: utilities */}
+        <div className="flex items-center gap-3">
           {activeModel && instanceStatus === 'active' && (
-            <div className="flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-2">
               {ProviderIcon && <ProviderIcon className="h-4 w-4 text-muted-foreground" />}
               <Badge variant="secondary" className="max-w-[120px] truncate font-mono text-xs">
                 {modelShortName(activeModel)}
@@ -89,24 +94,76 @@ export function DashboardHeader({ activeModel, instanceStatus, locale, translati
           {instanceStatus && instanceStatus !== 'active' && (
             <Badge
               variant={instanceStatus === 'provisioning' ? 'secondary' : 'destructive'}
-              className="text-xs"
+              className="hidden md:flex text-xs"
             >
               {instanceStatus}
             </Badge>
           )}
-          <CommandPalette />
-          <LanguageSwitcher currentLocale={locale} />
+
+          <div className="hidden md:flex items-center gap-3">
+            <CommandPalette />
+            <LanguageSwitcher currentLocale={locale} />
+            <button
+              onClick={() => { window.location.href = '/api/auth/signout?callbackUrl=%2F' }}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <LogOut className="h-5 w-5" />
+              {translations.common.signOut}
+            </button>
+          </div>
+
+          {/* Mobile hamburger */}
           <button
-            onClick={() => {
-              window.location.href = '/api/auth/signout?callbackUrl=%2F'
-            }}
-            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            onClick={() => setMobileOpen((v) => !v)}
+            className="md:hidden flex items-center justify-center w-10 h-10 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            aria-label="Toggle menu"
           >
-            <LogOut className="h-4 w-4" />
-            {translations.common.signOut}
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
+
+      {/* Mobile nav drawer */}
+      {mobileOpen && (
+        <div className="md:hidden border-t bg-background">
+          <nav className="flex flex-col px-4 py-2">
+            {navItems.map((item) => {
+              const Icon = item.icon
+              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={cn(
+                    'flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium transition-colors min-h-[44px]',
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  )}
+                >
+                  <Icon className="h-5 w-5 flex-shrink-0" />
+                  {translations.nav[item.labelKey]}
+                </Link>
+              )
+            })}
+
+            <div className="border-t mt-2 pt-2 flex flex-col gap-1">
+              <div className="flex items-center justify-between px-3 py-2">
+                <LanguageSwitcher currentLocale={locale} />
+                <CommandPalette />
+              </div>
+              <button
+                onClick={() => { window.location.href = '/api/auth/signout?callbackUrl=%2F' }}
+                className="flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors min-h-[44px] w-full text-left"
+              >
+                <LogOut className="h-5 w-5 flex-shrink-0" />
+                {translations.common.signOut}
+              </button>
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   )
 }

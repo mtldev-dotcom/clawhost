@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Loader2, MessageSquare, Rocket, Sparkles } from 'lucide-react'
+import { toast } from 'sonner'
 import { saveTelegramBot, deployInstance, savePlatformModel } from './actions'
 
 type ModelOption = {
@@ -39,19 +40,16 @@ export function SettingsClient({ user, instance, models }: SettingsClientProps) 
   const [botToken, setBotToken] = useState('')
   const [chatId, setChatId] = useState('')
   const [savingTelegram, setSavingTelegram] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
 
   const canDeploy = user.subscriptionStatus === 'active' && user.creditsBalance > 0
 
   async function handleSaveModel() {
     setSavingModel(true)
-    setError(null)
     try {
       await savePlatformModel(selectedModel)
-      setSuccess('Default model saved.')
+      toast.success('Default model saved.')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save model')
+      toast.error(err instanceof Error ? err.message : 'Failed to save model')
     } finally {
       setSavingModel(false)
     }
@@ -59,14 +57,13 @@ export function SettingsClient({ user, instance, models }: SettingsClientProps) 
 
   async function handleSaveTelegram() {
     setSavingTelegram(true)
-    setError(null)
     try {
       const result = await saveTelegramBot(botToken, chatId)
-      setSuccess(`Telegram connected — bot @${result.botUsername} is ready.`)
+      toast.success(`Telegram connected — bot @${result.botUsername} is ready.`)
       setBotToken('')
       setChatId('')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save Telegram bot')
+      toast.error(err instanceof Error ? err.message : 'Failed to save Telegram bot')
     } finally {
       setSavingTelegram(false)
     }
@@ -74,12 +71,11 @@ export function SettingsClient({ user, instance, models }: SettingsClientProps) 
 
   async function handleDeploy() {
     setDeploying(true)
-    setError(null)
     try {
       await deployInstance()
-      setSuccess('Provisioning started.')
+      toast.success('Provisioning started.')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Deployment failed')
+      toast.error(err instanceof Error ? err.message : 'Deployment failed')
     } finally {
       setDeploying(false)
     }
@@ -87,9 +83,6 @@ export function SettingsClient({ user, instance, models }: SettingsClientProps) 
 
   return (
     <div className="space-y-6">
-      {error && <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</div>}
-      {success && <div className="rounded-md bg-green-500/10 p-3 text-sm text-green-600">{success}</div>}
-
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>

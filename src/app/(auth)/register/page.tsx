@@ -5,10 +5,21 @@ import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
+import { User, Mail, Lock, Eye, EyeOff, Check, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+
+function PasswordRequirement({ met, label }: { met: boolean; label: string }) {
+  return (
+    <span className={`flex items-center gap-1 text-xs transition-colors ${met ? 'text-emerald' : 'text-muted-foreground'}`}>
+      <Check className={`h-3 w-3 ${met ? 'opacity-100' : 'opacity-30'}`} />
+      {label}
+    </span>
+  )
+}
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -16,12 +27,15 @@ export default function RegisterPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  const hasLength = password.length >= 8
+  const hasUpper = /[A-Z]/.test(password)
+  const hasNumber = /[0-9]/.test(password)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setError('')
     setLoading(true)
 
     try {
@@ -34,12 +48,11 @@ export default function RegisterPage() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || t('registrationFailed'))
+        toast.error(data.error || t('registrationFailed'))
         setLoading(false)
         return
       }
 
-      // Auto sign in after registration
       const result = await signIn('credentials', {
         email,
         password,
@@ -47,15 +60,14 @@ export default function RegisterPage() {
       })
 
       if (result?.error) {
-        setError(t('signInFailed'))
+        toast.error(t('signInFailed'))
         setLoading(false)
         return
       }
 
       router.push('/onboarding')
-      router.refresh()
     } catch {
-      setError(t('somethingWrong'))
+      toast.error(t('somethingWrong'))
       setLoading(false)
     }
   }
@@ -65,63 +77,87 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">{t('createAccount')}</CardTitle>
-          <CardDescription>
-            {t('createAccountDescription')}
-          </CardDescription>
+          <CardDescription>{t('createAccountDescription')}</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-            {error && (
-              <div className="p-3 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">
-                {error}
-              </div>
-            )}
             <div className="space-y-2">
               <Label htmlFor="name">{t('name')}</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder={t('namePlaceholder')}
-                name="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                disabled={loading}
-              />
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder={t('namePlaceholder')}
+                  name="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  disabled={loading}
+                  className="pl-9"
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">{t('email')}</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder={t('emailPlaceholder')}
-                name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-              />
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder={t('emailPlaceholder')}
+                  name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="pl-9"
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">{t('password')}</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder={t('createPasswordPlaceholder')}
-                name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={8}
-                disabled={loading}
-              />
-              <p className="text-xs text-muted-foreground">
-                {t('passwordRequirement')}
-              </p>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder={t('createPasswordPlaceholder')}
+                  name="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={8}
+                  disabled={loading}
+                  className="pl-9 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {password.length > 0 && (
+                <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1">
+                  <PasswordRequirement met={hasLength} label="8+ characters" />
+                  <PasswordRequirement met={hasUpper} label="Uppercase letter" />
+                  <PasswordRequirement met={hasNumber} label="Number" />
+                </div>
+              )}
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? t('creatingAccount') : t('createAccount')}
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t('creatingAccount')}
+                </>
+              ) : (
+                t('createAccount')
+              )}
             </Button>
             <p className="text-sm text-center text-muted-foreground">
               {t('hasAccount')}{' '}
@@ -129,7 +165,7 @@ export default function RegisterPage() {
                 {t('signIn')}
               </Link>
             </p>
-            <p className="mt-6 text-center text-xs text-muted-foreground">
+            <p className="mt-2 text-center text-xs text-muted-foreground">
               By registering you agree to our{' '}
               <a href="/legal/terms" className="underline hover:text-foreground">Terms of Service</a>
               {' '}and{' '}

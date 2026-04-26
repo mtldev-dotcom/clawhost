@@ -1,4 +1,4 @@
-import { Plus, Archive, TableProperties, Rows3 } from 'lucide-react'
+import { Plus, Archive, TableProperties, Rows3, Folder, Users, BarChart3, NotebookPen, FileText, Database, KanbanSquare, LayoutDashboard, Clipboard, File, Download, Trash2 } from 'lucide-react'
 import { addDatabaseField, addDatabaseRow, createWorkspacePage, archiveWorkspacePage, updateWorkspacePage, deleteWorkspaceFile, createFromTemplate } from '@/app/dashboard/workspace/actions'
 import { WorkspacePageTree } from '@/components/dashboard/WorkspacePageTree'
 import {
@@ -23,7 +23,6 @@ interface WorkspaceShellProps {
   rootFiles: { id: string; name: string; sizeBytes: number; createdBy: 'user' | 'agent' }[]
 }
 
-
 function pageLabel(pageType: WorkspacePageNode['pageType']) {
   const match = workspacePageTypeOptions.find((option) => option.value === pageType)
   return match?.label ?? pageType.charAt(0).toUpperCase() + pageType.slice(1)
@@ -35,10 +34,24 @@ function findSelectedPage(nodes: WorkspacePageNode[], selectedPageId?: string): 
     const nested = findSelectedPage(node.children, selectedPageId)
     if (nested) return nested
   }
-
   return nodes[0] ?? null
 }
 
+function formatFileSize(bytes: number): string {
+  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  return `${Math.max(1, Math.round(bytes / 1024))} KB`
+}
+
+function FileIcon({ name }: { name: string }) {
+  const ext = name.split('.').pop()?.toLowerCase()
+  if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext ?? '')) {
+    return <File className="h-4 w-4 text-blue-500 flex-shrink-0" />
+  }
+  if (['ts', 'tsx', 'js', 'jsx', 'json', 'py', 'md'].includes(ext ?? '')) {
+    return <FileText className="h-4 w-4 text-purple-500 flex-shrink-0" />
+  }
+  return <File className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+}
 
 function DatabasePageSection({ page }: { page: WorkspacePageNode }) {
   const content = getWorkspacePageContent(page)
@@ -139,6 +152,14 @@ function DatabasePageSection({ page }: { page: WorkspacePageNode }) {
   )
 }
 
+const pageTypeIcons: Record<WorkspacePageNode['pageType'], React.ElementType> = {
+  standard: FileText,
+  database: Database,
+  board: KanbanSquare,
+  dashboard: LayoutDashboard,
+  capture: Clipboard,
+}
+
 function PageTypeSummary({ pageType }: { pageType: WorkspacePageNode['pageType'] }) {
   const descriptions: Record<WorkspacePageNode['pageType'], string> = {
     standard: 'Flexible notes and structured content.',
@@ -148,13 +169,24 @@ function PageTypeSummary({ pageType }: { pageType: WorkspacePageNode['pageType']
     capture: 'Fast capture pages for raw thoughts, notes, and intake.',
   }
 
+  const Icon = pageTypeIcons[pageType]
+
   return (
     <Card className="p-4">
-      <p className="text-sm font-medium">This page type</p>
+      <div className="flex items-center gap-2">
+        <Icon className="h-4 w-4 text-muted-foreground" />
+        <p className="text-sm font-medium">This page type</p>
+      </div>
       <p className="mt-2 text-sm text-muted-foreground">{descriptions[pageType]}</p>
     </Card>
   )
 }
+
+const templates = [
+  { key: 'client-crm', label: 'Client CRM', desc: 'Track clients, deals, and next actions', icon: Users },
+  { key: 'weekly-ops', label: 'Weekly Ops Review', desc: 'Ship notes and priorities every week', icon: BarChart3 },
+  { key: 'meeting-notes', label: 'Meeting Notes', desc: 'Fast capture for meetings and calls', icon: NotebookPen },
+]
 
 export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolders, rootFiles }: WorkspaceShellProps) {
   const selectedPage = findSelectedPage(pages, selectedPageId)
@@ -223,11 +255,12 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
 
             <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
               <Card className="p-4">
-                <p className="text-sm font-medium">Folders</p>
-                <div className="mt-3 space-y-2">
+                <p className="text-sm font-medium mb-3">Folders</p>
+                <div className="space-y-2">
                   {rootFolders.map((folder) => (
-                    <div key={folder.id} className="rounded-md border px-3 py-2 text-sm">
-                      📁 {folder.name}
+                    <div key={folder.id} className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm">
+                      <Folder className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                      {folder.name}
                     </div>
                   ))}
                 </div>
@@ -240,29 +273,39 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
                 <div className="space-y-2">
                   {rootFiles.length > 0 ? (
                     rootFiles.map((file) => (
-                      <div key={file.id} className="flex items-center justify-between rounded-md border px-3 py-2 text-sm">
-                        <div>
-                          <p className="font-medium">{file.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {file.createdBy} • {Math.max(1, Math.round(file.sizeBytes / 1024))} KB
-                          </p>
+                      <div key={file.id} className="flex items-center justify-between rounded-md border px-3 py-2 text-sm gap-3">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <FileIcon name={file.name} />
+                          <div className="min-w-0">
+                            <p className="font-medium truncate">{file.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {file.createdBy} • {formatFileSize(file.sizeBytes)}
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1 flex-shrink-0">
                           <a
                             href={`/api/workspace/files/${file.id}/download`}
-                            className="text-xs font-medium text-foreground underline-offset-4 hover:underline"
+                            className="flex items-center justify-center w-8 h-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                            title="Download"
                           >
-                            Download
+                            <Download className="h-4 w-4" />
                           </a>
                           <form action={deleteWorkspaceFile} className="inline">
                             <input type="hidden" name="fileId" value={file.id} />
-                            <button type="submit" className="text-xs text-muted-foreground hover:text-destructive">Delete</button>
+                            <button
+                              type="submit"
+                              className="flex items-center justify-center w-8 h-8 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
                           </form>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-muted-foreground">No uploaded files yet. This panel can upload the first one now, and download/search are next.</p>
+                    <p className="text-sm text-muted-foreground">No uploaded files yet.</p>
                   )}
                 </div>
               </Card>
@@ -299,19 +342,23 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
               <p className="mt-2 max-w-sm text-sm text-muted-foreground">Create a page above, or pick a starter template to hit the ground running.</p>
             </div>
             <div className="grid w-full max-w-sm gap-3">
-              {[
-                { key: 'client-crm', label: 'Client CRM', desc: 'Track clients, deals, and next actions' },
-                { key: 'weekly-ops', label: 'Weekly Ops Review', desc: 'Ship notes and priorities every week' },
-                { key: 'meeting-notes', label: 'Meeting Notes', desc: 'Fast capture for meetings and calls' },
-              ].map((t) => (
-                <form key={t.key} action={createFromTemplate}>
-                  <input type="hidden" name="template" value={t.key} />
-                  <button type="submit" className="w-full rounded-lg border p-4 text-left transition hover:border-gray-400">
-                    <p className="font-medium">{t.label}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{t.desc}</p>
-                  </button>
-                </form>
-              ))}
+              {templates.map((t) => {
+                const Icon = t.icon
+                return (
+                  <form key={t.key} action={createFromTemplate}>
+                    <input type="hidden" name="template" value={t.key} />
+                    <button type="submit" className="w-full flex items-start gap-3 rounded-lg border p-4 text-left transition hover:border-gray-400">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted flex-shrink-0">
+                        <Icon className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{t.label}</p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">{t.desc}</p>
+                      </div>
+                    </button>
+                  </form>
+                )
+              })}
             </div>
           </div>
         )}

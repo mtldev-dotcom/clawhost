@@ -3,6 +3,7 @@ import { GeistSans } from 'geist/font/sans'
 import './globals.css'
 import { getLocale, getMessages } from 'next-intl/server'
 import { NextIntlClientProvider } from 'next-intl'
+import { Toaster } from '@/components/ui/sonner'
 
 // Force dynamic rendering for auth
 export const dynamic = 'force-dynamic'
@@ -25,6 +26,7 @@ export default async function RootLayout({
       <body className="font-sans bg-chalk text-ink dark:bg-ink dark:text-chalk antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
+          <Toaster />
         </NextIntlClientProvider>
       </body>
     </html>
