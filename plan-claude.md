@@ -1244,7 +1244,7 @@ Exit gate: Manual test of "Cmd-K → summarize this page → output written into
 
 **Commit message:** `feat: add Postgres full-text search index on workspace pages`
 
-- [ ] M3-1
+- [x] M3-1
 
 ---
 
@@ -1337,7 +1337,7 @@ function extractTextSnippet(content: unknown, maxLength: number): string {
 
 **Commit message:** `feat: add workspace context retrieval library (Postgres full-text)`
 
-- [ ] M3-2
+- [x] M3-2
 
 ---
 
@@ -1453,7 +1453,7 @@ export async function POST(req: Request) {
 
 **Commit message:** `feat: add /api/ai/command route with workspace context and credit gate`
 
-- [ ] M3-3
+- [x] M3-3
 
 ---
 
@@ -1635,7 +1635,7 @@ export function CommandPalette({ targetPageId, onResult }: CommandPaletteProps) 
 
 **Commit message:** `feat: add CommandPalette client component (Cmd+K AI palette)`
 
-- [ ] M3-4
+- [x] M3-4
 
 ---
 
@@ -1663,7 +1663,7 @@ export function CommandPalette({ targetPageId, onResult }: CommandPaletteProps) 
 
 **Commit message:** `feat: wire CommandPalette into DashboardHeader`
 
-- [ ] M3-5
+- [x] M3-5
 
 ---
 
@@ -1747,7 +1747,7 @@ describe('POST /api/ai/command credit gate', () => {
 
 **Commit message:** `test: add integration tests for /api/ai/command credit gate`
 
-- [ ] M3-6
+- [x] M3-6
 
 ---
 
@@ -1769,7 +1769,7 @@ describe('POST /api/ai/command credit gate', () => {
 
 **Commit message:** `chore: close milestone M3 — AI command palette verified`
 
-- [ ] M3-7
+- [x] M3-7
 
 ---
 

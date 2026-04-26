@@ -1,5 +1,5 @@
 # ⚡ ClawHost — ADHD.md
-> *Last updated: 2026-04-25 (M2 close)*
+> *Last updated: 2026-04-25 (M3 close)*
 
 ---
 
@@ -24,6 +24,9 @@ Merged app in progress: PageBase-style workspace product on top of ClawHost host
 - File list has soft-delete button
 - Empty workspace shows SMB starter templates: Client CRM, Weekly Ops Review, Meeting Notes
 - Dashboard header model badge shows readable short-name, truncates on mobile
+- AI Command Palette live: Cmd+K (or "Ask AI" button in header) opens modal, queries workspace context via Postgres FTS, calls OpenRouter, returns answer
+- `/api/ai/command` route: auth + credit gate + context retrieval + model call + credit decrement (1 per call)
+- Workspace full-text search index on Page.title + content (Postgres GIN)
 - 7 platform models available: Claude Sonnet 4.6 (default), GPT-4o, Gemini 2.5 Pro, Mistral Small 4, Gemini 3.1 Flash Lite, DeepSeek V4 Flash, Qwen 3.5 Flash
 - Skills marketplace UI/API exists
 - Bilingual UI (EN/FR)
@@ -223,6 +226,8 @@ If any of those drift from code, fix them.
 ---
 
 ## 🗒️ Nick's Notes
+> 2026-04-25 (M3): Closed M3 (AI command palette) in one session. Added Postgres FTS index, workspace context retrieval library, /api/ai/command route with credit gate, CommandPalette Cmd+K component, wired into DashboardHeader. 47 tests pass.
+
 > 2026-04-25 (M2): Closed M2 (workspace polish) in one session. Scrubbed all dev-grade scaffold copy, extracted collapsible WorkspacePageTree client component, styled textarea, added hover archive + file delete buttons, cleaned model indicator header, added SMB starter templates to empty state.
 
 > 2026-04-25 (M1): Session recap. Closed M1 (schema cleanup). Fixed build regression (`NODE_ENV=development` in shell broke `next build` — hardcoded `NODE_ENV=production` in package.json build script). Added `AUTH_SECRET` to `.env.local` (next-auth v5 key). Added `allowedDevOrigins` for Tailscale dev IP. Added 4 cheap models to platform: Mistral Small 4, Gemini 3.1 Flash Lite, DeepSeek V4 Flash, Qwen 3.5 Flash. Fixed workspace page create/update/addField forms with `required` to prevent empty-title 500. Updated `reset-users.ts` to deprovision containers before wiping DB. Audited all 15 manual story flows — 13 confirmed working, Telegram connect broken locally (missing env var), logout lands on `/` not `/login` (correct behavior, wrong doc).

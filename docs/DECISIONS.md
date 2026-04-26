@@ -44,6 +44,18 @@
 
 ---
 
+## D4 — 2026-04-25 — Use Postgres full-text search instead of a vector database for workspace context
+
+**Context:** M3 requires the AI command palette to retrieve relevant workspace pages as context before calling OpenRouter. Options: (a) a vector database (pgvector, Pinecone, Weaviate), (b) Postgres built-in FTS with tsvector/tsquery, (c) naive LIKE search.
+
+**Decision:** Use Postgres GIN full-text search (tsvector + plainto_tsquery). No new infrastructure, no embedding generation pipeline, no API keys for a second service. Workspace pages are short and keyword-heavy enough that FTS recall is acceptable for v1. Falls back to recency-ordered pages when the query string is empty.
+
+**Consequences:** No semantic similarity search (e.g. "clients" won't match "customers"). Vector search can be layered on later (pgvector extension) without changing the retrieval API surface — `retrieveWorkspaceContext` returns the same `WorkspaceContextChunk[]` shape regardless of backend. For v1 SMB workspaces (< 1000 pages) performance is not a concern.
+
+**Status:** Active.
+
+---
+
 <!--
 Template for future entries:
 

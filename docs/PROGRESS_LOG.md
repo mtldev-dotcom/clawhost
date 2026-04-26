@@ -98,3 +98,25 @@ Format:
 **Verification:** `npm run lint && npm run test:run && npm run build` — 0 errors, 45 tests, build clean.
 
 **Open items:** Next up is `TASK M3-1` — start of the AI Command Palette milestone.
+
+## 2026-04-25 — M3 close: AI Command Palette
+
+**Summary:** Closed milestone M3 in a single session. Added a Postgres GIN full-text search index on Page.title and Page.content, built a workspace context retrieval library, created the /api/ai/command route (auth + credit gate + FTS context + OpenRouter call + credit decrement), built the Cmd+K CommandPalette client component, wired it into the DashboardHeader, and added credit gate integration tests.
+
+**What changed in the product:**
+- Cmd+K (or "Ask AI" button in the dashboard header) opens an AI command palette
+- AI reads the user's workspace pages via Postgres FTS and passes relevant context to the configured model
+- Each command call decrements creditsBalance by 1 and gates users with 0 credits
+- Quick command suggestions: summarize, action items, weekly update, client follow-ups
+
+**What changed in the codebase:**
+- `prisma/migrations/20260426002631_add_page_fulltext_index/migration.sql`: GIN index on Page title+content
+- `src/lib/workspace-context.ts`: new library — FTS or recency-ordered context retrieval
+- `src/app/api/ai/command/route.ts`: new POST route — full credit-gated AI command handler
+- `src/components/dashboard/CommandPalette.tsx`: new Cmd+K client component
+- `src/components/dashboard/DashboardHeader.tsx`: added CommandPalette import + mount
+- `tests/integration/api/ai-command.test.ts`: 2 new tests (402 gate, 401 gate)
+
+**Verification:** `npm run lint && npm run test:run && npm run build` — 0 errors, 47 tests, build clean (13 static pages).
+
+**Open items:** Next up is `TASK M4-1`.
