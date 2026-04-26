@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ChevronRight, Database, LayoutDashboard, KanbanSquare, Clipboard, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { WorkspacePageNode } from '@/lib/workspace'
+import { archiveWorkspacePage } from '@/app/dashboard/workspace/actions'
 
 function pageIcon(pageType: WorkspacePageNode['pageType']) {
   switch (pageType) {
@@ -43,6 +44,10 @@ function PageNode({ node, selectedPageId }: { node: WorkspacePageNode; selectedP
         >
           {node.title}
         </Link>
+        <form action={archiveWorkspacePage} className="inline">
+          <input type="hidden" name="pageId" value={node.id} />
+          <button type="submit" className="opacity-0 group-hover:opacity-100 ml-auto text-muted-foreground hover:text-destructive transition-opacity text-xs px-1">×</button>
+        </form>
       </div>
       {hasChildren && expanded && (
         <div className="ml-5 border-l pl-3">
