@@ -25,6 +25,15 @@ const navItems = [
   { href: '/dashboard/skills', labelKey: 'skills' as const, icon: Sparkles },
 ]
 
+function modelShortName(model: string | null | undefined): string {
+  if (!model) return ''
+  const parts = model.split('/')
+  const slug = parts[parts.length - 1] ?? ''
+  return slug
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
 export function DashboardHeader({ activeModel, instanceStatus, locale, translations }: DashboardHeaderProps) {
   const pathname = usePathname()
 
@@ -71,8 +80,8 @@ export function DashboardHeader({ activeModel, instanceStatus, locale, translati
           {activeModel && instanceStatus === 'active' && (
             <div className="flex items-center gap-2">
               {ProviderIcon && <ProviderIcon className="h-4 w-4 text-muted-foreground" />}
-              <Badge variant="secondary" className="font-mono text-xs">
-                {activeModel.split('/').pop()}
+              <Badge variant="secondary" className="max-w-[120px] truncate font-mono text-xs">
+                {modelShortName(activeModel)}
               </Badge>
             </div>
           )}
