@@ -18,7 +18,7 @@
     "db:down": "docker compose -f docker-compose.dev.yml down",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
-    "db:reset-users": "tsx scripts/reset-users.ts",
+    "db:reset-users": "tsx --env-file=.env.local --env-file=.env scripts/reset-users.ts",
     "db:studio": "prisma studio",
     "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook",
     "setup": "npm run db:up && sleep 3 && npm run db:migrate && npm run db:seed"
