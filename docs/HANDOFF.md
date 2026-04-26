@@ -6,7 +6,7 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** (pending — M2-8 close commit)
+**Last commit:** `5eeb555 chore: close milestone M2 — workspace polish verified`
 **Plan version:** `plan-claude.md` at repo root
 **Task in flight:** none
 **State:** `M2 complete`, next milestone `M3`

@@ -2054,7 +2054,7 @@
 
 ### Session end
 - Ending branch: dev-claude
-- Ending commit: (pending — M2-8 close commit)
+- Ending commit: 5eeb555
 - Tasks completed this session: M2-1, M2-2, M2-3, M2-4, M2-5, M2-6, M2-7, M2-8
 - Next task to pick up: M3-1
 - Open blockers: none
