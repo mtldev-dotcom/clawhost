@@ -10,6 +10,7 @@ import {
 } from '@/lib/workspace'
 import type { DatabaseFieldDefinition } from '@/lib/workspace'
 import { revalidatePath } from 'next/cache'
+import { captureUrl } from '@/lib/url-capture'
 
 const validPageTypes = new Set(workspacePageTypeOptions.map((option) => option.value))
 const validDatabaseFieldTypes = new Set(databaseFieldTypeOptions.map((option) => option.value))
@@ -344,6 +345,32 @@ export async function quickCapture(formData: FormData) {
   const siblingsCount = parentId
     ? await prisma.page.count({ where: { workspaceId: workspace.id, parentId, status: 'active' } })
     : 0
+
+  const isUrl = /^https?:\/\/\S+$/i.test(text)
+  if (isUrl) {
+    const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { creditsBalance: true } })
+    // TODO: surface low-credit warning in the UI
+    if ((user?.creditsBalance ?? 0) > 0) {
+      const captured = await captureUrl(text)
+      await prisma.page.create({
+        data: {
+          workspaceId: workspace.id,
+          parentId,
+          title: captured.title,
+          pageType: 'capture',
+          position: siblingsCount,
+          content: { text: `${captured.summary}\n\n[Original link](${captured.url})`, url: captured.url },
+        },
+      })
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: { creditsBalance: { decrement: 1 } },
+      })
+      revalidateWorkspacePaths()
+      return
+    }
+  }
+
   const title = text.split('\n')[0].slice(0, 60) || 'Quick capture'
   await prisma.page.create({
     data: {
