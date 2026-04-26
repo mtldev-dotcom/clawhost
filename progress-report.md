@@ -2365,3 +2365,68 @@ build: ✓ Compiled, ✓ 28 routes — exit 0
 - Next task to pick up: M6-1
 - Open blockers: none
 
+
+---
+## Session 2026-04-26 — Claude Sonnet (M6)
+**Starting branch:** dev-claude
+**Starting commit:** dccdd3a (M5-14 close)
+**Plan version:** plan-foyer.md
+
+### Task: M6-1 — Reframe onboarding step 1 copy for solo pros
+- Files touched: src/app/onboarding/page.tsx
+- Verification: npm run build (exit 0), npm run lint (0 errors), grep "Pick your AI partner" returns 1 match
+- Result: ✅ complete
+- Commit: fa2d437 feat: M6-1 reframe onboarding step 1 copy for solo pros
+
+### Task: M6-2 — Replace SMB starter templates with solo-pro templates
+- Files touched: src/app/dashboard/workspace/actions.ts, src/components/dashboard/WorkspaceShell.tsx
+- Added: project-tracker (database), daily-plan (capture), weekly-review (standard, renamed from weekly-ops)
+- Grid updated to max-w-md sm:grid-cols-2 for 5 templates
+- Verification: npm run build (exit 0), npm run test:run (47 passed), grep returns 3 new keys
+- Result: ✅ complete
+- Commit: 64ce1c2 feat: M6-2 add solo-pro starter templates (project tracker, daily plan, weekly review)
+
+### Task: M6-3 — Add time-of-day greeting in workspace shell
+- Files touched: src/components/dashboard/GreetingLine.tsx (new), src/components/dashboard/WorkspaceShell.tsx, src/app/dashboard/workspace/page.tsx
+- Greeting shown when pages.length > 0 and userName is set; uses first name split
+- Verification: npm run build (exit 0), npm run lint (0 errors), ls GreetingLine.tsx exists
+- Result: ✅ complete
+- Commit: e6123f5 feat: M6-3 add time-of-day greeting in workspace shell
+
+### Task: M6-4 — Empty-state polish: solo-pro language
+- Files touched: src/components/dashboard/WorkspaceShell.tsx
+- Heading: "Start your workspace" → "Welcome to Foyer."
+- Subtext: tightened for solo-pro persona
+- Verification: npm run build (exit 0), grep "Welcome to Foyer" returns 1 match
+- Result: ✅ complete
+- Commit: a6877c0 refactor: M6-4 tighten workspace empty-state copy for solo pros
+
+### Task: M6-5 — Milestone M6 close
+
+#### Full verification output
+```
+lint: 0 errors, 7 warnings (all pre-existing)
+tests: 8 files, 47 tests — all passed
+build: ✓ Compiled, 28 routes — exit 0
+```
+
+- Result: ✅ complete
+
+### M6 — Solo Pro Onboarding & Templates
+- Status: 🟢 done
+- Started: 2026-04-26
+- Ended: 2026-04-26
+- Tasks: M6-1 ✅  M6-2 ✅  M6-3 ✅  M6-4 ✅  M6-5 ✅
+- Full verification run at close:
+  ```
+  lint: 0 errors, 7 warnings (all pre-existing)
+  tests: 8 files, 47 tests — all passed
+  build: ✓ Compiled, 28 routes — exit 0
+  ```
+
+### Session end
+- Ending branch: dev-claude
+- Ending commit: (M6-5 commit hash — see below)
+- Tasks completed this session: M6-1 through M6-5
+- Next task to pick up: M7-1
+- Open blockers: none

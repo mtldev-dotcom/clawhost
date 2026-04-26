@@ -9,44 +9,35 @@
 **Last commit:** `(see below after final commit)`
 **Plan version:** `plan-foyer.md` at repo root
 **Task in flight:** none
-**State:** M5 complete (Foyer rebrand). Next milestone M6 (Solo pro onboarding & templates).
+**State:** M6 complete (Solo pro onboarding & templates). Next milestone M7 (Second Brain Capture).
 **Updated:** 2026-04-26
 
 ---
 
 ## What happened this session
 
-- Completed all 14 tasks of M5 (Foyer rebrand):
-  - M5-1: Inventory of all ClawHost references
-  - M5-2: Rebranded package.json to `foyer`
-  - M5-3: Updated app metadata (title, description)
-  - M5-4: Rebranded EN UI copy + AI system prompt
-  - M5-5: Rebranded FR locale strings
-  - M5-6: Updated ToS and Privacy pages
-  - M5-7: Rewrote README.md for Foyer
-  - M5-8: Updated AGENTS.md, CLAUDE.md, ADHD.md
-  - M5-9: Rewrote public landing page for solo professionals
-  - M5-10: Hidden /chat and /skills routes from navigation
-  - M5-11: Created docs/LAUNCH_PROOF.md
-  - M5-12: Created docs/BRAND.md with domain/brand decisions
-  - M5-13: Final sweep confirmed no user-visible ClawHost strings
-  - M5-14: Milestone close with full verification
+- Completed all 5 tasks of M6 (Solo pro onboarding & templates):
+  - M6-1: Reframed onboarding step 1 copy — "Pick your AI partner", solo-pro description, "Use this AI partner" CTA
+  - M6-2: Replaced SMB templates with 5 solo-pro templates (Client CRM, Project Tracker, Weekly Review, Daily Plan, Meeting Notes)
+  - M6-3: Added time-of-day greeting (GreetingLine component) in workspace shell
+  - M6-4: Tightened empty-state copy — "Welcome to Foyer." heading + shorter subtext
+  - M6-5: Milestone close, all truth files updated
 
 ---
 
-## Verification at M5 close
+## Verification at M6 close
 
 ```
 lint: 0 errors, 7 warnings (all pre-existing)
 tests: 8 files, 47 tests — all passed
-build: ✓ Compiled, ✓ 28 routes — exit 0
+build: ✓ Compiled, 28 routes — exit 0
 ```
 
 ---
 
 ## Next suggested task
 
-Proceed with `TASK M6-1` — Reframe onboarding step copy for solo pros.
+Proceed with `TASK M7-1` — Add Quick Capture floating button (Cmd+Shift+K).
 
 ---
 

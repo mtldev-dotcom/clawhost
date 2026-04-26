@@ -184,3 +184,43 @@ build: ✓ Compiled, ✓ 28 routes — exit 0
 
 ### What's next
 M6 — Solo Pro Onboarding & Templates
+
+---
+
+## 2026-04-26 — M6 Solo Pro Onboarding & Templates
+
+**Summary:** Reframed the first-run experience for solo professionals. Onboarding now leads with "Pick your AI partner" instead of a generic model-picker heading. The empty workspace shows 5 solo-pro starter templates in a 2-column grid, a time-of-day greeting appears once pages exist, and the empty-state heading now reads "Welcome to Foyer."
+
+**What changed in the product:**
+- Onboarding step 1 heading: "Pick your AI partner"
+- Onboarding description: solo-pro copy explaining subscription-based model access
+- Onboarding CTA: "Use this AI partner" (was "Save model and continue")
+- 5 solo-pro starter templates: Client CRM, Project Tracker, Weekly Review, Daily Plan, Meeting Notes
+- Time-of-day greeting (Good morning/afternoon/evening) on workspace when pages exist
+- Empty-state heading: "Welcome to Foyer."
+
+**What changed in the codebase:**
+- `src/app/onboarding/page.tsx`: 3 copy strings updated
+- `src/app/dashboard/workspace/actions.ts`: TEMPLATES — added project-tracker, daily-plan; renamed weekly-ops → weekly-review with solo-pro content
+- `src/components/dashboard/WorkspaceShell.tsx`: templates array updated (5 entries), grid widened, empty-state copy updated, GreetingLine mounted
+- `src/components/dashboard/GreetingLine.tsx`: new client component (time-of-day greeting)
+- `src/app/dashboard/workspace/page.tsx`: passes userName to WorkspaceShell
+
+**Verification:**
+```
+lint: 0 errors, 7 warnings (all pre-existing)
+tests: 8 files, 47 tests — all passed
+build: ✓ Compiled, 28 routes — exit 0
+```
+
+**Open items:** none
+
+### Tasks completed
+- M6-1: Reframe onboarding step 1 copy for solo pros
+- M6-2: Add solo-pro starter templates (project tracker, daily plan, weekly review)
+- M6-3: Add time-of-day greeting in workspace shell
+- M6-4: Tighten workspace empty-state copy for solo pros
+- M6-5: Milestone close
+
+### What's next
+M7 — Second Brain Capture

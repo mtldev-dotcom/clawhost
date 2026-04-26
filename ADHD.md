@@ -9,6 +9,9 @@ Foyer — workspace OS, second brain, and AI partner for solo professional worke
 ---
 
 ## ✅ What It Does (Right Now)
+- Solo-pro starter templates (5): Client CRM, Project Tracker, Weekly Review, Daily Plan, Meeting Notes
+- Time-of-day greeting in workspace shell (GreetingLine component)
+- Persona-aligned onboarding copy: "Pick your AI partner", "Use this AI partner" CTA
 - Foyer rebrand complete (M5)
 - User registration + login
 - Signed-in users auto-bootstrap into a workspace with a root Home page + root folders (Inbox, Projects, Notes)
@@ -231,6 +234,8 @@ If any of those drift from code, fix them.
 ---
 
 ## 🗒️ Nick's Notes
+> 2026-04-26 (M6): Closed M6 (solo pro onboarding & templates). Reframed onboarding copy for solo pros, added 5 solo-pro starter templates (Project Tracker, Daily Plan, Weekly Review replacing SMB ops templates), added time-of-day greeting in workspace, tightened empty-state to "Welcome to Foyer." 47 tests, 28 routes, lint clean.
+
 > 2026-04-25 (M4): Closed M4 (production readiness) in one session. Added /status health-check, rate limiting on AI command route, security headers (X-Frame-Options/DENY, X-Content-Type-Options, Referrer-Policy, Permissions-Policy), legal stub pages (ToS + Privacy), register page footer links. Replaced platform model list with 5 models (Nemotron free as default). 47 tests, 27 routes, lint clean.
 
 > 2026-04-25 (M3): Closed M3 (AI command palette) in one session. Added Postgres FTS index, workspace context retrieval library, /api/ai/command route with credit gate, CommandPalette Cmd+K component, wired into DashboardHeader. 47 tests pass.
