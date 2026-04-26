@@ -22,6 +22,7 @@ const envSchema = z.object({
 
   // Telegram
   TELEGRAM_SHARED_BOT_USERNAME: z.string().min(1).optional(),
+  TELEGRAM_BOT_TOKEN: z.string().min(1).optional(),
 
   // Stripe
   STRIPE_SECRET_KEY: z.string().startsWith('sk_'),
