@@ -1,6 +1,7 @@
 import Link from 'next/link'
-import { Plus, Archive, ChevronRight, Database, LayoutDashboard, KanbanSquare, Clipboard, FileText, TableProperties, Rows3 } from 'lucide-react'
+import { Plus, Archive, TableProperties, Rows3 } from 'lucide-react'
 import { addDatabaseField, addDatabaseRow, createWorkspacePage, archiveWorkspacePage, updateWorkspacePage } from '@/app/dashboard/workspace/actions'
+import { WorkspacePageTree } from '@/components/dashboard/WorkspacePageTree'
 import {
   databaseFieldTypeOptions,
   getWorkspacePageContent,
@@ -23,20 +24,6 @@ interface WorkspaceShellProps {
   rootFiles: { id: string; name: string; sizeBytes: number; createdBy: 'user' | 'agent' }[]
 }
 
-function pageIcon(pageType: WorkspacePageNode['pageType']) {
-  switch (pageType) {
-    case 'database':
-      return Database
-    case 'board':
-      return KanbanSquare
-    case 'dashboard':
-      return LayoutDashboard
-    case 'capture':
-      return Clipboard
-    default:
-      return FileText
-  }
-}
 
 function pageLabel(pageType: WorkspacePageNode['pageType']) {
   const match = workspacePageTypeOptions.find((option) => option.value === pageType)
@@ -53,36 +40,6 @@ function findSelectedPage(nodes: WorkspacePageNode[], selectedPageId?: string): 
   return nodes[0] ?? null
 }
 
-function PageTree({ nodes, selectedPageId }: { nodes: WorkspacePageNode[]; selectedPageId?: string }) {
-  return (
-    <ul className="space-y-1">
-      {nodes.map((node) => {
-        const Icon = pageIcon(node.pageType)
-        const isSelected = node.id === selectedPageId
-
-        return (
-          <li key={node.id}>
-            <div className="group flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/70">
-              <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-              <Icon className="h-4 w-4 text-muted-foreground" />
-              <Link
-                href={`/dashboard/workspace?page=${node.id}`}
-                className={isSelected ? 'font-medium text-foreground' : 'text-muted-foreground hover:text-foreground'}
-              >
-                {node.title}
-              </Link>
-            </div>
-            {node.children.length > 0 && (
-              <div className="ml-5 border-l pl-3">
-                <PageTree nodes={node.children} selectedPageId={selectedPageId} />
-              </div>
-            )}
-          </li>
-        )}
-      )}
-    </ul>
-  )
-}
 
 function DatabasePageSection({ page }: { page: WorkspacePageNode }) {
   const content = getWorkspacePageContent(page)
@@ -232,7 +189,7 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
           <div className="space-y-2">
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Pages</p>
             {pages.length > 0 ? (
-              <PageTree nodes={pages} selectedPageId={selectedPageId} />
+              <WorkspacePageTree nodes={pages} selectedPageId={selectedPageId} />
             ) : (
               <p className="text-sm text-muted-foreground">No pages yet. Create your first page.</p>
             )}
