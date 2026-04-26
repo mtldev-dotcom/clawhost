@@ -1,17 +1,18 @@
-# CLAUDE.md — Pointer File
+# CLAUDE.md — Foyer Pointer File
 
-This file is **not** the source of truth. It points at the files that are.
+This file is **not** the source of truth. It points at the files that are. Foyer is a workspace OS for solo professionals.
 
 ---
 
 ## Read these first (in order)
 
-1. `plan-claude.md` — the executable build plan (work queue)
-2. `progress-report.md` — the per-task execution log (last 3 entries)
-3. `docs/HANDOFF.md` — the live baton between sessions
-4. `AGENTS.md` — the hard execution contract
-5. `ADHD.md` — short product-state summary
-6. `docs/AGENT_PIPELINE.md` — the 9-step pipeline
+1. `plan-foyer.md` — the executable build plan (work queue)
+2. `plan-claude.md` — historical M0–M4 only
+3. `progress-report.md` — the per-task execution log (last 3 entries)
+4. `docs/HANDOFF.md` — the live baton between sessions
+5. `AGENTS.md` — the hard execution contract
+6. `ADHD.md` — short product-state summary
+7. `docs/AGENT_PIPELINE.md` — the 9-step pipeline
 
 If any of those are stale after your change, your work is not done.
 
@@ -19,11 +20,11 @@ If any of those are stale after your change, your work is not done.
 
 ## Intended executor
 
-The agent running `plan-claude.md` is a cheap OpenRouter model (preferred: `deepseek/deepseek-v3.2`; fallback: `minimax/minimax-m2.7`). See Appendix K of `plan-claude.md` for the boot prompt.
+The agent running `plan-foyer.md` is a cheap OpenRouter model (preferred: `deepseek/deepseek-v3.2`; fallback: `minimax/minimax-m2.7`). See Appendix K of `plan-claude.md` for the boot prompt.
 
 Claude Sonnet (this model) is used for:
 - branch cleanup and destructive git operations
-- drafting `plan-claude.md` and appendices
+- drafting `plan-foyer.md` and appendices
 - milestone close audits
 - stop-event triage
 
@@ -35,7 +36,7 @@ Optimize for:
 - tight scoped changes (one task, one commit)
 - truth-aligned docs (no optimism)
 - clean commits on `dev-claude`
-- current product direction: **workspace-first AI product for SMB owners and professional workers**
+- current product direction: **Foyer — workspace OS, second brain, AI partner for solo professionals**
 
 ---
 

@@ -1,4 +1,4 @@
-# AGENTS.md — ClawHost Execution Contract
+# AGENTS.md — Foyer Execution Contract
 
 > This file is the **hard contract** for every human developer and AI coding agent working in this repo.
 > Reading this file is step 4 of the session startup ritual defined in `docs/AGENT_PIPELINE.md`.
@@ -10,11 +10,12 @@
 
 You must have already read, in order:
 
-1. `plan-claude.md` (the executable build plan)
-2. `progress-report.md` (the last 3 session entries)
-3. `docs/HANDOFF.md` (the current baton)
-4. This file
-5. `ADHD.md` (short product-state summary)
+1. `plan-foyer.md` (the executable build plan)
+2. `plan-claude.md` (historical M0–M4 only)
+3. `progress-report.md` (the last 3 session entries)
+4. `docs/HANDOFF.md` (the current baton)
+5. This file
+6. `ADHD.md` (short product-state summary)
 
 If you have not read all five, stop reading and go back.
 
@@ -22,12 +23,14 @@ If you have not read all five, stop reading and go back.
 
 ## 1. Product identity (fixed)
 
-ClawHost is an **AI-powered workspace OS for small/medium business owners and professional workers.** It is **not**:
+Foyer is a **workspace OS, second brain, and AI partner for solo professional workers.**
 
+It is **not**:
 - a chat interface wrapper
 - a hosted-agent bot marketplace
 - an OpenClaw clone
 - a generic "AI assistant" product
+- a team collaboration product
 
 The workspace (pages, databases, files, command palette) is the product face. The hosted-agent runtime code (Dokploy, compose, OpenClaw) lives in the repo as deprecated infrastructure and will be revived only as a Pro-tier power feature post-launch. See `docs/DECISIONS.md` entry D2.
 
@@ -176,7 +179,7 @@ A task is done only when:
 
 ---
 
-## 12. Current repo reality to respect
+## 12. Current Foyer repo reality
 
 - Local dev runs on localhost + local Postgres (`npm run db:up`). Remote DB is not trusted.
 - Onboarding is provider-first / model-first, platform-managed OpenRouter. Users do not paste their own LLM keys.

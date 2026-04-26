@@ -1,14 +1,15 @@
-# ⚡ ClawHost — ADHD.md
+# ⚡ Foyer — ADHD.md
 > *Last updated: 2026-04-25 (M4 close)*
 
 ---
 
 ## 🧠 What Is This?
-Merged app in progress: PageBase-style workspace product on top of ClawHost hosted-agent infrastructure.
+Foyer — workspace OS, second brain, and AI partner for solo professional workers.
 
 ---
 
 ## ✅ What It Does (Right Now)
+- Foyer rebrand complete (M5)
 - User registration + login
 - Signed-in users auto-bootstrap into a workspace with a root Home page + root folders (Inbox, Projects, Notes)
 - `/dashboard/workspace` is the main product shell
@@ -238,7 +239,7 @@ If any of those drift from code, fix them.
 
 > 2026-04-25 (M1): Session recap. Closed M1 (schema cleanup). Fixed build regression (`NODE_ENV=development` in shell broke `next build` — hardcoded `NODE_ENV=production` in package.json build script). Added `AUTH_SECRET` to `.env.local` (next-auth v5 key). Added `allowedDevOrigins` for Tailscale dev IP. Added 4 cheap models to platform: Mistral Small 4, Gemini 3.1 Flash Lite, DeepSeek V4 Flash, Qwen 3.5 Flash. Fixed workspace page create/update/addField forms with `required` to prevent empty-title 500. Updated `reset-users.ts` to deprovision containers before wiping DB. Audited all 15 manual story flows — 13 confirmed working, Telegram connect broken locally (missing env var), logout lands on `/` not `/login` (correct behavior, wrong doc).
 
-> 2026-04-22: Started the merge cut. Added workspace + page foundation to the main schema, auto-bootstrap for signed-in users, a new `/dashboard/workspace` shell, and workspace-first nav so the product starts moving from ClawHost platform UX toward PageBase product UX.
+> 2026-04-22: Started the merge cut. Added workspace + page foundation to the main schema, auto-bootstrap for signed-in users, a new `/dashboard/workspace` shell, and workspace-first nav so the product starts moving from legacy platform UX toward workspace-first UX.
 
 > 2026-04-22: Follow-up cut landed. Onboarding now routes into the workspace shell instead of chat, and selected workspace pages now support title + notes editing backed by `Page.content`.
 
