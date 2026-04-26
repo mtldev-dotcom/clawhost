@@ -15,6 +15,7 @@ import { Select } from '@/components/ui/select'
 import { WorkspaceFileUpload } from '@/components/dashboard/WorkspaceFileUpload'
 import { WorkspaceFileSearch } from '@/components/dashboard/WorkspaceFileSearch'
 import { GreetingLine } from '@/components/dashboard/GreetingLine'
+import { QuickCapture } from '@/components/dashboard/QuickCapture'
 
 interface WorkspaceShellProps {
   workspaceName: string
@@ -370,6 +371,7 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
           </div>
         )}
       </Card>
+      <QuickCapture />
     </div>
   )
 }

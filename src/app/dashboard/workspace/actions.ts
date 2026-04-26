@@ -331,6 +331,33 @@ export async function createFromTemplate(formData: FormData) {
   revalidateWorkspacePaths()
 }
 
+export async function quickCapture(formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  const text = String(formData.get('text') || '').trim()
+  if (!text) throw new Error('Capture text is required')
+  const workspace = await getWorkspaceForUser(session.user.id)
+  const inbox = await prisma.page.findFirst({
+    where: { workspaceId: workspace.id, title: 'Inbox', parentId: workspace.rootPage?.id, status: 'active' },
+  })
+  const parentId = inbox?.id ?? workspace.rootPage?.id ?? null
+  const siblingsCount = parentId
+    ? await prisma.page.count({ where: { workspaceId: workspace.id, parentId, status: 'active' } })
+    : 0
+  const title = text.split('\n')[0].slice(0, 60) || 'Quick capture'
+  await prisma.page.create({
+    data: {
+      workspaceId: workspace.id,
+      parentId,
+      title,
+      pageType: 'capture',
+      position: siblingsCount,
+      content: { text },
+    },
+  })
+  revalidateWorkspacePaths()
+}
+
 export async function deleteWorkspaceFile(formData: FormData) {
   const session = await auth()
   if (!session?.user?.id) throw new Error('Unauthorized')
