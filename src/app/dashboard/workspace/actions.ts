@@ -273,10 +273,32 @@ const TEMPLATES: Record<string, { title: string; pageType: string; content: obje
       },
     },
   },
-  'weekly-ops': {
-    title: 'Weekly Ops Review',
+  'project-tracker': {
+    title: 'Project Tracker',
+    pageType: 'database',
+    content: {
+      text: 'Track your active projects, status, and next milestones.',
+      database: {
+        fields: [
+          { id: 'name', name: 'Project', type: 'text' },
+          { id: 'client', name: 'Client', type: 'text' },
+          { id: 'status', name: 'Status', type: 'select' },
+          { id: 'next', name: 'Next milestone', type: 'text' },
+          { id: 'due', name: 'Due', type: 'text' },
+        ],
+        rows: [],
+      },
+    },
+  },
+  'weekly-review': {
+    title: 'Weekly Review',
     pageType: 'standard',
-    content: { text: '## Week of [date]\n\n### What shipped\n-\n\n### Blockers\n-\n\n### Next week priorities\n1.\n2.\n3.' },
+    content: { text: '## Week of [date]\n\n### Wins this week\n-\n\n### What I\'m carrying\n-\n\n### Next week priorities\n1.\n2.\n3.\n\n### Reflections\n-' },
+  },
+  'daily-plan': {
+    title: 'Daily Plan',
+    pageType: 'capture',
+    content: { text: '## Today — [date]\n\n### Top 3\n- [ ]\n- [ ]\n- [ ]\n\n### Calls / meetings\n-\n\n### Tonight\'s shutdown notes\n-' },
   },
   'meeting-notes': {
     title: 'Meeting Notes',
