@@ -143,3 +143,44 @@ Format:
 **Verification:** `npm run lint && npm run test:run && npm run build` — 0 errors, 47 tests, build clean (13 static pages).
 
 **Open items:** Next up is `TASK M4-1`.
+
+---
+
+## M5 — Rebrand to Foyer + Launch Prep
+
+**Status:** 🟢 Complete
+**Started:** 2026-04-26
+**Ended:** 2026-04-26
+
+### Summary
+Complete rebrand from ClawHost to Foyer across all user-visible surfaces, docs, and internal contract files. The product is now positioned as a workspace OS, second brain, and AI partner for solo professionals.
+
+### Tasks completed
+- M5-1: Inventory of all ClawHost references (A/B/C classification)
+- M5-2: Rebranded package.json to `foyer`
+- M5-3: Updated app metadata (title, description)
+- M5-4: Rebranded EN UI copy + AI system prompt
+- M5-5: Rebranded FR locale strings
+- M5-6: Updated ToS and Privacy pages with foyer.work emails
+- M5-7: Rewrote README.md for Foyer
+- M5-8: Updated AGENTS.md, CLAUDE.md, ADHD.md
+- M5-9: Rewrote public landing page for solo professionals
+- M5-10: Hidden /chat and /skills routes from navigation
+- M5-11: Created docs/LAUNCH_PROOF.md
+- M5-12: Created docs/BRAND.md with domain/brand decisions
+- M5-13: Final sweep confirmed no user-visible ClawHost strings
+- M5-14: Milestone close with full verification
+
+### Verification at close
+```
+lint: 0 errors, 7 warnings (all pre-existing)
+tests: 8 files, 47 tests — all passed
+build: ✓ Compiled, ✓ 28 routes — exit 0
+```
+
+### Key artifacts
+- `docs/BRAND.md` — brand reference (colors, typography, voice, domain candidates)
+- `docs/LAUNCH_PROOF.md` — pre-launch checklist
+
+### What's next
+M6 — Solo Pro Onboarding & Templates

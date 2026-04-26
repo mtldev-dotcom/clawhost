@@ -2317,3 +2317,51 @@ src/app/legal/terms/page.tsx:16: support@clawhost.com
 
 - Result: ✅ complete
 
+
+### Task: M5-13 — Final sweep confirms Foyer rebrand is clean
+
+#### Grep output
+```
+src/lib/dokploy.ts:234:      body: JSON.stringify({ name: `clawhost-${slug}`, description: `ClawHost for ${user.email}` }),
+src/lib/crypto.ts:30:  return scryptSync(keyString, 'clawhost-salt', KEY_LENGTH)
+```
+
+#### Classification
+- src/lib/dokploy.ts:234 — **Acceptable (C)**: dormant Dokploy provisioning, deprecated infra
+- src/lib/crypto.ts:30 — **Acceptable (C)**: internal crypto salt, changing would break existing encrypted data
+
+**Zero user-visible matches remain.**
+
+- Result: ✅ complete (verification only, no commit needed)
+
+
+### Task: M5-14 — Milestone M5 close
+
+#### Full verification output
+```
+lint: 0 errors, 7 warnings (all pre-existing)
+tests: 8 files, 47 tests passed
+build: ✓ Compiled, ✓ 28 routes — exit 0
+```
+
+- Result: ✅ complete
+
+### M5 — Rebrand to Foyer + Launch Prep
+- Status: 🟢 done
+- Started: 2026-04-26
+- Ended: 2026-04-26
+- Tasks: M5-1 ✅  M5-2 ✅  M5-3 ✅  M5-4 ✅  M5-5 ✅  M5-6 ✅  M5-7 ✅  M5-8 ✅  M5-9 ✅  M5-10 ✅  M5-11 ✅  M5-12 ✅  M5-13 ✅  M5-14 ✅
+- Full verification run at close:
+  ```
+  lint: 0 errors, 7 warnings (all pre-existing)
+  tests: 8 files, 47 tests — all passed
+  build: ✓ Compiled, ✓ 28 routes — exit 0
+  ```
+
+### Session end
+- Ending branch: dev-claude
+- Ending commit: (see below)
+- Tasks completed this session: M5-1 through M5-14
+- Next task to pick up: M6-1
+- Open blockers: none
+
