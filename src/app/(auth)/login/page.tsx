@@ -39,7 +39,6 @@ export default function LoginPage() {
 
       const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
       router.push(callbackUrl)
-      router.refresh()
     } catch {
       setError(t('somethingWrong'))
       setLoading(false)
