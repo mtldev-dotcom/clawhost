@@ -39,7 +39,8 @@ export async function POST(req: Request) {
       where: { userId: session.user.id },
       select: { activeModel: true },
     })
-    const model = instance?.activeModel ?? env.PLATFORM_DEFAULT_MODEL
+    const rawModel = instance?.activeModel ?? env.PLATFORM_DEFAULT_MODEL
+    const model = rawModel.startsWith('openrouter/') ? rawModel.slice('openrouter/'.length) : rawModel
 
     const aiResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
