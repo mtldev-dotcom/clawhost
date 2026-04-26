@@ -321,7 +321,8 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
                   name="content"
                   defaultValue={selectedContent.text}
                   placeholder={selectedPage.pageType === 'database' ? 'Describe what this database is for...' : 'Start writing here...'}
-                  className="min-h-[240px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  spellCheck={false}
+                  className="min-h-[320px] w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-base leading-relaxed outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 />
               </div>
               <div className="flex justify-end">
