@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Settings, Sparkles, Brain, Zap, LogOut, Files, Menu, X } from 'lucide-react'
+import { Settings, Sparkles, Brain, Zap, LogOut, Files, Inbox, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
@@ -15,7 +15,7 @@ interface DashboardHeaderProps {
   instanceStatus?: string
   locale: Locale
   translations: {
-    nav: { workspace: string; chat: string; settings: string; skills: string }
+    nav: { workspace: string; inbox: string; chat: string; settings: string; skills: string }
     common: { signOut: string }
   }
 }
@@ -23,6 +23,7 @@ interface DashboardHeaderProps {
 // Deprecated routes /chat and /dashboard/skills hidden in M5-10. See docs/DECISIONS.md.
 const navItems = [
   { href: '/dashboard/workspace', labelKey: 'workspace' as const, icon: Files },
+  { href: '/dashboard/inbox', labelKey: 'inbox' as const, icon: Inbox },
   { href: '/dashboard/settings', labelKey: 'settings' as const, icon: Settings },
 ]
 

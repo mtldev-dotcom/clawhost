@@ -22,6 +22,7 @@
   },
   "nav": {
     "workspace": "Espace",
+    "inbox": "Boîte de réception",
     "chat": "Chat",
     "settings": "Parametres",
     "skills": "Competences"

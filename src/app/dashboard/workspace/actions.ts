@@ -18,6 +18,7 @@ const validDatabaseFieldTypes = new Set(databaseFieldTypeOptions.map((option) =>
 function revalidateWorkspacePaths() {
   revalidatePath('/dashboard')
   revalidatePath('/dashboard/workspace')
+  revalidatePath('/dashboard/inbox')
 }
 
 async function getOwnedWorkspacePage(userId: string, pageId: string, pageType?: 'database') {
@@ -382,6 +383,28 @@ export async function quickCapture(formData: FormData) {
       content: { text },
     },
   })
+  revalidateWorkspacePaths()
+}
+
+export async function triageCapture(formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  const pageId = String(formData.get('pageId') || '').trim()
+  const action = String(formData.get('action') || '').trim()
+  if (!pageId) throw new Error('Page id required')
+  const workspace = await getWorkspaceForUser(session.user.id)
+  const page = await prisma.page.findFirst({ where: { id: pageId, workspaceId: workspace.id } })
+  if (!page) throw new Error('Page not found')
+  if (action === 'archive') {
+    await prisma.page.update({ where: { id: page.id }, data: { status: 'archived' } })
+  } else if (action === 'move-projects') {
+    const projects = await prisma.page.findFirst({
+      where: { workspaceId: workspace.id, title: 'Projects', parentId: workspace.rootPage?.id, status: 'active' },
+    })
+    if (projects) {
+      await prisma.page.update({ where: { id: page.id }, data: { parentId: projects.id } })
+    }
+  }
   revalidateWorkspacePaths()
 }
 
