@@ -1,34 +1,40 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { env } from '@/lib/env'
-
-interface TelegramMessage {
-  message_id: number
-  from?: {
-    id: number
-    username?: string
-    first_name?: string
-  }
-  chat: { id: number }
-  text?: string
-}
+import { decrypt } from '@/lib/crypto'
+import { getOrCreateConnection, sendRequest, subscribeToEvents } from '@/app/api/chat/ws-client'
 
 interface TelegramUpdate {
-  update_id: number
-  message?: TelegramMessage
+  message?: {
+    from?: { id: number; username?: string }
+    chat: { id: number }
+    text?: string
+  }
 }
 
-async function sendMessage(chatId: number, text: string) {
-  if (!env.TELEGRAM_BOT_TOKEN) return
-  await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+async function sendTelegramMessage(botToken: string, chatId: string, text: string) {
+  await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ chat_id: chatId, text }),
   })
 }
 
+async function sendTyping(botToken: string, chatId: string) {
+  await fetch(`https://api.telegram.org/bot${botToken}/sendChatAction`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: chatId, action: 'typing' }),
+  })
+}
+
 export async function POST(req: Request) {
   try {
+    // Authenticate via secret_token = userId set during webhook registration
+    const userId = req.headers.get('x-telegram-bot-api-secret-token')
+    if (!userId) {
+      return NextResponse.json({ ok: false }, { status: 401 })
+    }
+
     const update: TelegramUpdate = await req.json()
     const message = update.message
     if (!message?.text || !message.from) {
@@ -36,61 +42,105 @@ export async function POST(req: Request) {
     }
 
     const text = message.text.trim()
-    const chatId = message.chat.id
-    const from = message.from
+    const chatId = String(message.chat.id)
 
-    // Handle /start <token> deep-link
-    const startMatch = text.match(/^\/start\s+(.+)$/)
-    if (startMatch) {
-      const token = startMatch[1].trim()
-      const now = new Date()
+    // Load user + instance
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { instance: true },
+    })
 
-      const linkToken = await prisma.telegramLinkToken.findUnique({
-        where: { token },
-        include: { user: true },
-      })
-
-      if (!linkToken) {
-        await sendMessage(chatId, 'Invalid or expired link. Please generate a new connect link from ClawHost settings.')
-        return NextResponse.json({ ok: true })
-      }
-
-      if (linkToken.expiresAt < now) {
-        await sendMessage(chatId, 'This link has expired. Please generate a new connect link from ClawHost settings.')
-        return NextResponse.json({ ok: true })
-      }
-
-      if (linkToken.consumedAt) {
-        await sendMessage(chatId, 'This link has already been used.')
-        return NextResponse.json({ ok: true })
-      }
-
-      const username = from.username ?? from.first_name ?? String(from.id)
-
-      await prisma.$transaction([
-        prisma.user.update({
-          where: { id: linkToken.userId },
-          data: {
-            telegramUsername: username,
-            telegramLinkedAt: now,
-          },
-        }),
-        prisma.telegramLinkToken.update({
-          where: { token },
-          data: { consumedAt: now },
-        }),
-      ])
-
-      await sendMessage(chatId, `✅ Telegram account linked to ClawHost. You're all set, ${username}!`)
+    if (!user?.telegramBotToken || !user.telegramChatId) {
       return NextResponse.json({ ok: true })
     }
 
-    // Default response for unrecognized messages
-    await sendMessage(chatId, 'Send /start <token> from the ClawHost settings page to link your account.')
+    const botToken = decrypt(user.telegramBotToken)
+
+    // Guard: only respond to the registered chat ID
+    if (chatId !== user.telegramChatId) {
+      return NextResponse.json({ ok: true })
+    }
+
+    const instance = user.instance
+
+    if (!instance || instance.status !== 'active') {
+      await sendTelegramMessage(
+        botToken,
+        chatId,
+        "Your OpenClaw instance isn't running yet. Go to Settings → Deploy runtime to start it."
+      )
+      return NextResponse.json({ ok: true })
+    }
+
+    if (!instance.containerHost || !instance.gatewayToken) {
+      await sendTelegramMessage(botToken, chatId, 'Gateway not configured. Try redeploying from Settings.')
+      return NextResponse.json({ ok: true })
+    }
+
+    await sendTyping(botToken, chatId)
+
+    const gatewayPort = instance.gatewayPort ?? 18789
+    const gatewayUrl = `ws://${instance.containerHost}:${gatewayPort}`
+
+    // Connect to OpenClaw and send the message
+    const connection = await getOrCreateConnection(userId, gatewayUrl, instance.gatewayToken)
+
+    const responseText = await new Promise<string>((resolve, reject) => {
+      let fullText = ''
+      let done = false
+
+      const unsubscribe = subscribeToEvents(connection, (msg) => {
+        if (done) return
+
+        if (msg.type === 'event' && msg.payload) {
+          const payload = msg.payload as {
+            event?: string
+            delta?: { text?: string }
+            status?: string
+          }
+
+          if (payload.event === 'agent' && payload.delta?.text) {
+            fullText += payload.delta.text
+          }
+
+          if (payload.event === 'agent' && payload.status === 'done') {
+            done = true
+            unsubscribe()
+            resolve(fullText.trim())
+          }
+        }
+      })
+
+      const timeout = setTimeout(() => {
+        if (!done) {
+          done = true
+          unsubscribe()
+          reject(new Error('Response timeout'))
+        }
+      }, 60_000)
+
+      sendRequest(connection, 'chat.send', {
+        text,
+        idempotencyKey: `tg-${Date.now()}-${Math.random()}`,
+      }).catch((err) => {
+        clearTimeout(timeout)
+        if (!done) {
+          done = true
+          unsubscribe()
+          reject(err)
+        }
+      })
+
+      // Clear timeout on resolve
+      const origResolve = resolve
+      resolve = (v) => { clearTimeout(timeout); origResolve(v) }
+    })
+
+    await sendTelegramMessage(botToken, chatId, responseText || '(no response)')
     return NextResponse.json({ ok: true })
   } catch (error) {
     console.error('Telegram webhook error:', error)
-    // Always return 200 to Telegram — otherwise it will retry
+    // Always 200 — Telegram retries on non-200
     return NextResponse.json({ ok: true })
   }
 }

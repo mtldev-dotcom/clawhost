@@ -21,6 +21,7 @@ model User {
   telegramUsername      String?
   telegramLinkedAt      DateTime?
   telegramBotToken      String?
+  telegramBotId         String?
   telegramChatId        String?
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt

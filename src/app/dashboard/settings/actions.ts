@@ -78,16 +78,32 @@ export async function saveTelegramBot(botToken: string, chatId: string) {
   }
   const data = await res.json()
   const botUsername: string = data.result?.username ?? 'unknown'
+  const botId: string = String(data.result?.id ?? trimmedToken.split(':')[0])
 
   await prisma.user.update({
     where: { id: user.id },
     data: {
       telegramBotToken: encrypt(trimmedToken),
+      telegramBotId: botId,
       telegramChatId: trimmedChatId,
       telegramUsername: botUsername,
       telegramLinkedAt: new Date(),
     },
   })
+
+  // Register webhook with Telegram (only works when app is on HTTPS)
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+  if (appUrl.startsWith('https')) {
+    await fetch(`https://api.telegram.org/bot${trimmedToken}/setWebhook`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: `${appUrl}/api/telegram/webhook`,
+        secret_token: user.id,
+        allowed_updates: ['message'],
+      }),
+    })
+  }
 
   revalidatePath('/dashboard/settings')
   return { success: true, botUsername }
