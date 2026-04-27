@@ -54,6 +54,17 @@ This roadmap is intentionally shorter and closer to the current app truth.
 - [ ] workspace-aware agent hooks
 - [ ] clearer chat/workspace interplay inside the shell
 
+## M10 — Polish & Growth (sketch)
+
+Post-launch roadmap. These are not broken down into tasks yet.
+
+- In-app feedback widget (NPS or thumbs)
+- Public marketing site rebuild on the Foyer brand
+- Referral program (give a credit, get a credit)
+- SEO foundation (sitemap, structured data, blog scaffolding)
+- Mobile-friendly capture surface
+- OpenClaw revival as Pro-tier (bring back the original multi-channel personal-agent feature behind a Pro plan)
+
 ## Later
 
 - team/multi-user collaboration

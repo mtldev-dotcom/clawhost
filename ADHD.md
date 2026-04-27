@@ -1,5 +1,5 @@
 # ⚡ Foyer — ADHD.md
-> *Last updated: 2026-04-27 (M8 close)*
+> *Last updated: 2026-04-27 (M9 close)*
 
 ---
 
@@ -9,6 +9,9 @@ Foyer — workspace OS, second brain, and AI partner for solo professional worke
 ---
 
 ## ✅ What It Does (Right Now)
+- "Save as page" button on Cmd+K AI results — saves AI answer as a workspace page in Inbox
+- Page-scoped AI ask input — "Ask about this page" input under each page title, scoped to that page's content
+- "Generate today's plan" button on /dashboard/today — AI creates a daily plan from open action items and recent pages
 - ActionItem model for AI-extracted action items linked to source pages
 - `/dashboard/today` planning view — shows daily plan + grouped open action items
 - "Extract action items" button on standard/capture pages — calls AI to parse action items from page content

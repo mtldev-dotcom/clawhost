@@ -6,39 +6,37 @@
 ---
 
 **Branch:** `master`
-**Last commit:** `643298c feat: M8-4 add Extract action items button on standard/capture pages`
+**Last commit:** `2de6482 feat: M9-3 add AI daily plan generator on /dashboard/today`
 **Plan version:** `plan-foyer.md` at repo root
 **Task in flight:** none
-**State:** M8 complete (Planning Layer). Next milestone M9 (AI Partner Behaviors).
+**State:** M9 complete (AI Partner Behaviors). Foyer is feature-rich for solo pros. Next milestone M10 (Polish & Growth) is post-launch.
 **Updated:** 2026-04-27
 
 ---
 
 ## What happened this session
 
-- Set up local dev environment on Windows laptop (cloned from homelab)
-- Fixed Windows build issue by creating not-found.tsx and global-error.tsx (next-intl compatibility)
-- Completed all 4 tasks of M8 (Planning Layer):
-  - M8-1: ActionItem model + migration
-  - M8-2: `/api/ai/extract-actions` route — extracts action items from page content via AI
-  - M8-3: `/dashboard/today` planning view — shows daily plan + open action items grouped by source
-  - M8-4: "Extract action items" button on standard/capture pages
+- Completed all 4 tasks of M9 (AI Partner Behaviors):
+  - M9-1: "Save as page" button on Cmd+K results
+  - M9-2: Page-scoped AI ask input under page titles
+  - M9-3: "Generate today's plan" button on /dashboard/today
+  - M9-4: Milestone close, ROADMAP.md updated with M10 sketch
 
 ---
 
-## Verification at M8 close
+## Verification at M9 close
 
 ```
-lint: 0 errors, 5 warnings (pre-existing)
+lint: 0 errors, 7 warnings (pre-existing)
 tests: 8 files, 47 tests — all passed
-build: ✓ Compiled, 30 routes — exit 0
+build: exit 0
 ```
 
 ---
 
 ## Next suggested task
 
-Proceed with M9-1 in `plan-foyer.md` — "Save as page" action on Cmd+K result.
+M10 is post-launch polish. No immediate dev task unless user requests otherwise.
 
 ---
 
