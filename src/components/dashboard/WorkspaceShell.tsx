@@ -17,6 +17,7 @@ import { WorkspaceFileSearch } from '@/components/dashboard/WorkspaceFileSearch'
 import { GreetingLine } from '@/components/dashboard/GreetingLine'
 import { QuickCapture } from '@/components/dashboard/QuickCapture'
 import { ExtractActionsButton } from '@/components/dashboard/ExtractActionsButton'
+import { PageScopedAsk } from '@/components/dashboard/PageScopedAsk'
 
 interface WorkspaceShellProps {
   workspaceName: string
@@ -246,6 +247,7 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
                   <h2 className="text-2xl font-semibold">{selectedPage.title}</h2>
                   <Badge variant="outline">{pageLabel(selectedPage.pageType)}</Badge>
                 </div>
+                <PageScopedAsk pageId={selectedPage.id} />
               </div>
               {!selectedPage.isRoot && (
                 <form action={archiveWorkspacePage}>

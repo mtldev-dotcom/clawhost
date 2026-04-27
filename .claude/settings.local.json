@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "PowerShell($env:NODE_ENV = 'production'; npx next build 2>&1 | Select-Object -Last 50)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "PowerShell($env:NODE_ENV = 'production'; npx next build 2>&1 | Select-Object -Last 40)"
     ]
   }
 }

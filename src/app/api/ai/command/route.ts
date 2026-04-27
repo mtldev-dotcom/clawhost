@@ -29,17 +29,36 @@ export async function POST(req: Request) {
     const body = await req.json()
     const command = typeof body.command === 'string' ? body.command.trim() : ''
     const targetPageId = typeof body.targetPageId === 'string' ? body.targetPageId : null
+    const scopeToPageId = typeof body.scopeToPageId === 'string' ? body.scopeToPageId : null
 
     if (!command) {
       return NextResponse.json({ error: 'Command is required' }, { status: 400 })
     }
 
     const workspace = await getWorkspaceForUser(session.user.id)
-    const context = await retrieveWorkspaceContext(workspace.id, command, 5)
 
-    const contextBlock = context.length > 0
-      ? context.map(c => `[Page: ${c.pageTitle} (${c.pageType})]\n${c.snippet}`).join('\n\n---\n\n')
-      : 'No relevant workspace pages found.'
+    let contextBlock: string
+    let context: { pageId: string; pageTitle: string }[] = []
+
+    if (scopeToPageId) {
+      const page = await prisma.page.findFirst({
+        where: { id: scopeToPageId, workspaceId: workspace.id, status: 'active' },
+        select: { id: true, title: true, pageType: true, content: true },
+      })
+      if (page) {
+        const text = (page.content as { text?: string } | null)?.text ?? ''
+        contextBlock = `[Page: ${page.title} (${page.pageType})]\n${text}`
+        context = [{ pageId: page.id, pageTitle: page.title }]
+      } else {
+        contextBlock = 'Page not found.'
+      }
+    } else {
+      const retrieved = await retrieveWorkspaceContext(workspace.id, command, 5)
+      contextBlock = retrieved.length > 0
+        ? retrieved.map(c => `[Page: ${c.pageTitle} (${c.pageType})]\n${c.snippet}`).join('\n\n---\n\n')
+        : 'No relevant workspace pages found.'
+      context = retrieved.map(c => ({ pageId: c.pageId, pageTitle: c.pageTitle }))
+    }
 
     const instance = await prisma.instance.findUnique({
       where: { userId: session.user.id },
@@ -86,7 +105,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       answer,
-      contextUsed: context.map(c => ({ pageId: c.pageId, pageTitle: c.pageTitle })),
+      contextUsed: context,
       targetPageId,
     })
   } catch (error) {
