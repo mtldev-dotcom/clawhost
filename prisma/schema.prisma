@@ -33,35 +33,53 @@ model User {
 }
 
 model Workspace {
-  id        String            @id @default(cuid())
-  userId    String            @unique
-  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name      String            @default("My Workspace")
-  pages     Page[]
-  folders   WorkspaceFolder[]
-  files     WorkspaceFile[]
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
+  id          String            @id @default(cuid())
+  userId      String            @unique
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String            @default("My Workspace")
+  pages       Page[]
+  folders     WorkspaceFolder[]
+  files       WorkspaceFile[]
+  actionItems ActionItem[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 }
 
 model Page {
-  id          String     @id @default(cuid())
+  id          String       @id @default(cuid())
   workspaceId String
-  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   parentId    String?
-  parent      Page?      @relation("PageTree", fields: [parentId], references: [id], onDelete: SetNull)
-  children    Page[]     @relation("PageTree")
+  parent      Page?        @relation("PageTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Page[]       @relation("PageTree")
   title       String
-  pageType    PageType   @default(standard)
-  status      PageStatus @default(active)
-  position    Int        @default(0)
+  pageType    PageType     @default(standard)
+  status      PageStatus   @default(active)
+  position    Int          @default(0)
   content     Json?
-  isRoot      Boolean    @default(false)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  isRoot      Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  actionItems ActionItem[]
 
   @@index([workspaceId, status, position])
   @@index([parentId, position])
+}
+
+model ActionItem {
+  id           String    @id @default(cuid())
+  workspaceId  String
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  sourcePageId String?
+  sourcePage   Page?     @relation(fields: [sourcePageId], references: [id], onDelete: SetNull)
+  text         String
+  status       String    @default("open")
+  dueDate      DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([workspaceId, status])
+  @@index([sourcePageId])
 }
 
 model Instance {
