@@ -424,3 +424,28 @@ export async function deleteWorkspaceFile(formData: FormData) {
   })
   revalidateWorkspacePaths()
 }
+
+export async function saveAiResultAsPage(formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  const title = String(formData.get('title') || 'AI result').trim().slice(0, 100) || 'AI result'
+  const text = String(formData.get('text') || '').trim()
+  if (!text) throw new Error('Empty result')
+  const workspace = await getWorkspaceForUser(session.user.id)
+  const inbox = await prisma.page.findFirst({
+    where: { workspaceId: workspace.id, title: 'Inbox', parentId: workspace.rootPage?.id, status: 'active' },
+  })
+  const parentId = inbox?.id ?? workspace.rootPage?.id ?? null
+  const siblings = parentId ? await prisma.page.count({ where: { workspaceId: workspace.id, parentId, status: 'active' } }) : 0
+  await prisma.page.create({
+    data: {
+      workspaceId: workspace.id,
+      parentId,
+      title,
+      pageType: 'standard',
+      position: siblings,
+      content: { text },
+    },
+  })
+  revalidateWorkspacePaths()
+}

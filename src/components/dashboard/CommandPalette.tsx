@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Loader2, Sparkles, X } from 'lucide-react'
+import { Loader2, Sparkles, X, Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
+import { saveAiResultAsPage } from '@/app/dashboard/workspace/actions'
 
 interface CommandPaletteProps {
   targetPageId?: string
@@ -114,6 +115,14 @@ export function CommandPalette({ targetPageId, onResult }: CommandPaletteProps) 
                 </div>
               )}
               <div className="flex gap-2">
+                <form action={saveAiResultAsPage}>
+                  <input type="hidden" name="title" value={command.slice(0, 100)} />
+                  <input type="hidden" name="text" value={result} />
+                  <Button size="sm" variant="outline" type="submit">
+                    <Save className="mr-1.5 h-3 w-3" />
+                    Save as page
+                  </Button>
+                </form>
                 <Button size="sm" variant="outline" onClick={() => { setResult(null); setCommand('') }}>
                   New command
                 </Button>
