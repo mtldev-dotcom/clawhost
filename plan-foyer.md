@@ -1811,6 +1811,46 @@ npm run lint && npm run test:run && npm run build all exit 0.
 grep "M10" docs/ROADMAP.md returns 1+ match.
 Commit message: chore: M9-4 close milestone M9 — Foyer feature roadmap shipped
 ## M9-4
+
+MILESTONE M10 — Admin & Operations
+Goal: Owner-only webmaster dashboard for managing users, credits, instances, and skills
+from inside the app. No separate deployment — lives at /admin/* behind role-based guard.
+
+TASK M10-1 — Webmaster admin dashboard
+Goal: Full admin dashboard at /admin with owner-only access (role: admin). Covers users,
+credits, subscription management, skills CRUD, and system health.
+Files touched:
+  prisma/schema.prisma (UserRole enum + role field on User)
+  prisma/migrations/20260427214128_add_user_role/
+  prisma/seed-admin.ts (one-shot owner promotion script)
+  src/types/next-auth.d.ts (role in Session + JWT types)
+  src/lib/auth.ts (role in jwt + session callbacks)
+  src/middleware.ts (admin route guard)
+  src/app/admin/layout.tsx (admin shell + sidebar nav)
+  src/app/admin/page.tsx (stats overview)
+  src/app/admin/users/page.tsx (user table)
+  src/app/admin/users/UsersTable.tsx (client search/filter)
+  src/app/admin/users/[id]/page.tsx (user detail)
+  src/app/admin/users/[id]/client.tsx (credit/status/role mutations)
+  src/app/admin/users/[id]/actions.ts (server actions)
+  src/app/admin/skills/page.tsx (skills CRUD)
+  src/app/admin/skills/client.tsx (toggle/add/delete)
+  src/app/admin/skills/actions.ts (server actions)
+  src/app/admin/system/page.tsx (instance health overview)
+Steps:
+  1. Add UserRole enum to prisma/schema.prisma; run migration.
+  2. Seed owner account as admin via prisma/seed-admin.ts.
+  3. Thread role through NextAuth jwt + session callbacks.
+  4. Guard /admin/* in middleware — non-admins → /dashboard.
+  5. Build admin layout + 5 pages.
+Verification:
+  npx prisma migrate dev exits 0.
+  npx tsc --noEmit shows 0 errors in admin/auth/middleware files.
+  npm run dev: /admin loads for admin user, redirects for regular user.
+  Credit grant on /admin/users/[id] updates creditsBalance in DB.
+Commit message: feat: M10-1 add owner admin dashboard at /admin
+## M10-1
+
 - Appendix A — Cheap-model boot prompt (paste into
 OpenRouter)
 For deepseek/deepseek-v3.2 (preferred)

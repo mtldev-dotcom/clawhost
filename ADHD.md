@@ -1,5 +1,5 @@
 # ⚡ Foyer — ADHD.md
-> *Last updated: 2026-04-27 (M9 close)*
+> *Last updated: 2026-04-27 (M10-1 admin dashboard)*
 
 ---
 
@@ -9,6 +9,7 @@ Foyer — workspace OS, second brain, and AI partner for solo professional worke
 ---
 
 ## ✅ What It Does (Right Now)
+- Owner admin dashboard at `/admin` — users, credits, subscription status, skills CRUD, instance health (role-gated: admin only)
 - "Save as page" button on Cmd+K AI results — saves AI answer as a workspace page in Inbox
 - Page-scoped AI ask input — "Ask about this page" input under each page title, scoped to that page's content
 - "Generate today's plan" button on /dashboard/today — AI creates a daily plan from open action items and recent pages

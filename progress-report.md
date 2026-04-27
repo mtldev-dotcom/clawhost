@@ -2494,3 +2494,45 @@ build: ✓ Compiled, 29 routes — exit 0
 - Tasks completed this session: M7-1 through M7-4
 - Next task to pick up: M8-1
 - Open blockers: none
+
+---
+
+## Session 2026-04-27 — Claude Sonnet 4.6
+
+**Starting branch:** `master`
+**Starting commit:** `6aa0f56 chore: M9-4 close milestone M9 — Foyer feature roadmap shipped`
+**Plan version:** plan-foyer.md (M10-1 added this session)
+
+### Task: M10-1 — Webmaster admin dashboard
+
+- Files touched: prisma/schema.prisma, prisma/migrations/20260427214128_add_user_role/, prisma/seed-admin.ts, src/types/next-auth.d.ts, src/lib/auth.ts, src/middleware.ts, src/app/admin/ (7 files), docs/HANDOFF.md, ADHD.md, docs/ROADMAP.md, plan-foyer.md, progress-report.md
+- Steps run:
+  1. Added `UserRole` enum + `role` field to prisma/schema.prisma
+  2. Ran `npx prisma migrate dev --name add-user-role` — migration applied clean
+  3. Created prisma/seed-admin.ts for one-shot owner promotion
+  4. Added src/types/next-auth.d.ts — role in Session + JWT type declarations
+  5. Updated src/lib/auth.ts — role in authorize(), jwt(), session() callbacks
+  6. Updated src/middleware.ts — /admin/* guard, non-admins → /dashboard
+  7. Created admin layout + 5 pages: overview, users, users/[id], skills, system
+- Verification commands + raw output:
+  ```
+  $ npx prisma migrate dev --name add-user-role
+  Applying migration `20260427214128_add_user_role` ✓
+
+  $ npx tsc --noEmit 2>&1 | grep "src/app/admin\|src/lib/auth\|src/middleware\|src/types"
+  (no output — 0 errors in admin/auth/middleware files)
+  ```
+- Result: ✅ complete
+- Commit: 77fa802 feat: M10-1 add owner admin dashboard at /admin
+
+### M10 — Admin & Operations
+- Status: 🟡 in progress (M10-1 done)
+- Started: 2026-04-27
+- Tasks: M10-1 ✅
+
+### Session end
+- Ending branch: master
+- Ending commit: (docs update commit — see git log)
+- Tasks completed this session: M10-1
+- Next task to pick up: M10-2 or M11 (Polish & Growth)
+- Open blockers: Admin seed requires owner to register first at /register

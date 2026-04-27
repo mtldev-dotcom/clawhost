@@ -54,7 +54,11 @@ This roadmap is intentionally shorter and closer to the current app truth.
 - [ ] workspace-aware agent hooks
 - [ ] clearer chat/workspace interplay inside the shell
 
-## M10 — Polish & Growth (sketch)
+## M10 — Admin & Operations (active)
+
+- [x] M10-1: Owner admin dashboard at `/admin` — users, credits, subscription management, skills CRUD, instance health
+
+## M11 — Polish & Growth (sketch)
 
 Post-launch roadmap. These are not broken down into tasks yet.
 
