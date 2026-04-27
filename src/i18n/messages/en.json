@@ -23,6 +23,7 @@
   "nav": {
     "workspace": "Workspace",
     "inbox": "Inbox",
+    "today": "Today",
     "chat": "Chat",
     "settings": "Settings",
     "skills": "Skills"

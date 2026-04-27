@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Settings, Sparkles, Brain, Zap, LogOut, Files, Inbox, Menu, X } from 'lucide-react'
+import { Settings, Sparkles, Brain, Zap, LogOut, Files, Inbox, Menu, X, CalendarDays } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
@@ -15,7 +15,7 @@ interface DashboardHeaderProps {
   instanceStatus?: string
   locale: Locale
   translations: {
-    nav: { workspace: string; inbox: string; chat: string; settings: string; skills: string }
+    nav: { workspace: string; inbox: string; today: string; chat: string; settings: string; skills: string }
     common: { signOut: string }
   }
 }
@@ -24,6 +24,7 @@ interface DashboardHeaderProps {
 const navItems = [
   { href: '/dashboard/workspace', labelKey: 'workspace' as const, icon: Files },
   { href: '/dashboard/inbox', labelKey: 'inbox' as const, icon: Inbox },
+  { href: '/dashboard/today', labelKey: 'today' as const, icon: CalendarDays },
   { href: '/dashboard/settings', labelKey: 'settings' as const, icon: Settings },
 ]
 
