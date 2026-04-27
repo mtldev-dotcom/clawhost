@@ -33,3 +33,9 @@ export async function setUserRole(userId: string, role: UserRole) {
   await prisma.user.update({ where: { id: userId }, data: { role } })
   revalidatePath(`/admin/users/${userId}`)
 }
+
+export async function setEmailVerified(userId: string, emailVerified: boolean) {
+  await requireAdmin()
+  await prisma.user.update({ where: { id: userId }, data: { emailVerified } })
+  revalidatePath(`/admin/users/${userId}`)
+}

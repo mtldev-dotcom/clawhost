@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import type { User, Instance, SubscriptionStatus, UserRole } from '@prisma/client'
-import { grantCredits, setSubscriptionStatus, setUserRole } from './actions'
+import { grantCredits, setSubscriptionStatus, setUserRole, setEmailVerified } from './actions'
 
 type Props = {
   user: User & { instance: Instance | null }
@@ -58,6 +58,14 @@ export function UserDetailClient({ user }: Props) {
           <dd className="tabular-nums">{user.creditsBalance}</dd>
           <dt className="text-gray-500">Lifetime Credits</dt>
           <dd className="tabular-nums">{user.lifetimeCreditsGranted}</dd>
+          <dt className="text-gray-500">Email Verified</dt>
+          <dd>
+            {user.emailVerified ? (
+              <span className="text-green-400">Yes</span>
+            ) : (
+              <span className="text-red-400">No — blocked from login</span>
+            )}
+          </dd>
           <dt className="text-gray-500">Telegram</dt>
           <dd>{user.telegramUserId ? `@${user.telegramUsername ?? user.telegramUserId}` : '—'}</dd>
           <dt className="text-gray-500">Joined</dt>
@@ -136,6 +144,27 @@ export function UserDetailClient({ user }: Props) {
                 <option key={s} value={s}>{s}</option>
               ))}
             </select>
+          </div>
+        </div>
+
+        {/* Email verified */}
+        <div className="mb-4">
+          <label className="mb-1 block text-sm text-gray-400">Email verification</label>
+          <div className="flex gap-2">
+            <button
+              disabled={isPending || user.emailVerified}
+              onClick={() => act(() => setEmailVerified(user.id, true))}
+              className="rounded bg-green-800 px-3 py-1.5 text-sm hover:bg-green-700 disabled:opacity-40"
+            >
+              Mark verified
+            </button>
+            <button
+              disabled={isPending || !user.emailVerified}
+              onClick={() => act(() => setEmailVerified(user.id, false))}
+              className="rounded bg-red-900 px-3 py-1.5 text-sm hover:bg-red-800 disabled:opacity-40"
+            >
+              Revoke verification
+            </button>
           </div>
         </div>
 

@@ -23,6 +23,7 @@ const authConfig: NextAuthConfig = {
         if (!user?.passwordHash) return null
         const valid = await bcrypt.compare(credentials.password as string, user.passwordHash)
         if (!valid) return null
+        if (!user.emailVerified) return null
         return { id: user.id, email: user.email, name: user.name, role: user.role }
       },
     }),

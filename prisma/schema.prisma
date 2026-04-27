@@ -18,6 +18,7 @@ model User {
   subscriptionStatus    SubscriptionStatus  @default(inactive)
   creditsBalance        Int                 @default(0)
   lifetimeCreditsGranted Int                @default(0)
+  emailVerified         Boolean             @default(true)
   telegramUserId        String?             @unique
   telegramUsername      String?
   telegramLinkedAt      DateTime?
@@ -114,6 +115,16 @@ model TelegramLinkToken {
   createdAt  DateTime @default(now())
 
   @@index([userId, expiresAt])
+}
+
+model PlatformSettings {
+  id                      String             @id @default("global")
+  signupEnabled           Boolean            @default(true)
+  requireEmailConfirm     Boolean            @default(false)
+  defaultCredits          Int                @default(0)
+  defaultSubStatus        SubscriptionStatus @default(inactive)
+  maintenanceMode         Boolean            @default(false)
+  updatedAt               DateTime           @updatedAt
 }
 
 enum UserRole {

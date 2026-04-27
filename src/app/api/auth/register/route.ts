@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
+import { getPlatformSettings } from '@/lib/platform-settings'
 import { NextResponse } from 'next/server'
 import { checkAuthRateLimit, getClientIP, createRateLimitResponse } from '@/lib/rate-limit'
 
@@ -45,6 +46,11 @@ export async function POST(req: Request) {
     return createRateLimitResponse(rateLimitCheck.resetAt)
   }
 
+  const settings = await getPlatformSettings()
+  if (!settings.signupEnabled) {
+    return NextResponse.json({ error: 'Registration is currently closed.' }, { status: 403 })
+  }
+
   let body: { email?: string; password?: string; name?: string }
   try {
     body = await req.json()
@@ -83,7 +89,17 @@ export async function POST(req: Request) {
 
   try {
     const passwordHash = await bcrypt.hash(password, 12)
-    const user = await prisma.user.create({ data: { email, name: name || null, passwordHash } })
+    const user = await prisma.user.create({
+      data: {
+        email,
+        name: name || null,
+        passwordHash,
+        emailVerified: !settings.requireEmailConfirm,
+        creditsBalance: settings.defaultCredits,
+        lifetimeCreditsGranted: settings.defaultCredits,
+        subscriptionStatus: settings.defaultSubStatus,
+      },
+    })
 
     return NextResponse.json({ id: user.id }, { status: 201 })
   } catch (error) {
