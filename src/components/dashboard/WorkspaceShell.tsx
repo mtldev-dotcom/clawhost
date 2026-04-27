@@ -16,6 +16,7 @@ import { WorkspaceFileUpload } from '@/components/dashboard/WorkspaceFileUpload'
 import { WorkspaceFileSearch } from '@/components/dashboard/WorkspaceFileSearch'
 import { GreetingLine } from '@/components/dashboard/GreetingLine'
 import { QuickCapture } from '@/components/dashboard/QuickCapture'
+import { ExtractActionsButton } from '@/components/dashboard/ExtractActionsButton'
 
 interface WorkspaceShellProps {
   workspaceName: string
@@ -329,6 +330,9 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
                 <label htmlFor="content" className="text-sm font-medium">
                   {selectedPage.pageType === 'database' ? 'Description' : 'Notes'}
                 </label>
+                {(selectedPage.pageType === 'standard' || selectedPage.pageType === 'capture') && (
+                  <ExtractActionsButton pageId={selectedPage.id} />
+                )}
                 <textarea
                   id="content"
                   name="content"
