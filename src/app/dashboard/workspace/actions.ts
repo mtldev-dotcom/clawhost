@@ -2,6 +2,7 @@
 
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { env } from '@/lib/env'
 import {
   buildWorkspacePageContent,
   databaseFieldTypeOptions,
@@ -443,6 +444,66 @@ export async function saveAiResultAsPage(formData: FormData) {
       parentId,
       title,
       pageType: 'standard',
+      position: siblings,
+      content: { text },
+    },
+  })
+  revalidateWorkspacePaths()
+}
+
+export async function generateDailyPlan() {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  const user = await prisma.user.findUnique({ where: { id: session.user.id } })
+  if (!user) throw new Error('User not found')
+  if (user.creditsBalance <= 0) throw new Error('No credits remaining')
+  const workspace = await getWorkspaceForUser(session.user.id)
+  const openActions = await prisma.actionItem.findMany({
+    where: { workspaceId: workspace.id, status: 'open' },
+    orderBy: { createdAt: 'desc' },
+    take: 30,
+  })
+  const recentPages = await prisma.page.findMany({
+    where: { workspaceId: workspace.id, status: 'active', pageType: { in: ['standard', 'capture'] } },
+    orderBy: { updatedAt: 'desc' },
+    take: 5,
+    select: { title: true, content: true },
+  })
+  const prompt =
+    `Open action items:\n${openActions.map(a => `- ${a.text}`).join('\n')}\n\n` +
+    `Recent pages:\n${recentPages.map(p => `- ${p.title}: ${((p.content as { text?: string } | null)?.text ?? '').slice(0, 200)}`).join('\n')}`
+
+  const aiResp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${env.OPENROUTER_API_KEY}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': env.NEXT_PUBLIC_APP_URL,
+      'X-Title': 'Foyer',
+    },
+    body: JSON.stringify({
+      model: env.PLATFORM_DEFAULT_MODEL,
+      max_tokens: 500,
+      messages: [
+        { role: 'system', content: 'You are a chief-of-staff for a solo professional. Given their open action items and recent work, write a tight daily plan with: a top-3 priorities list, a calls/meetings line, and 2 lines of suggested shutdown notes for tonight. Be concrete. No fluff.' },
+        { role: 'user', content: prompt },
+      ],
+    }),
+  })
+  const data = await aiResp.json()
+  const text = data.choices?.[0]?.message?.content ?? ''
+  await prisma.user.update({ where: { id: session.user.id }, data: { creditsBalance: { decrement: 1 } } })
+  const inbox = await prisma.page.findFirst({
+    where: { workspaceId: workspace.id, title: 'Inbox', parentId: workspace.rootPage?.id, status: 'active' },
+  })
+  const parentId = inbox?.id ?? workspace.rootPage?.id ?? null
+  const siblings = parentId ? await prisma.page.count({ where: { workspaceId: workspace.id, parentId, status: 'active' } }) : 0
+  await prisma.page.create({
+    data: {
+      workspaceId: workspace.id,
+      parentId,
+      title: `Daily Plan — ${new Date().toISOString().slice(0, 10)}`,
+      pageType: 'capture',
       position: siblings,
       content: { text },
     },

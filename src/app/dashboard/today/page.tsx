@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getWorkspaceForUser } from '@/lib/workspace'
+import { generateDailyPlan } from '@/app/dashboard/workspace/actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -46,7 +47,14 @@ export default async function TodayPage() {
       </header>
 
       <section>
-        <h2 className="text-lg font-medium mb-2">Plan</h2>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-lg font-medium">Plan</h2>
+          <form action={generateDailyPlan}>
+            <button type="submit" className="rounded-md bg-emerald-500 px-4 py-2 text-sm text-white hover:bg-emerald-600 transition">
+              Generate today&apos;s plan
+            </button>
+          </form>
+        </div>
         {todayPlan ? (
           <div className="rounded-lg border p-4 whitespace-pre-wrap text-sm">
             {(todayPlan.content as { text?: string })?.text ?? ''}
