@@ -5,38 +5,40 @@
 
 ---
 
-**Branch:** `dev-claude`
-**Last commit:** `690a175 chore: M7-4 close milestone M7 — second brain capture verified`
+**Branch:** `master`
+**Last commit:** `643298c feat: M8-4 add Extract action items button on standard/capture pages`
 **Plan version:** `plan-foyer.md` at repo root
 **Task in flight:** none
-**State:** M7 complete (Second Brain Capture). Next milestone M8.
+**State:** M8 complete (Planning Layer). Next milestone M9 (AI Partner Behaviors).
 **Updated:** 2026-04-27
 
 ---
 
 ## What happened this session
 
-- Completed all 4 tasks of M7 (Second Brain Capture):
-  - M7-1: Quick Capture floating button (Cmd+Shift+K) — QuickCapture component, `quickCapture` server action, mounted in WorkspaceShell
-  - M7-2: URL-to-page capture — `url-capture.ts` lib, URL detection + AI summary in `quickCapture`, credit gate with plain-text fallback
-  - M7-3: Inbox triage view — `/dashboard/inbox` page, `triageCapture` action, Inbox nav link (EN + FR)
-  - M7-4: Milestone close, all truth files updated
+- Set up local dev environment on Windows laptop (cloned from homelab)
+- Fixed Windows build issue by creating not-found.tsx and global-error.tsx (next-intl compatibility)
+- Completed all 4 tasks of M8 (Planning Layer):
+  - M8-1: ActionItem model + migration
+  - M8-2: `/api/ai/extract-actions` route — extracts action items from page content via AI
+  - M8-3: `/dashboard/today` planning view — shows daily plan + open action items grouped by source
+  - M8-4: "Extract action items" button on standard/capture pages
 
 ---
 
-## Verification at M7 close
+## Verification at M8 close
 
 ```
-lint: 0 errors, 7 warnings (all pre-existing)
+lint: 0 errors, 5 warnings (pre-existing)
 tests: 8 files, 47 tests — all passed
-build: ✓ Compiled, 29 routes — exit 0
+build: ✓ Compiled, 30 routes — exit 0
 ```
 
 ---
 
 ## Next suggested task
 
-Proceed with the next task in `plan-foyer.md` after M7-4.
+Proceed with M9-1 in `plan-foyer.md` — "Save as page" action on Cmd+K result.
 
 ---
 

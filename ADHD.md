@@ -1,5 +1,5 @@
 # ⚡ Foyer — ADHD.md
-> *Last updated: 2026-04-27 (M7 close)*
+> *Last updated: 2026-04-27 (M8 close)*
 
 ---
 
@@ -9,6 +9,10 @@ Foyer — workspace OS, second brain, and AI partner for solo professional worke
 ---
 
 ## ✅ What It Does (Right Now)
+- ActionItem model for AI-extracted action items linked to source pages
+- `/dashboard/today` planning view — shows daily plan + grouped open action items
+- "Extract action items" button on standard/capture pages — calls AI to parse action items from page content
+- `/api/ai/extract-actions` route — extracts action items via OpenRouter + saves to ActionItem table
 - Quick Capture floating button (bottom-right, Cmd+Shift+K) — saves text as capture page in Inbox
 - URL capture: paste a URL → AI-summarized title + 2-sentence summary saved as capture page
 - Inbox triage view at `/dashboard/inbox` — list, move-to-Projects, or archive captures
