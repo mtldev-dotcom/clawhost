@@ -6,7 +6,7 @@
 ---
 
 **Branch:** `dev-claude`
-**Last commit:** `(see below after final commit)`
+**Last commit:** `690a175 chore: M7-4 close milestone M7 — second brain capture verified`
 **Plan version:** `plan-foyer.md` at repo root
 **Task in flight:** none
 **State:** M7 complete (Second Brain Capture). Next milestone M8.

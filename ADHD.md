@@ -1,5 +1,5 @@
 # ⚡ Foyer — ADHD.md
-> *Last updated: 2026-04-26 (M5 close)*
+> *Last updated: 2026-04-27 (M7 close)*
 
 ---
 
