@@ -5,6 +5,18 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth
   const { pathname } = req.nextUrl
 
+  if (pathname.startsWith('/admin')) {
+    if (!isLoggedIn) {
+      const loginUrl = new URL('/login', req.nextUrl.origin)
+      loginUrl.searchParams.set('callbackUrl', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
+    if (req.auth?.user?.role !== 'admin') {
+      return NextResponse.redirect(new URL('/dashboard', req.nextUrl.origin))
+    }
+    return NextResponse.next()
+  }
+
   const protectedRoutes = ['/dashboard', '/onboarding']
   const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route))
 
@@ -25,5 +37,5 @@ export default auth((req) => {
 })
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/onboarding', '/login', '/register'],
+  matcher: ['/admin/:path*', '/dashboard/:path*', '/onboarding', '/login', '/register'],
 }

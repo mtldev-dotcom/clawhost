@@ -12,6 +12,7 @@ model User {
   email                 String              @unique
   name                  String?
   passwordHash          String?
+  role                  UserRole            @default(user)
   stripeCustomerId      String?             @unique
   locale                String              @default("en") // 'en' or 'fr'
   subscriptionStatus    SubscriptionStatus  @default(inactive)
@@ -113,6 +114,11 @@ model TelegramLinkToken {
   createdAt  DateTime @default(now())
 
   @@index([userId, expiresAt])
+}
+
+enum UserRole {
+  user
+  admin
 }
 
 enum InstanceStatus {
