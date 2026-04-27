@@ -2426,7 +2426,71 @@ build: ✓ Compiled, 28 routes — exit 0
 
 ### Session end
 - Ending branch: dev-claude
-- Ending commit: (M6-5 commit hash — see below)
+- Ending commit: 166234b chore: M6-5 close milestone M6 — solo pro onboarding verified
 - Tasks completed this session: M6-1 through M6-5
 - Next task to pick up: M7-1
+
+---
+
+## Session 2026-04-27 — Claude Sonnet 4.6
+
+**Starting branch:** `dev-claude`
+**Starting commit:** `166234b chore: M6-5 close milestone M6 — solo pro onboarding verified`
+**Plan version:** plan-foyer.md
+
+### Task: M7-1 — Add Quick Capture floating button (Cmd+Shift+K)
+- Files touched: src/app/dashboard/workspace/actions.ts, src/components/dashboard/QuickCapture.tsx (new), src/components/dashboard/WorkspaceShell.tsx
+- Added `quickCapture` server action: finds Inbox folder, saves text as capture page
+- Created QuickCapture client component: floating emerald "+" button, Cmd+Shift+K shortcut, textarea dialog
+- Mounted `<QuickCapture />` in WorkspaceShell top-level container
+- Verification: npm run build (exit 0), npm run lint (0 errors, 7 warnings pre-existing), ls QuickCapture.tsx exists
+- Result: ✅ complete
+- Commit: a58a2c8 feat: M7-1 add Quick Capture floating button (Cmd+Shift+K)
+
+### Task: M7-2 — Add URL-to-page capture (web clip)
+- Files touched: src/lib/url-capture.ts (new), src/app/dashboard/workspace/actions.ts
+- Created `captureUrl` lib: fetches URL, extracts title, strips HTML, asks OpenRouter for 2-sentence summary
+- Extended `quickCapture`: detects URL inputs, uses captureUrl when credits > 0, falls through to plain-text otherwise
+- Verification: npm run build (exit 0), npm run test:run (47 passed), ls url-capture.ts exists
+- Result: ✅ complete
+- Commit: fade429 feat: M7-2 capture URLs as pages with AI summary
+
+### Task: M7-3 — Add Inbox triage view
+- Files touched: src/app/dashboard/workspace/actions.ts, src/app/dashboard/inbox/page.tsx (new), src/components/dashboard/DashboardHeader.tsx, src/app/dashboard/layout.tsx, src/i18n/messages/en.json, src/i18n/messages/fr.json
+- Added `triageCapture` server action: move-projects or archive a capture page
+- Added `/dashboard/inbox` to revalidateWorkspacePaths
+- Created InboxPage server component: lists active captures under Inbox folder, one-tap triage actions
+- Added Inbox nav link to DashboardHeader (desktop + mobile), added "inbox" translation key to EN/FR
+- Verification: npm run build (exit 0), npm run test:run (47 passed), npm run lint (0 errors, 7 warnings pre-existing)
+- Result: ✅ complete
+- Commit: 5060d1c feat: M7-3 add inbox triage page and move/archive actions
+
+### Task: M7-4 — Milestone M7 close
+
+#### Full verification output
+```
+lint: 0 errors, 7 warnings (all pre-existing)
+tests: 8 files, 47 tests — all passed
+build: ✓ Compiled, 29 routes — exit 0
+```
+
+- Result: ✅ complete
+
+### M7 — Second Brain Capture
+- Status: 🟢 done
+- Started: 2026-04-27
+- Ended: 2026-04-27
+- Tasks: M7-1 ✅  M7-2 ✅  M7-3 ✅  M7-4 ✅
+- Full verification run at close:
+  ```
+  lint: 0 errors, 7 warnings (all pre-existing)
+  tests: 8 files, 47 tests — all passed
+  build: ✓ Compiled, 29 routes — exit 0
+  ```
+
+### Session end
+- Ending branch: dev-claude
+- Ending commit: (M7-4 commit hash — see git log)
+- Tasks completed this session: M7-1 through M7-4
+- Next task to pick up: M8-1
 - Open blockers: none

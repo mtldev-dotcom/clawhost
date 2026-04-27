@@ -9,6 +9,9 @@ Foyer — workspace OS, second brain, and AI partner for solo professional worke
 ---
 
 ## ✅ What It Does (Right Now)
+- Quick Capture floating button (bottom-right, Cmd+Shift+K) — saves text as capture page in Inbox
+- URL capture: paste a URL → AI-summarized title + 2-sentence summary saved as capture page
+- Inbox triage view at `/dashboard/inbox` — list, move-to-Projects, or archive captures
 - Solo-pro starter templates (5): Client CRM, Project Tracker, Weekly Review, Daily Plan, Meeting Notes
 - Time-of-day greeting in workspace shell (GreetingLine component)
 - Persona-aligned onboarding copy: "Pick your AI partner", "Use this AI partner" CTA
@@ -234,6 +237,8 @@ If any of those drift from code, fix them.
 ---
 
 ## 🗒️ Nick's Notes
+> 2026-04-27 (M7): Closed M7 (second brain capture). Quick Capture floating button + Cmd+Shift+K shortcut saves text or URLs as capture pages in Inbox. URLs get AI title + 2-sentence summary via OpenRouter (credit-gated, falls back to plain text). New /dashboard/inbox triage view: list captures, move to Projects, or archive. Inbox nav link added (EN + FR). 47 tests, 29 routes, lint clean.
+
 > 2026-04-26 (M6): Closed M6 (solo pro onboarding & templates). Reframed onboarding copy for solo pros, added 5 solo-pro starter templates (Project Tracker, Daily Plan, Weekly Review replacing SMB ops templates), added time-of-day greeting in workspace, tightened empty-state to "Welcome to Foyer." 47 tests, 28 routes, lint clean.
 
 > 2026-04-25 (M4): Closed M4 (production readiness) in one session. Added /status health-check, rate limiting on AI command route, security headers (X-Frame-Options/DENY, X-Content-Type-Options, Referrer-Policy, Permissions-Policy), legal stub pages (ToS + Privacy), register page footer links. Replaced platform model list with 5 models (Nemotron free as default). 47 tests, 27 routes, lint clean.

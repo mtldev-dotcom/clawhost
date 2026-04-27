@@ -222,5 +222,40 @@ build: ✓ Compiled, 28 routes — exit 0
 - M6-4: Tighten workspace empty-state copy for solo pros
 - M6-5: Milestone close
 
+### What's next: M7 Second Brain Capture
+
+---
+
+## 2026-04-27 — M7 Second Brain Capture
+
+**Summary:** Made capture frictionless. A persistent Quick Capture button (bottom-right, Cmd+Shift+K) lets a solo pro dump text or URLs from anywhere in the workspace. URL inputs are auto-summarized by the platform AI model and saved with the page title and a 2-sentence summary. All captures land in the Inbox folder. A new `/dashboard/inbox` page lists them oldest-first with one-tap "Move to Projects" or "Archive" triage actions. Inbox now appears in the main nav.
+
+**What changed in the product:**
+- Floating "+" button at bottom-right of workspace — always visible, opens Quick Capture dialog
+- Cmd+Shift+K keyboard shortcut toggles capture dialog
+- Text captures: saved as capture page in user's Inbox folder, first line (≤60 chars) becomes title
+- URL captures: page title extracted, AI 2-sentence summary generated via OpenRouter, stored with original link; falls back to plain-text if credits = 0
+- New `/dashboard/inbox` route: lists active Inbox captures, move-to-Projects and archive actions
+- "Inbox" link added to the nav bar (desktop + mobile, EN + FR)
+
+**What changed in the codebase:**
+- `src/components/dashboard/QuickCapture.tsx`: new 'use client' component — floating button, dialog, keyboard shortcut
+- `src/lib/url-capture.ts`: new lib — fetch URL, extract title, strip HTML, call OpenRouter for summary
+- `src/app/dashboard/workspace/actions.ts`: added `quickCapture` (text + URL path), `triageCapture` (archive / move-projects), added `/dashboard/inbox` to revalidateWorkspacePaths
+- `src/components/dashboard/WorkspaceShell.tsx`: mounts `<QuickCapture />`
+- `src/app/dashboard/inbox/page.tsx`: new server component
+- `src/components/dashboard/DashboardHeader.tsx`: added Inbox to navItems, added Inbox icon import, updated nav type
+- `src/app/dashboard/layout.tsx`: updated translations type cast to include inbox
+- `src/i18n/messages/en.json` + `fr.json`: added "inbox" nav key
+
+**Verification:**
+```
+lint: 0 errors, 7 warnings (all pre-existing)
+tests: 8 files, 47 tests — all passed
+build: ✓ Compiled, 29 routes — exit 0
+```
+
+**Open items:** none
+
 ### What's next
 M7 — Second Brain Capture
