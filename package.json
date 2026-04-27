@@ -1,6 +1,7 @@
 {
-  "name": "clawhost",
+  "name": "foyer",
   "version": "0.1.0",
+  "description": "Foyer — workspace OS, second brain, and AI partner for solo professionals.",
   "private": true,
   "scripts": {
     "dev": "next dev",

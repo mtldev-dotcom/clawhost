@@ -29,7 +29,7 @@ export default async function DashboardLayout({
   ])
 
   const translations = {
-    nav: (messages as { nav: { workspace: string; chat: string; settings: string; skills: string } }).nav,
+    nav: (messages as { nav: { workspace: string; inbox: string; chat: string; settings: string; skills: string } }).nav,
     common: (messages as { common: { signOut: string } }).common,
   }
 

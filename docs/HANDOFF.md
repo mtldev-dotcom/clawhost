@@ -5,51 +5,46 @@
 
 ---
 
-**Branch:** `master`
-**Last commit:** `4d3618e fix: use NextAuth v5 auth() in middleware to fix login redirect loop`
-**Plan version:** `plan-claude.md` at repo root
+**Branch:** `dev-claude`
+**Last commit:** `690a175 chore: M7-4 close milestone M7 — second brain capture verified`
+**Plan version:** `plan-foyer.md` at repo root
 **Task in flight:** none
-**State:** production live at `https://claw.nickybruno.com`, login fixed
-**Updated:** 2026-04-25
+**State:** M7 complete (Second Brain Capture). Next milestone M8.
+**Updated:** 2026-04-27
 
 ---
 
 ## What happened this session
 
-Two production bugs were diagnosed and fixed:
-
-1. **Login redirect loop (root cause):** Middleware was using `getToken()` from `next-auth/jwt` (v4 API). NextAuth v5 encrypts session tokens as JWE — `getToken` cannot decrypt them, so `isLoggedIn` was always `false`. Every `/dashboard` request redirected back to `/login` even after successful sign-in. Fixed by rewriting `src/middleware.ts` to use `auth()` from NextAuth v5 (`export default auth((req) => { ... })`).
-
-2. **Test user bad password hash:** The manually-created `test@claw.dev` user in production had a bcrypt hash from an unknown password. Reset to `Testing123!` directly via `psql` against `postgresql://clawhost:clawhost2026@5.161.238.111:5344/clawhost`.
-
-3. **Login form freeze (minor):** `router.refresh()` call after `router.push()` on the success path was causing a double navigation. Removed.
-
-The fix is deployed to `master` and pushed — Dokploy will auto-redeploy from the latest commit.
+- Completed all 4 tasks of M7 (Second Brain Capture):
+  - M7-1: Quick Capture floating button (Cmd+Shift+K) — QuickCapture component, `quickCapture` server action, mounted in WorkspaceShell
+  - M7-2: URL-to-page capture — `url-capture.ts` lib, URL detection + AI summary in `quickCapture`, credit gate with plain-text fallback
+  - M7-3: Inbox triage view — `/dashboard/inbox` page, `triageCapture` action, Inbox nav link (EN + FR)
+  - M7-4: Milestone close, all truth files updated
 
 ---
 
-## Production state
+## Verification at M7 close
 
-- URL: `https://claw.nickybruno.com`
-- DB: `postgresql://clawhost:clawhost2026@5.161.238.111:5344/clawhost` (external port 5344)
-- Test account: `test@claw.dev` / `Testing123!`
-- Dokploy app: `clawpagebase-frontend-wwtuj2`
-- Dokploy URL: `https://dokhost.nickybruno.com`
+```
+lint: 0 errors, 7 warnings (all pre-existing)
+tests: 8 files, 47 tests — all passed
+build: ✓ Compiled, 29 routes — exit 0
+```
 
 ---
 
 ## Next suggested task
 
-Proceed with `TASK M5-1` — the first task of Milestone M5.
-
-After the Dokploy redeploy completes (~2-3 min), verify login works end-to-end in the browser, then continue with M5.
+Proceed with the next task in `plan-foyer.md` after M7-4.
 
 ---
 
 ## Open questions for the human
 
-- Stripe webhook needs to be registered at `https://claw.nickybruno.com/api/stripe/webhook` in the Stripe dashboard.
-- Telegram bot token needs to be re-saved in Settings (to register the webhook against the production HTTPS URL).
+- Domain registration (foyer.work preferred) still pending
+- Favicon swap needs Foyer wordmark from human
+- Stripe webhook registration at production domain
 
 ---
 
@@ -58,4 +53,4 @@ After the Dokploy redeploy completes (~2-3 min), verify login works end-to-end i
 - Do not touch files under `docs/archive/**`.
 - Do not batch tasks. One task at a time.
 - Do not run `npm install <package>` without a `docs/DECISIONS.md` entry first.
-- Do not invent tasks. Only execute tasks listed in `plan-claude.md`.
+- Do not invent tasks. Only execute tasks listed in `plan-foyer.md`.

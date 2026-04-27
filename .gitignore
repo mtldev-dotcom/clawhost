@@ -77,3 +77,4 @@ test-results/
 skills/
 skills-lock.json
 .env.local.pre-local-dev-backup
+data/

@@ -10,6 +10,7 @@ import {
 } from '@/lib/workspace'
 import type { DatabaseFieldDefinition } from '@/lib/workspace'
 import { revalidatePath } from 'next/cache'
+import { captureUrl } from '@/lib/url-capture'
 
 const validPageTypes = new Set(workspacePageTypeOptions.map((option) => option.value))
 const validDatabaseFieldTypes = new Set(databaseFieldTypeOptions.map((option) => option.value))
@@ -17,6 +18,7 @@ const validDatabaseFieldTypes = new Set(databaseFieldTypeOptions.map((option) =>
 function revalidateWorkspacePaths() {
   revalidatePath('/dashboard')
   revalidatePath('/dashboard/workspace')
+  revalidatePath('/dashboard/inbox')
 }
 
 async function getOwnedWorkspacePage(userId: string, pageId: string, pageType?: 'database') {
@@ -273,10 +275,32 @@ const TEMPLATES: Record<string, { title: string; pageType: string; content: obje
       },
     },
   },
-  'weekly-ops': {
-    title: 'Weekly Ops Review',
+  'project-tracker': {
+    title: 'Project Tracker',
+    pageType: 'database',
+    content: {
+      text: 'Track your active projects, status, and next milestones.',
+      database: {
+        fields: [
+          { id: 'name', name: 'Project', type: 'text' },
+          { id: 'client', name: 'Client', type: 'text' },
+          { id: 'status', name: 'Status', type: 'select' },
+          { id: 'next', name: 'Next milestone', type: 'text' },
+          { id: 'due', name: 'Due', type: 'text' },
+        ],
+        rows: [],
+      },
+    },
+  },
+  'weekly-review': {
+    title: 'Weekly Review',
     pageType: 'standard',
-    content: { text: '## Week of [date]\n\n### What shipped\n-\n\n### Blockers\n-\n\n### Next week priorities\n1.\n2.\n3.' },
+    content: { text: '## Week of [date]\n\n### Wins this week\n-\n\n### What I\'m carrying\n-\n\n### Next week priorities\n1.\n2.\n3.\n\n### Reflections\n-' },
+  },
+  'daily-plan': {
+    title: 'Daily Plan',
+    pageType: 'capture',
+    content: { text: '## Today — [date]\n\n### Top 3\n- [ ]\n- [ ]\n- [ ]\n\n### Calls / meetings\n-\n\n### Tonight\'s shutdown notes\n-' },
   },
   'meeting-notes': {
     title: 'Meeting Notes',
@@ -306,6 +330,81 @@ export async function createFromTemplate(formData: FormData) {
       content: template.content,
     },
   })
+  revalidateWorkspacePaths()
+}
+
+export async function quickCapture(formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  const text = String(formData.get('text') || '').trim()
+  if (!text) throw new Error('Capture text is required')
+  const workspace = await getWorkspaceForUser(session.user.id)
+  const inbox = await prisma.page.findFirst({
+    where: { workspaceId: workspace.id, title: 'Inbox', parentId: workspace.rootPage?.id, status: 'active' },
+  })
+  const parentId = inbox?.id ?? workspace.rootPage?.id ?? null
+  const siblingsCount = parentId
+    ? await prisma.page.count({ where: { workspaceId: workspace.id, parentId, status: 'active' } })
+    : 0
+
+  const isUrl = /^https?:\/\/\S+$/i.test(text)
+  if (isUrl) {
+    const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { creditsBalance: true } })
+    // TODO: surface low-credit warning in the UI
+    if ((user?.creditsBalance ?? 0) > 0) {
+      const captured = await captureUrl(text)
+      await prisma.page.create({
+        data: {
+          workspaceId: workspace.id,
+          parentId,
+          title: captured.title,
+          pageType: 'capture',
+          position: siblingsCount,
+          content: { text: `${captured.summary}\n\n[Original link](${captured.url})`, url: captured.url },
+        },
+      })
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: { creditsBalance: { decrement: 1 } },
+      })
+      revalidateWorkspacePaths()
+      return
+    }
+  }
+
+  const title = text.split('\n')[0].slice(0, 60) || 'Quick capture'
+  await prisma.page.create({
+    data: {
+      workspaceId: workspace.id,
+      parentId,
+      title,
+      pageType: 'capture',
+      position: siblingsCount,
+      content: { text },
+    },
+  })
+  revalidateWorkspacePaths()
+}
+
+export async function triageCapture(formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  const pageId = String(formData.get('pageId') || '').trim()
+  const action = String(formData.get('action') || '').trim()
+  if (!pageId) throw new Error('Page id required')
+  const workspace = await getWorkspaceForUser(session.user.id)
+  const page = await prisma.page.findFirst({ where: { id: pageId, workspaceId: workspace.id } })
+  if (!page) throw new Error('Page not found')
+  if (action === 'archive') {
+    await prisma.page.update({ where: { id: page.id }, data: { status: 'archived' } })
+  } else if (action === 'move-projects') {
+    const projects = await prisma.page.findFirst({
+      where: { workspaceId: workspace.id, title: 'Projects', parentId: workspace.rootPage?.id, status: 'active' },
+    })
+    if (projects) {
+      await prisma.page.update({ where: { id: page.id }, data: { parentId: projects.id } })
+    }
+  }
   revalidateWorkspacePaths()
 }
 

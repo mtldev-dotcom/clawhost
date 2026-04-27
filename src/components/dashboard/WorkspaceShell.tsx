@@ -14,6 +14,8 @@ import { Badge } from '@/components/ui/badge'
 import { Select } from '@/components/ui/select'
 import { WorkspaceFileUpload } from '@/components/dashboard/WorkspaceFileUpload'
 import { WorkspaceFileSearch } from '@/components/dashboard/WorkspaceFileSearch'
+import { GreetingLine } from '@/components/dashboard/GreetingLine'
+import { QuickCapture } from '@/components/dashboard/QuickCapture'
 
 interface WorkspaceShellProps {
   workspaceName: string
@@ -21,6 +23,7 @@ interface WorkspaceShellProps {
   selectedPageId?: string
   rootFolders: { id: string; name: string }[]
   rootFiles: { id: string; name: string; sizeBytes: number; createdBy: 'user' | 'agent' }[]
+  userName?: string
 }
 
 function pageLabel(pageType: WorkspacePageNode['pageType']) {
@@ -183,12 +186,14 @@ function PageTypeSummary({ pageType }: { pageType: WorkspacePageNode['pageType']
 }
 
 const templates = [
-  { key: 'client-crm', label: 'Client CRM', desc: 'Track clients, deals, and next actions', icon: Users },
-  { key: 'weekly-ops', label: 'Weekly Ops Review', desc: 'Ship notes and priorities every week', icon: BarChart3 },
-  { key: 'meeting-notes', label: 'Meeting Notes', desc: 'Fast capture for meetings and calls', icon: NotebookPen },
+  { key: 'client-crm',      label: 'Client CRM',      desc: 'Track clients, deals, and next actions',      icon: Users },
+  { key: 'project-tracker', label: 'Project Tracker',  desc: 'Active projects, status, and milestones',      icon: KanbanSquare },
+  { key: 'weekly-review',   label: 'Weekly Review',    desc: 'Wins, priorities, and reflections',            icon: BarChart3 },
+  { key: 'daily-plan',      label: 'Daily Plan',       desc: 'Your top 3, meetings, and shutdown notes',     icon: Clipboard },
+  { key: 'meeting-notes',   label: 'Meeting Notes',    desc: 'Fast capture for meetings and calls',          icon: NotebookPen },
 ]
 
-export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolders, rootFiles }: WorkspaceShellProps) {
+export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolders, rootFiles, userName }: WorkspaceShellProps) {
   const selectedPage = findSelectedPage(pages, selectedPageId)
   const selectedContent = selectedPage ? getWorkspacePageContent(selectedPage) : { text: '' }
 
@@ -229,6 +234,9 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
       </Card>
 
       <Card className="p-6">
+        {!selectedPage && pages.length > 0 && userName && (
+          <GreetingLine name={userName.split(' ')[0] || userName} />
+        )}
         {selectedPage ? (
           <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4">
@@ -338,10 +346,10 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
         ) : (
           <div className="flex min-h-[420px] flex-col items-center justify-center gap-6 text-center">
             <div>
-              <h2 className="text-xl font-semibold">Start your workspace</h2>
-              <p className="mt-2 max-w-sm text-sm text-muted-foreground">Create a page above, or pick a starter template to hit the ground running.</p>
+              <h2 className="text-xl font-semibold">Welcome to Foyer.</h2>
+              <p className="mt-2 max-w-sm text-sm text-muted-foreground">Pick a template to start. You can rename, edit, or delete any of these later.</p>
             </div>
-            <div className="grid w-full max-w-sm gap-3">
+            <div className="grid gap-3 w-full max-w-md sm:grid-cols-2">
               {templates.map((t) => {
                 const Icon = t.icon
                 return (
@@ -363,6 +371,7 @@ export function WorkspaceShell({ workspaceName, pages, selectedPageId, rootFolde
           </div>
         )}
       </Card>
+      <QuickCapture />
     </div>
   )
 }

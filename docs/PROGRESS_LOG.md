@@ -143,3 +143,119 @@ Format:
 **Verification:** `npm run lint && npm run test:run && npm run build` — 0 errors, 47 tests, build clean (13 static pages).
 
 **Open items:** Next up is `TASK M4-1`.
+
+---
+
+## M5 — Rebrand to Foyer + Launch Prep
+
+**Status:** 🟢 Complete
+**Started:** 2026-04-26
+**Ended:** 2026-04-26
+
+### Summary
+Complete rebrand from ClawHost to Foyer across all user-visible surfaces, docs, and internal contract files. The product is now positioned as a workspace OS, second brain, and AI partner for solo professionals.
+
+### Tasks completed
+- M5-1: Inventory of all ClawHost references (A/B/C classification)
+- M5-2: Rebranded package.json to `foyer`
+- M5-3: Updated app metadata (title, description)
+- M5-4: Rebranded EN UI copy + AI system prompt
+- M5-5: Rebranded FR locale strings
+- M5-6: Updated ToS and Privacy pages with foyer.work emails
+- M5-7: Rewrote README.md for Foyer
+- M5-8: Updated AGENTS.md, CLAUDE.md, ADHD.md
+- M5-9: Rewrote public landing page for solo professionals
+- M5-10: Hidden /chat and /skills routes from navigation
+- M5-11: Created docs/LAUNCH_PROOF.md
+- M5-12: Created docs/BRAND.md with domain/brand decisions
+- M5-13: Final sweep confirmed no user-visible ClawHost strings
+- M5-14: Milestone close with full verification
+
+### Verification at close
+```
+lint: 0 errors, 7 warnings (all pre-existing)
+tests: 8 files, 47 tests — all passed
+build: ✓ Compiled, ✓ 28 routes — exit 0
+```
+
+### Key artifacts
+- `docs/BRAND.md` — brand reference (colors, typography, voice, domain candidates)
+- `docs/LAUNCH_PROOF.md` — pre-launch checklist
+
+### What's next
+M6 — Solo Pro Onboarding & Templates
+
+---
+
+## 2026-04-26 — M6 Solo Pro Onboarding & Templates
+
+**Summary:** Reframed the first-run experience for solo professionals. Onboarding now leads with "Pick your AI partner" instead of a generic model-picker heading. The empty workspace shows 5 solo-pro starter templates in a 2-column grid, a time-of-day greeting appears once pages exist, and the empty-state heading now reads "Welcome to Foyer."
+
+**What changed in the product:**
+- Onboarding step 1 heading: "Pick your AI partner"
+- Onboarding description: solo-pro copy explaining subscription-based model access
+- Onboarding CTA: "Use this AI partner" (was "Save model and continue")
+- 5 solo-pro starter templates: Client CRM, Project Tracker, Weekly Review, Daily Plan, Meeting Notes
+- Time-of-day greeting (Good morning/afternoon/evening) on workspace when pages exist
+- Empty-state heading: "Welcome to Foyer."
+
+**What changed in the codebase:**
+- `src/app/onboarding/page.tsx`: 3 copy strings updated
+- `src/app/dashboard/workspace/actions.ts`: TEMPLATES — added project-tracker, daily-plan; renamed weekly-ops → weekly-review with solo-pro content
+- `src/components/dashboard/WorkspaceShell.tsx`: templates array updated (5 entries), grid widened, empty-state copy updated, GreetingLine mounted
+- `src/components/dashboard/GreetingLine.tsx`: new client component (time-of-day greeting)
+- `src/app/dashboard/workspace/page.tsx`: passes userName to WorkspaceShell
+
+**Verification:**
+```
+lint: 0 errors, 7 warnings (all pre-existing)
+tests: 8 files, 47 tests — all passed
+build: ✓ Compiled, 28 routes — exit 0
+```
+
+**Open items:** none
+
+### Tasks completed
+- M6-1: Reframe onboarding step 1 copy for solo pros
+- M6-2: Add solo-pro starter templates (project tracker, daily plan, weekly review)
+- M6-3: Add time-of-day greeting in workspace shell
+- M6-4: Tighten workspace empty-state copy for solo pros
+- M6-5: Milestone close
+
+### What's next: M7 Second Brain Capture
+
+---
+
+## 2026-04-27 — M7 Second Brain Capture
+
+**Summary:** Made capture frictionless. A persistent Quick Capture button (bottom-right, Cmd+Shift+K) lets a solo pro dump text or URLs from anywhere in the workspace. URL inputs are auto-summarized by the platform AI model and saved with the page title and a 2-sentence summary. All captures land in the Inbox folder. A new `/dashboard/inbox` page lists them oldest-first with one-tap "Move to Projects" or "Archive" triage actions. Inbox now appears in the main nav.
+
+**What changed in the product:**
+- Floating "+" button at bottom-right of workspace — always visible, opens Quick Capture dialog
+- Cmd+Shift+K keyboard shortcut toggles capture dialog
+- Text captures: saved as capture page in user's Inbox folder, first line (≤60 chars) becomes title
+- URL captures: page title extracted, AI 2-sentence summary generated via OpenRouter, stored with original link; falls back to plain-text if credits = 0
+- New `/dashboard/inbox` route: lists active Inbox captures, move-to-Projects and archive actions
+- "Inbox" link added to the nav bar (desktop + mobile, EN + FR)
+
+**What changed in the codebase:**
+- `src/components/dashboard/QuickCapture.tsx`: new 'use client' component — floating button, dialog, keyboard shortcut
+- `src/lib/url-capture.ts`: new lib — fetch URL, extract title, strip HTML, call OpenRouter for summary
+- `src/app/dashboard/workspace/actions.ts`: added `quickCapture` (text + URL path), `triageCapture` (archive / move-projects), added `/dashboard/inbox` to revalidateWorkspacePaths
+- `src/components/dashboard/WorkspaceShell.tsx`: mounts `<QuickCapture />`
+- `src/app/dashboard/inbox/page.tsx`: new server component
+- `src/components/dashboard/DashboardHeader.tsx`: added Inbox to navItems, added Inbox icon import, updated nav type
+- `src/app/dashboard/layout.tsx`: updated translations type cast to include inbox
+- `src/i18n/messages/en.json` + `fr.json`: added "inbox" nav key
+
+**Verification:**
+```
+lint: 0 errors, 7 warnings (all pre-existing)
+tests: 8 files, 47 tests — all passed
+build: ✓ Compiled, 29 routes — exit 0
+```
+
+**Open items:** none
+
+### What's next
+M7 — Second Brain Capture

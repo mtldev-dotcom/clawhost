@@ -53,12 +53,12 @@ export default function OnboardingPage() {
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle>
-            {step === 1 && 'Choose your default model'}
+            {step === 1 && 'Pick your AI partner'}
             {step === 2 && 'Telegram is next'}
             {step === 3 && 'Workspace ready'}
           </CardTitle>
           <CardDescription>
-            ClawHost now uses a platform-managed OpenRouter key for v1. Users pick a model, subscribe, and use credits instead of pasting provider keys during setup.
+            Foyer comes with five AI models you can switch between any time. Most solo pros stay on the default — it&apos;s free with your subscription. You can change this later from Settings.
           </CardDescription>
           <div className="flex gap-2 mt-4">
             {Array.from({ length: totalSteps }, (_, i) => i + 1).map((s) => (
@@ -84,7 +84,7 @@ export default function OnboardingPage() {
                   Platform-managed AI access
                 </div>
                 <p className="mt-2">
-                  For now, ClawHost uses your OpenRouter key from the app environment. Subscription credits control usage, and model choice stays per workspace.
+                  Foyer handles all AI access for you. Your subscription credits control usage, and you can change your model any time in Settings.
                 </p>
               </div>
 
@@ -106,7 +106,7 @@ export default function OnboardingPage() {
 
               <Button onClick={configureWorkspace} disabled={loading} className="w-full">
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Save model and continue
+                Use this AI partner
               </Button>
             </div>
           )}

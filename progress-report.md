@@ -2204,3 +2204,293 @@
 - Tasks completed: PROD-DEBUG
 - Next task to pick up: TASK M5-1
 - Open blockers: Stripe webhook registration (manual step), Telegram re-save (manual step after deploy)
+
+---
+
+## Session 2026-04-26 — Claude Opus 4.5 (M5)
+
+**Starting branch:** `dev-claude`
+**Starting commit:** `843628d`
+**Plan version:** `plan-foyer.md` at repo root
+
+### Task: M5-1 — Inventory all ClawHost / clawhost references
+
+#### Grep outputs
+
+**grep -rn "ClawHost" src/ --include="*.ts" --include="*.tsx":**
+```
+src/components/PublicNav.tsx:21:            ClawHost
+src/app/layout.tsx:12:  title: 'ClawHost - Your AI. Running 24/7.',
+src/app/onboarding/page.tsx:61:            ClawHost now uses a platform-managed OpenRouter key for v1...
+src/app/onboarding/page.tsx:87:                  For now, ClawHost uses your OpenRouter key from the app environment...
+src/app/api/ai/command/route.ts:57:        'X-Title': 'ClawHost Workspace',
+src/app/dashboard/settings/client.tsx:91:              Platform-managed OpenRouter access now runs through your ClawHost subscription.
+src/app/dashboard/settings/client.tsx:110:              For v1, users do not paste their own LLM key. ClawHost uses the platform OpenRouter key...
+src/app/dashboard/settings/client.tsx:119:              Connect your own Telegram bot so ClawHost can send you notifications...
+src/app/dashboard/settings/client.tsx:212:            Deploy your ClawHost runtime with the saved default model.
+src/app/legal/privacy/page.tsx:6:      <p>ClawHost collects only what is necessary to provide the service.</p>
+src/app/legal/terms/page.tsx:6:      <p>By using ClawHost, you agree to use the service lawfully...
+src/app/legal/terms/page.tsx:8:      <p>ClawHost provides AI-powered workspace tools for business use...
+src/app/legal/terms/page.tsx:14:      <p>ClawHost is provided as-is. We are not liable for data loss...
+src/lib/dokploy.ts:234:      body: JSON.stringify({ name: `clawhost-${slug}`, description: `ClawHost for ${user.email}` }),
+```
+
+**grep -rn "ClawHost" public/ --include="*.html" --include="*.svg":**
+```
+(no output)
+```
+
+**grep -rn "ClawHost" --include="*.md" .:**
+```
+progress-report.md:1:# ClawHost Progress Report
+plan-claude.md:1:# ClawHost Build Plan (v1)
+plan-claude.md:863 / 871 / 881 / 1407 / 1941 / 1943 / 1949 / 1963 / 2127 / 2292 / 2328: (historical plan, various)
+plan-foyer.md: (multiple lines — instructions for rebrand)
+docs/PROGRESS_LOG.md:84: (historical log)
+ADHD.md:1, 7, 241: (project state doc)
+AGENTS.md:1, 25: (execution contract)
+docs/DECISIONS.md:24: (decision record)
+.claude/commands/deprovision.md:3, .claude/commands/provision.md:3: (Claude commands)
+docs/DEPLOYMENT.md:3, docs/ARCHITECTURE.md:3,7,122, docs/WORKFLOW.md:3, docs/AGENT_PIPELINE.md:3: (internal docs)
+README.md:1, 3, 7: (project README)
+```
+
+**grep -rn "clawhost" src/ --include="*.ts" --include="*.tsx":**
+```
+src/lib/dokploy.ts:234:      body: JSON.stringify({ name: `clawhost-${slug}`, description: `ClawHost for ${user.email}` }),
+src/lib/crypto.ts:30:  return scryptSync(keyString, 'clawhost-salt', KEY_LENGTH)
+src/app/legal/privacy/page.tsx:23:      <p>Privacy questions: privacy@clawhost.com</p>
+src/app/legal/terms/page.tsx:16:      <p>Questions? Email us at support@clawhost.com.</p>
+```
+
+**grep -rn "clawhost" --include="*.json" --include="*.yml" --include="*.yaml" .:**
+```
+package.json:2:  "name": "clawhost",
+.claude/settings.local.json:5-42: (various historical bash commands with old paths)
+.claude/settings.json:16: (historical bash command)
+docker-compose.dev.yml:10-11: POSTGRES_USER/PASSWORD: clawhost
+package-lock.json:2, 8: "name": "clawhost"
+.github/workflows/ci.yml:18-30: (CI postgres user/password/db: clawhost)
+```
+
+**grep -rn "support@clawhost|feedback@clawhost|privacy@clawhost":**
+```
+src/app/legal/privacy/page.tsx:23: privacy@clawhost.com
+src/app/legal/terms/page.tsx:16: support@clawhost.com
+```
+
+#### Classification
+
+**Bucket A — User-visible copy (rename to Foyer):**
+- src/components/PublicNav.tsx:21 — "ClawHost" in navigation
+- src/app/layout.tsx:12 — title metadata
+- src/app/onboarding/page.tsx:61, 87 — onboarding UI copy
+- src/app/api/ai/command/route.ts:57 — X-Title header (AI identity)
+- src/app/dashboard/settings/client.tsx:91, 110, 119, 212 — settings UI copy
+- src/app/legal/privacy/page.tsx:6, 23 — privacy page copy + email
+- src/app/legal/terms/page.tsx:6, 8, 14, 16 — ToS page copy + email
+
+**Bucket B — Doc / repo-internal (rename to Foyer):**
+- progress-report.md:1 — H1 title
+- plan-claude.md — historical plan (not user-visible, but rename where relevant)
+- ADHD.md:1, 7, 241 — project state doc
+- AGENTS.md:1, 25 — execution contract
+- docs/DECISIONS.md:24 — decision record
+- README.md:1, 3, 7 — project README
+- docs/DEPLOYMENT.md, docs/ARCHITECTURE.md, docs/WORKFLOW.md, docs/AGENT_PIPELINE.md, docs/PROGRESS_LOG.md — internal docs
+- .claude/commands/*.md — Claude commands
+- package.json:2 — package name (per M5-2)
+
+**Bucket C — Deprecated infrastructure (leave as-is per AGENTS.md §1):**
+- src/lib/dokploy.ts:234 — dormant Dokploy provisioning code
+- src/lib/crypto.ts:30 — internal crypto salt (not user-visible, keep)
+- .claude/settings.local.json — local Claude settings, historical paths
+- .claude/settings.json — local Claude settings
+- docker-compose.dev.yml:10-11 — local dev DB credentials
+- package-lock.json — will auto-update with package.json
+- .github/workflows/ci.yml:18-30 — CI DB credentials (local dev only)
+
+#### Verification
+- ✅ Inventory pasted into progress-report.md (this section)
+- ✅ Each match is classified A, B, or C
+- ✅ No file was modified in this task (read-only)
+
+- Result: ✅ complete
+
+
+### Task: M5-13 — Final sweep confirms Foyer rebrand is clean
+
+#### Grep output
+```
+src/lib/dokploy.ts:234:      body: JSON.stringify({ name: `clawhost-${slug}`, description: `ClawHost for ${user.email}` }),
+src/lib/crypto.ts:30:  return scryptSync(keyString, 'clawhost-salt', KEY_LENGTH)
+```
+
+#### Classification
+- src/lib/dokploy.ts:234 — **Acceptable (C)**: dormant Dokploy provisioning, deprecated infra
+- src/lib/crypto.ts:30 — **Acceptable (C)**: internal crypto salt, changing would break existing encrypted data
+
+**Zero user-visible matches remain.**
+
+- Result: ✅ complete (verification only, no commit needed)
+
+
+### Task: M5-14 — Milestone M5 close
+
+#### Full verification output
+```
+lint: 0 errors, 7 warnings (all pre-existing)
+tests: 8 files, 47 tests passed
+build: ✓ Compiled, ✓ 28 routes — exit 0
+```
+
+- Result: ✅ complete
+
+### M5 — Rebrand to Foyer + Launch Prep
+- Status: 🟢 done
+- Started: 2026-04-26
+- Ended: 2026-04-26
+- Tasks: M5-1 ✅  M5-2 ✅  M5-3 ✅  M5-4 ✅  M5-5 ✅  M5-6 ✅  M5-7 ✅  M5-8 ✅  M5-9 ✅  M5-10 ✅  M5-11 ✅  M5-12 ✅  M5-13 ✅  M5-14 ✅
+- Full verification run at close:
+  ```
+  lint: 0 errors, 7 warnings (all pre-existing)
+  tests: 8 files, 47 tests — all passed
+  build: ✓ Compiled, ✓ 28 routes — exit 0
+  ```
+
+### Session end
+- Ending branch: dev-claude
+- Ending commit: (see below)
+- Tasks completed this session: M5-1 through M5-14
+- Next task to pick up: M6-1
+- Open blockers: none
+
+
+---
+## Session 2026-04-26 — Claude Sonnet (M6)
+**Starting branch:** dev-claude
+**Starting commit:** dccdd3a (M5-14 close)
+**Plan version:** plan-foyer.md
+
+### Task: M6-1 — Reframe onboarding step 1 copy for solo pros
+- Files touched: src/app/onboarding/page.tsx
+- Verification: npm run build (exit 0), npm run lint (0 errors), grep "Pick your AI partner" returns 1 match
+- Result: ✅ complete
+- Commit: fa2d437 feat: M6-1 reframe onboarding step 1 copy for solo pros
+
+### Task: M6-2 — Replace SMB starter templates with solo-pro templates
+- Files touched: src/app/dashboard/workspace/actions.ts, src/components/dashboard/WorkspaceShell.tsx
+- Added: project-tracker (database), daily-plan (capture), weekly-review (standard, renamed from weekly-ops)
+- Grid updated to max-w-md sm:grid-cols-2 for 5 templates
+- Verification: npm run build (exit 0), npm run test:run (47 passed), grep returns 3 new keys
+- Result: ✅ complete
+- Commit: 64ce1c2 feat: M6-2 add solo-pro starter templates (project tracker, daily plan, weekly review)
+
+### Task: M6-3 — Add time-of-day greeting in workspace shell
+- Files touched: src/components/dashboard/GreetingLine.tsx (new), src/components/dashboard/WorkspaceShell.tsx, src/app/dashboard/workspace/page.tsx
+- Greeting shown when pages.length > 0 and userName is set; uses first name split
+- Verification: npm run build (exit 0), npm run lint (0 errors), ls GreetingLine.tsx exists
+- Result: ✅ complete
+- Commit: e6123f5 feat: M6-3 add time-of-day greeting in workspace shell
+
+### Task: M6-4 — Empty-state polish: solo-pro language
+- Files touched: src/components/dashboard/WorkspaceShell.tsx
+- Heading: "Start your workspace" → "Welcome to Foyer."
+- Subtext: tightened for solo-pro persona
+- Verification: npm run build (exit 0), grep "Welcome to Foyer" returns 1 match
+- Result: ✅ complete
+- Commit: a6877c0 refactor: M6-4 tighten workspace empty-state copy for solo pros
+
+### Task: M6-5 — Milestone M6 close
+
+#### Full verification output
+```
+lint: 0 errors, 7 warnings (all pre-existing)
+tests: 8 files, 47 tests — all passed
+build: ✓ Compiled, 28 routes — exit 0
+```
+
+- Result: ✅ complete
+
+### M6 — Solo Pro Onboarding & Templates
+- Status: 🟢 done
+- Started: 2026-04-26
+- Ended: 2026-04-26
+- Tasks: M6-1 ✅  M6-2 ✅  M6-3 ✅  M6-4 ✅  M6-5 ✅
+- Full verification run at close:
+  ```
+  lint: 0 errors, 7 warnings (all pre-existing)
+  tests: 8 files, 47 tests — all passed
+  build: ✓ Compiled, 28 routes — exit 0
+  ```
+
+### Session end
+- Ending branch: dev-claude
+- Ending commit: 166234b chore: M6-5 close milestone M6 — solo pro onboarding verified
+- Tasks completed this session: M6-1 through M6-5
+- Next task to pick up: M7-1
+
+---
+
+## Session 2026-04-27 — Claude Sonnet 4.6
+
+**Starting branch:** `dev-claude`
+**Starting commit:** `166234b chore: M6-5 close milestone M6 — solo pro onboarding verified`
+**Plan version:** plan-foyer.md
+
+### Task: M7-1 — Add Quick Capture floating button (Cmd+Shift+K)
+- Files touched: src/app/dashboard/workspace/actions.ts, src/components/dashboard/QuickCapture.tsx (new), src/components/dashboard/WorkspaceShell.tsx
+- Added `quickCapture` server action: finds Inbox folder, saves text as capture page
+- Created QuickCapture client component: floating emerald "+" button, Cmd+Shift+K shortcut, textarea dialog
+- Mounted `<QuickCapture />` in WorkspaceShell top-level container
+- Verification: npm run build (exit 0), npm run lint (0 errors, 7 warnings pre-existing), ls QuickCapture.tsx exists
+- Result: ✅ complete
+- Commit: a58a2c8 feat: M7-1 add Quick Capture floating button (Cmd+Shift+K)
+
+### Task: M7-2 — Add URL-to-page capture (web clip)
+- Files touched: src/lib/url-capture.ts (new), src/app/dashboard/workspace/actions.ts
+- Created `captureUrl` lib: fetches URL, extracts title, strips HTML, asks OpenRouter for 2-sentence summary
+- Extended `quickCapture`: detects URL inputs, uses captureUrl when credits > 0, falls through to plain-text otherwise
+- Verification: npm run build (exit 0), npm run test:run (47 passed), ls url-capture.ts exists
+- Result: ✅ complete
+- Commit: fade429 feat: M7-2 capture URLs as pages with AI summary
+
+### Task: M7-3 — Add Inbox triage view
+- Files touched: src/app/dashboard/workspace/actions.ts, src/app/dashboard/inbox/page.tsx (new), src/components/dashboard/DashboardHeader.tsx, src/app/dashboard/layout.tsx, src/i18n/messages/en.json, src/i18n/messages/fr.json
+- Added `triageCapture` server action: move-projects or archive a capture page
+- Added `/dashboard/inbox` to revalidateWorkspacePaths
+- Created InboxPage server component: lists active captures under Inbox folder, one-tap triage actions
+- Added Inbox nav link to DashboardHeader (desktop + mobile), added "inbox" translation key to EN/FR
+- Verification: npm run build (exit 0), npm run test:run (47 passed), npm run lint (0 errors, 7 warnings pre-existing)
+- Result: ✅ complete
+- Commit: 5060d1c feat: M7-3 add inbox triage page and move/archive actions
+
+### Task: M7-4 — Milestone M7 close
+
+#### Full verification output
+```
+lint: 0 errors, 7 warnings (all pre-existing)
+tests: 8 files, 47 tests — all passed
+build: ✓ Compiled, 29 routes — exit 0
+```
+
+- Result: ✅ complete
+
+### M7 — Second Brain Capture
+- Status: 🟢 done
+- Started: 2026-04-27
+- Ended: 2026-04-27
+- Tasks: M7-1 ✅  M7-2 ✅  M7-3 ✅  M7-4 ✅
+- Full verification run at close:
+  ```
+  lint: 0 errors, 7 warnings (all pre-existing)
+  tests: 8 files, 47 tests — all passed
+  build: ✓ Compiled, 29 routes — exit 0
+  ```
+
+### Session end
+- Ending branch: dev-claude
+- Ending commit: (M7-4 commit hash — see git log)
+- Tasks completed this session: M7-1 through M7-4
+- Next task to pick up: M8-1
+- Open blockers: none

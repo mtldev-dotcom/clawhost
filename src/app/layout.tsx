@@ -9,8 +9,8 @@ import { Toaster } from '@/components/ui/sonner'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'ClawHost - Your AI. Running 24/7.',
-  description: 'Get a hosted AI agent instance in 60 seconds',
+  title: 'Foyer — Your second brain. Your plan. Your AI partner.',
+  description: 'Foyer is a workspace built for solo professionals. Capture notes, plan your week, and think alongside an AI that knows your work.',
 }
 
 export default async function RootLayout({

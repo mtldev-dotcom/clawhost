@@ -1,14 +1,21 @@
-# ⚡ ClawHost — ADHD.md
-> *Last updated: 2026-04-25 (M4 close)*
+# ⚡ Foyer — ADHD.md
+> *Last updated: 2026-04-27 (M7 close)*
 
 ---
 
 ## 🧠 What Is This?
-Merged app in progress: PageBase-style workspace product on top of ClawHost hosted-agent infrastructure.
+Foyer — workspace OS, second brain, and AI partner for solo professional workers.
 
 ---
 
 ## ✅ What It Does (Right Now)
+- Quick Capture floating button (bottom-right, Cmd+Shift+K) — saves text as capture page in Inbox
+- URL capture: paste a URL → AI-summarized title + 2-sentence summary saved as capture page
+- Inbox triage view at `/dashboard/inbox` — list, move-to-Projects, or archive captures
+- Solo-pro starter templates (5): Client CRM, Project Tracker, Weekly Review, Daily Plan, Meeting Notes
+- Time-of-day greeting in workspace shell (GreetingLine component)
+- Persona-aligned onboarding copy: "Pick your AI partner", "Use this AI partner" CTA
+- Foyer rebrand complete (M5)
 - User registration + login
 - Signed-in users auto-bootstrap into a workspace with a root Home page + root folders (Inbox, Projects, Notes)
 - `/dashboard/workspace` is the main product shell
@@ -230,6 +237,10 @@ If any of those drift from code, fix them.
 ---
 
 ## 🗒️ Nick's Notes
+> 2026-04-27 (M7): Closed M7 (second brain capture). Quick Capture floating button + Cmd+Shift+K shortcut saves text or URLs as capture pages in Inbox. URLs get AI title + 2-sentence summary via OpenRouter (credit-gated, falls back to plain text). New /dashboard/inbox triage view: list captures, move to Projects, or archive. Inbox nav link added (EN + FR). 47 tests, 29 routes, lint clean.
+
+> 2026-04-26 (M6): Closed M6 (solo pro onboarding & templates). Reframed onboarding copy for solo pros, added 5 solo-pro starter templates (Project Tracker, Daily Plan, Weekly Review replacing SMB ops templates), added time-of-day greeting in workspace, tightened empty-state to "Welcome to Foyer." 47 tests, 28 routes, lint clean.
+
 > 2026-04-25 (M4): Closed M4 (production readiness) in one session. Added /status health-check, rate limiting on AI command route, security headers (X-Frame-Options/DENY, X-Content-Type-Options, Referrer-Policy, Permissions-Policy), legal stub pages (ToS + Privacy), register page footer links. Replaced platform model list with 5 models (Nemotron free as default). 47 tests, 27 routes, lint clean.
 
 > 2026-04-25 (M3): Closed M3 (AI command palette) in one session. Added Postgres FTS index, workspace context retrieval library, /api/ai/command route with credit gate, CommandPalette Cmd+K component, wired into DashboardHeader. 47 tests pass.
@@ -238,7 +249,7 @@ If any of those drift from code, fix them.
 
 > 2026-04-25 (M1): Session recap. Closed M1 (schema cleanup). Fixed build regression (`NODE_ENV=development` in shell broke `next build` — hardcoded `NODE_ENV=production` in package.json build script). Added `AUTH_SECRET` to `.env.local` (next-auth v5 key). Added `allowedDevOrigins` for Tailscale dev IP. Added 4 cheap models to platform: Mistral Small 4, Gemini 3.1 Flash Lite, DeepSeek V4 Flash, Qwen 3.5 Flash. Fixed workspace page create/update/addField forms with `required` to prevent empty-title 500. Updated `reset-users.ts` to deprovision containers before wiping DB. Audited all 15 manual story flows — 13 confirmed working, Telegram connect broken locally (missing env var), logout lands on `/` not `/login` (correct behavior, wrong doc).
 
-> 2026-04-22: Started the merge cut. Added workspace + page foundation to the main schema, auto-bootstrap for signed-in users, a new `/dashboard/workspace` shell, and workspace-first nav so the product starts moving from ClawHost platform UX toward PageBase product UX.
+> 2026-04-22: Started the merge cut. Added workspace + page foundation to the main schema, auto-bootstrap for signed-in users, a new `/dashboard/workspace` shell, and workspace-first nav so the product starts moving from legacy platform UX toward workspace-first UX.
 
 > 2026-04-22: Follow-up cut landed. Onboarding now routes into the workspace shell instead of chat, and selected workspace pages now support title + notes editing backed by `Page.content`.
 
