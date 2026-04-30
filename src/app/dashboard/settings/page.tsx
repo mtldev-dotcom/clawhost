@@ -26,7 +26,9 @@ export default async function SettingsPage() {
       <h1 className="mb-8 text-3xl font-bold">Settings</h1>
       <SettingsClient
         user={{
+          name: user.name ?? '',
           email: user.email,
+          hasPassword: !!user.passwordHash,
           subscriptionStatus: user.subscriptionStatus,
           creditsBalance: user.creditsBalance,
           lifetimeCreditsGranted: user.lifetimeCreditsGranted,

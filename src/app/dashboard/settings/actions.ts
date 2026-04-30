@@ -7,6 +7,7 @@ import { revalidatePath } from 'next/cache'
 import { env } from '@/lib/env'
 import { isSupportedPlatformModel } from '@/lib/platform'
 import { encrypt } from '@/lib/crypto'
+import bcrypt from 'bcryptjs'
 
 async function requireUser() {
   const session = await auth()
@@ -144,6 +145,43 @@ export async function deployInstance() {
       data: { status: 'failed' },
     })
   })
+
+  revalidatePath('/dashboard/settings')
+  return { success: true }
+}
+
+export async function saveProfile(data: {
+  name: string
+  email: string
+  currentPassword?: string
+  newPassword?: string
+}) {
+  const user = await requireUser()
+
+  const name = data.name.trim()
+  const email = data.email.trim().toLowerCase()
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new Error('Valid email is required')
+  }
+
+  if (email !== user.email) {
+    const existing = await prisma.user.findUnique({ where: { email } })
+    if (existing) throw new Error('That email is already in use')
+  }
+
+  const updateData: Record<string, unknown> = { name, email }
+
+  if (data.newPassword) {
+    if (!data.currentPassword) throw new Error('Current password is required to set a new one')
+    if (!user.passwordHash) throw new Error('No password set on this account')
+    const valid = await bcrypt.compare(data.currentPassword, user.passwordHash)
+    if (!valid) throw new Error('Current password is incorrect')
+    if (data.newPassword.length < 8) throw new Error('New password must be at least 8 characters')
+    updateData.passwordHash = await bcrypt.hash(data.newPassword, 10)
+  }
+
+  await prisma.user.update({ where: { id: user.id }, data: updateData })
 
   revalidatePath('/dashboard/settings')
   return { success: true }

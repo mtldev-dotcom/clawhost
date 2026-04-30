@@ -5,9 +5,9 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Loader2, MessageSquare, Rocket, Sparkles } from 'lucide-react'
+import { Loader2, MessageSquare, Rocket, Sparkles, User } from 'lucide-react'
 import { toast } from 'sonner'
-import { saveTelegramBot, deployInstance, savePlatformModel } from './actions'
+import { saveTelegramBot, deployInstance, savePlatformModel, saveProfile } from './actions'
 
 type ModelOption = {
   id: string
@@ -17,7 +17,9 @@ type ModelOption = {
 
 interface SettingsClientProps {
   user: {
+    name: string
     email: string
+    hasPassword: boolean
     subscriptionStatus: 'inactive' | 'active' | 'past_due' | 'cancelled'
     creditsBalance: number
     lifetimeCreditsGranted: number
@@ -41,7 +43,38 @@ export function SettingsClient({ user, instance, models }: SettingsClientProps) 
   const [chatId, setChatId] = useState('')
   const [savingTelegram, setSavingTelegram] = useState(false)
 
+  const [profileName, setProfileName] = useState(user.name)
+  const [profileEmail, setProfileEmail] = useState(user.email)
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [savingProfile, setSavingProfile] = useState(false)
+
   const canDeploy = user.subscriptionStatus === 'active' && user.creditsBalance > 0
+
+  async function handleSaveProfile() {
+    if (newPassword && newPassword !== confirmPassword) {
+      toast.error('New passwords do not match')
+      return
+    }
+    setSavingProfile(true)
+    try {
+      await saveProfile({
+        name: profileName,
+        email: profileEmail,
+        currentPassword: currentPassword || undefined,
+        newPassword: newPassword || undefined,
+      })
+      toast.success('Profile updated.')
+      setCurrentPassword('')
+      setNewPassword('')
+      setConfirmPassword('')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to save profile')
+    } finally {
+      setSavingProfile(false)
+    }
+  }
 
   async function handleSaveModel() {
     setSavingModel(true)
@@ -83,6 +116,47 @@ export function SettingsClient({ user, instance, models }: SettingsClientProps) 
 
   return (
     <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2"><User className="h-5 w-5" />Profile</CardTitle>
+          <CardDescription>Update your name, email, and password.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1">
+              <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Name</label>
+              <Input placeholder="Your name" value={profileName} onChange={(e) => setProfileName(e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Email</label>
+              <Input type="email" placeholder="you@example.com" value={profileEmail} onChange={(e) => setProfileEmail(e.target.value)} />
+            </div>
+          </div>
+
+          {user.hasPassword && (
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Current password</label>
+                <Input type="password" placeholder="••••••••" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">New password</label>
+                <Input type="password" placeholder="••••••••" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Confirm new password</label>
+                <Input type="password" placeholder="••••••••" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+              </div>
+            </div>
+          )}
+
+          <Button onClick={handleSaveProfile} disabled={savingProfile}>
+            {savingProfile && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Save profile
+          </Button>
+        </CardContent>
+      </Card>
+
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
