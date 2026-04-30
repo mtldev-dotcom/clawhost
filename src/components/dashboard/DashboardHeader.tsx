@@ -2,17 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Settings, Sparkles, Brain, Zap, LogOut, Files, Inbox, Menu, X, CalendarDays } from 'lucide-react'
+import { Settings, LogOut, Files, Inbox, Menu, X, CalendarDays, Coins } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { CommandPalette } from '@/components/dashboard/CommandPalette'
 import type { Locale } from '@/i18n/config'
 
 interface DashboardHeaderProps {
-  activeModel?: string | null
-  instanceStatus?: string
+  credits?: number
   locale: Locale
   translations: {
     nav: { workspace: string; inbox: string; today: string; chat: string; settings: string; skills: string }
@@ -28,27 +26,9 @@ const navItems = [
   { href: '/dashboard/settings', labelKey: 'settings' as const, icon: Settings },
 ]
 
-function modelShortName(model: string | null | undefined): string {
-  if (!model) return ''
-  const parts = model.split('/')
-  const slug = parts[parts.length - 1] ?? ''
-  return slug
-    .replace(/-/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase())
-}
-
-export function DashboardHeader({ activeModel, instanceStatus, locale, translations }: DashboardHeaderProps) {
+export function DashboardHeader({ credits, locale, translations }: DashboardHeaderProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
-
-  const getProviderIcon = (model: string | null | undefined) => {
-    if (!model) return null
-    if (model.includes('anthropic')) return Brain
-    if (model.includes('openrouter')) return Zap
-    return Sparkles
-  }
-
-  const ProviderIcon = getProviderIcon(activeModel)
 
   return (
     <header className="border-b bg-background sticky top-0 z-40">
@@ -84,21 +64,11 @@ export function DashboardHeader({ activeModel, instanceStatus, locale, translati
 
         {/* Right: utilities */}
         <div className="flex items-center gap-3">
-          {activeModel && instanceStatus === 'active' && (
-            <div className="hidden md:flex items-center gap-2">
-              {ProviderIcon && <ProviderIcon className="h-4 w-4 text-muted-foreground" />}
-              <Badge variant="secondary" className="max-w-[120px] truncate font-mono text-xs">
-                {modelShortName(activeModel)}
-              </Badge>
+          {credits !== undefined && (
+            <div className="hidden md:flex items-center gap-1.5 text-sm text-muted-foreground">
+              <Coins className="h-4 w-4" />
+              <span className="font-mono">{credits}</span>
             </div>
-          )}
-          {instanceStatus && instanceStatus !== 'active' && (
-            <Badge
-              variant={instanceStatus === 'provisioning' ? 'secondary' : 'destructive'}
-              className="hidden md:flex text-xs"
-            >
-              {instanceStatus}
-            </Badge>
           )}
 
           <div className="hidden md:flex items-center gap-3">

@@ -16,28 +16,24 @@ export default async function DashboardLayout({
     redirect('/login')
   }
 
-  const [instance, locale, messages] = await Promise.all([
-    prisma.instance.findUnique({
-      where: { userId: session.user.id },
-      select: {
-        activeModel: true,
-        status: true,
-      },
+  const [user, locale, messages] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { creditsBalance: true },
     }),
     getLocale(),
     getMessages(),
   ])
 
   const translations = {
-    nav: (messages as { nav: { workspace: string; inbox: string; chat: string; settings: string; skills: string } }).nav,
+    nav: (messages as { nav: { workspace: string; inbox: string; today: string; chat: string; settings: string; skills: string } }).nav,
     common: (messages as { common: { signOut: string } }).common,
   }
 
   return (
     <div className="flex min-h-screen flex-col">
       <DashboardHeader
-        activeModel={instance?.activeModel}
-        instanceStatus={instance?.status}
+        credits={user?.creditsBalance}
         locale={locale as Locale}
         translations={translations}
       />
