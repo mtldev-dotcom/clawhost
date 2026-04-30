@@ -1,5 +1,5 @@
 # ⚡ Foyer — ADHD.md
-> *Last updated: 2026-04-27 (M10-1 admin dashboard)*
+> *Last updated: 2026-04-30 (M10-2 Telegram OpenClaw redesign)*
 
 ---
 
@@ -33,7 +33,8 @@ Foyer — workspace OS, second brain, and AI partner for solo professional worke
 - Workspace file layer is real with root folders: Inbox, Projects, Notes
 - Authenticated `/api/workspace/files` supports list + upload
 - Workspace UI supports file upload, download, and search
-- Settings page: model selection (5 models: Nemotron, Kimi K2.6, DeepSeek V4 Pro/Flash, MiniMax M2.7), deploy state, Telegram connect (broken locally — see Watch Out)
+- Settings page: profile edit (name/email/password), model selection (5 models), deploy state, Telegram bot pairing flow
+- Telegram: OpenClaw runtime owns Telegram via long-polling — no HTTPS needed, works in local dev. User pastes bot token → Foyer pushes to container → user DMs bot → gets pairing code → approves in Settings
 - Workspace shell is clean — all dev-grade scaffold copy removed
 - Collapsible page tree sidebar with hover archive button per page
 - File list has soft-delete button
@@ -118,7 +119,7 @@ Foyer — workspace OS, second brain, and AI partner for solo professional worke
 | Stripe | Subscriptions + webhooks | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` |
 | Dokploy | Instance provisioning | `DOKPLOY_URL`, `DOKPLOY_API_KEY` |
 | NextAuth | Auth sessions | `NEXTAUTH_SECRET` + `AUTH_SECRET` (both needed) |
-| Telegram | Shared bot linking foundation | `TELEGRAM_SHARED_BOT_USERNAME` (optional, not set locally) |
+| Telegram | Per-user bot tokens pushed into OpenClaw container via docker exec | No Foyer env var needed — token stored encrypted in DB, pushed to container |
 
 ---
 
@@ -133,7 +134,7 @@ Foyer — workspace OS, second brain, and AI partner for solo professional worke
 - If you browse local dev over a Tailscale/LAN IP, `NEXTAUTH_URL` should match the URL you are actually using
 - Layouts: Root layout has NO nav, public pages use PublicNav, dashboard uses DashboardHeader
 - Middleware must be in `src/middleware.ts` (not project root) for src/app structure
-- **Telegram connect** throws locally if `TELEGRAM_SHARED_BOT_USERNAME` is not set in `.env.local`. Add it to test that flow.
+- **Telegram connect** requires an active deployed runtime (OpenClaw container must be running). The token is pushed into the container via docker exec — won't work without an active instance.
 - **Logout** lands on `/` (homepage), not `/login`. From `/`, unauthenticated users see the marketing page.
 
 ---
@@ -197,10 +198,11 @@ Foyer — workspace OS, second brain, and AI partner for solo professional worke
 4. Save it
 5. Refresh and confirm the selection persisted
 
-### 11. Settings → Telegram connect link ❌ Broken locally
-- Requires `TELEGRAM_SHARED_BOT_USERNAME` in `.env.local`
-- Without it, the "Connect Telegram" button throws a server error
-- Add the var to test this flow; it is not set by default in local dev
+### 11. Settings → Telegram bot pairing ⚠️ Requires active runtime
+- Step 1: Paste bot token from @BotFather → "Save bot token" (pushes to OpenClaw container)
+- Step 2: DM your bot from Telegram → bot replies with pairing code → paste → "Approve pairing"
+- Requires a deployed + active OpenClaw instance (container must be running)
+- Works identically in local dev and prod — no HTTPS needed (long-polling)
 
 ### 12. Settings → deploy state ✅
 1. Open `/dashboard/settings`
