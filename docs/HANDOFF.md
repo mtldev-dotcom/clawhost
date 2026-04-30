@@ -6,54 +6,47 @@
 ---
 
 **Branch:** `master`
-**Last commit:** `77fa802 feat: M10-1 add owner admin dashboard at /admin`
+**Last commit:** `e23ea4a feat: delegate Telegram channel to OpenClaw runtime`
 **Plan version:** `plan-foyer.md` at repo root
 **Task in flight:** none
-**State:** M10-1 complete (admin dashboard). Owner can manage users, credits, skills, and system health at `/admin`.
-**Updated:** 2026-04-27
+**State:** M10-2 complete. Telegram integration redesigned — OpenClaw runtime now owns Telegram end-to-end via long-polling. Settings page has profile edit, new Telegram pairing flow, and platform settings.
+**Updated:** 2026-04-30
 
 ---
 
 ## What happened this session
 
-- M10-1: Owner admin dashboard shipped at `/admin`
-  - Added `UserRole` enum + `role` field to Prisma schema (migration applied)
-  - Threaded role through NextAuth JWT and session callbacks
-  - Middleware guards `/admin/*` — non-admins redirected to `/dashboard`
-  - 5 admin pages: overview stats, users table, user detail (credit/status/role mutations), skills CRUD, system instance health
-  - `prisma/seed-admin.ts` — one-shot script to promote owner account
+- **Header fix:** Removed "pending" instance status badge from DashboardHeader. Replaced with `creditsBalance` display using Coins icon.
+- **Nixpacks + CI fix:** Pinned Node 20 + npm 10 in `nixpacks.toml` to resolve Dokploy lock file mismatch. Updated CI to Node 24 + `npm install --legacy-peer-deps`.
+- **Auto admin seed on deploy:** `package.json` start script now runs `prisma migrate deploy && tsx /app/prisma/seed-admin.ts && node .next/standalone/server.js`. `seed-admin.ts` made graceful (findUnique first, skip if not found/already admin).
+- **Profile edit card:** Added Profile card to settings page — name, email, optional password change (bcrypt verify + hash). New `saveProfile` server action.
+- **Telegram redesign (major):** Foyer no longer acts as Telegram's webhook target. OpenClaw runtime owns Telegram via long-polling (no HTTPS needed).
+  - Deleted `src/app/api/telegram/webhook/route.ts`
+  - New `saveTelegramBot`: verifies token via `getMe`, pushes token into user's OpenClaw container via `node /app/openclaw.mjs config set channels.telegram.botToken <token>` + reload
+  - New `approveTelegramPairing`: calls `openclaw pairing approve telegram <code>` against user's container
+  - Settings UI redesigned: Step 1 = paste token + Save; Step 2 = DM bot → get pairing code → Approve
+  - `setChannelTelegramToken()` added to `src/lib/dokploy.ts`
+  - Schema: removed `telegramChatId` from User, deleted orphan `TelegramLinkToken` model
+  - Migration: `20260430212206_remove_telegram_chat_id_and_link_token` applied
 
 ---
 
-## To activate admin access
+## How Telegram works now
 
-1. Register at `/register` with `nickybcotroni@gmail.com`
-2. Run: `npx ts-node --compiler-options '{"module":"commonjs"}' prisma/seed-admin.ts`
-3. Sign in → visit `localhost:3000/admin`
-
----
-
-## Verification at M10-1
-
-```
-tsc --noEmit: 0 errors in admin/auth/middleware files
-migration: 20260427214128_add_user_role applied clean
-```
-
----
-
-## Next suggested task
-
-M10-2 or M11 (Polish & Growth) — no immediate dev task unless user requests otherwise.
+1. User creates a bot via @BotFather, gets a token
+2. Pastes token in Settings → "Save bot token" → Foyer pushes it into the user's OpenClaw container
+3. OpenClaw runtime connects outbound to Telegram (long-poll, no HTTPS needed)
+4. User DMs their bot → bot replies with a pairing code
+5. User pastes code in Settings → "Approve pairing" → Foyer calls `openclaw pairing approve telegram <code>`
+6. All future Telegram messages flow Telegram ↔ OpenClaw directly — no Foyer involvement
 
 ---
 
 ## Open questions for the human
 
+- The `openclaw reload` CLI subcommand may need verification at runtime. Fallback to `docker restart <container>` is already coded in `setChannelTelegramToken`.
 - Domain registration (foyer.work preferred) still pending
-- Favicon swap needs Foyer wordmark from human
 - Stripe webhook registration at production domain
-- Admin seed needs to be re-run after registering at `/register`
 
 ---
 

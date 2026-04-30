@@ -2536,3 +2536,45 @@ build: ✓ Compiled, 29 routes — exit 0
 - Tasks completed this session: M10-1
 - Next task to pick up: M10-2 or M11 (Polish & Growth)
 - Open blockers: Admin seed requires owner to register first at /register
+
+---
+
+## Session 2026-04-30 — Claude Sonnet (human-directed)
+**Starting branch:** `master`
+**Starting commit:** `57c91f4 feat: M10-2 add platform settings to admin dashboard`
+
+### Task: header-fix — Remove pending instance badge, show credits
+- Files touched: `src/components/dashboard/DashboardHeader.tsx`, `src/app/dashboard/layout.tsx`, `src/app/chat/layout.tsx`
+- Result: ✅ complete
+
+### Task: deploy-fix — Nixpacks Node version + lock file mismatch
+- Files touched: `nixpacks.toml` (created), `.github/workflows/ci.yml`
+- Result: ✅ complete
+
+### Task: seed-admin — Auto admin seed on deployment
+- Files touched: `package.json`, `prisma/seed-admin.ts`
+- Result: ✅ complete — start script runs migrate + seed-admin + server
+
+### Task: profile-edit — Add profile edit card to settings
+- Files touched: `src/app/dashboard/settings/actions.ts`, `src/app/dashboard/settings/client.tsx`, `src/app/dashboard/settings/page.tsx`
+- Result: ✅ complete — name/email/password edit with bcrypt verification
+
+### Task: telegram-redesign — Delegate Telegram to OpenClaw runtime
+- Files touched:
+  - `src/app/api/telegram/webhook/route.ts` (deleted)
+  - `src/lib/dokploy.ts` (added `setChannelTelegramToken`)
+  - `src/app/dashboard/settings/actions.ts` (rewrote `saveTelegramBot`, added `approveTelegramPairing`)
+  - `src/app/dashboard/settings/client.tsx` (new two-step pairing UI)
+  - `src/app/dashboard/settings/page.tsx`
+  - `prisma/schema.prisma` (removed `telegramChatId`, removed `TelegramLinkToken` model)
+  - `prisma/migrations/20260430212206_remove_telegram_chat_id_and_link_token/`
+- Architecture change: Foyer no longer acts as Telegram webhook target. OpenClaw runtime owns Telegram via long-polling. No HTTPS needed — works identically in local dev and prod.
+- Result: ✅ complete
+- Commit: `e23ea4a feat: delegate Telegram channel to OpenClaw runtime`
+
+### Session end
+- Ending branch: `master`
+- Ending commit: `e23ea4a`
+- Tasks completed this session: header-fix, deploy-fix, seed-admin, profile-edit, telegram-redesign
+- Next task to pick up: M11 (Polish & Growth) or test full signup → payment → provision → Telegram flow end to end
+- Open blockers: `openclaw reload` CLI subcommand needs runtime verification (fallback to `docker restart` already coded)

@@ -416,6 +416,46 @@ export async function getGatewayToken(containerName: string): Promise<string | n
   }
 }
 
+export async function setChannelTelegramToken(containerName: string, token: string) {
+  if (!validateContainerName(containerName)) {
+    throw new Error('Invalid container name')
+  }
+
+  if (!/^\d+:[A-Za-z0-9_-]{35,}$/.test(token)) {
+    throw new Error('Invalid bot token format')
+  }
+
+  await execDocker(
+    containerName,
+    ['node', '/app/openclaw.mjs', 'config', 'set', 'channels.telegram.botToken', token],
+    !isProduction
+  )
+
+  // Reload the gateway so the new token is picked up by the long-poll worker.
+  // OpenClaw's CLI exposes `reload`; if it fails on a given image, fall back to a container restart.
+  try {
+    await execDocker(
+      containerName,
+      ['node', '/app/openclaw.mjs', 'reload'],
+      !isProduction
+    )
+  } catch {
+    if (isProduction) {
+      // gcloud SSH path
+      await execSafe('gcloud', [
+        'compute', 'ssh', 'dokploy',
+        '--zone', GCP_ZONE,
+        '--project', GCP_PROJECT_ID,
+        '--command', `sudo docker restart ${containerName}`
+      ], { timeout: 60000 })
+    } else {
+      await execSafe('docker', ['restart', containerName], { timeout: 60000 })
+    }
+  }
+
+  return { success: true }
+}
+
 export async function approvePairing(containerName: string, pairingCode: string) {
   if (!validateContainerName(containerName)) {
     throw new Error('Invalid container name')

@@ -24,14 +24,12 @@ model User {
   telegramLinkedAt      DateTime?
   telegramBotToken      String?
   telegramBotId         String?
-  telegramChatId        String?
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
   instance              Instance?
   workspace             Workspace?
   accounts              Account[]
   sessions              Session[]
-  telegramLinkTokens    TelegramLinkToken[]
 }
 
 model Workspace {
@@ -103,18 +101,6 @@ model Instance {
   gatewayPort      Int            @default(18789)
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
-}
-
-model TelegramLinkToken {
-  id         String   @id @default(cuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  token      String   @unique
-  expiresAt  DateTime
-  consumedAt DateTime?
-  createdAt  DateTime @default(now())
-
-  @@index([userId, expiresAt])
 }
 
 model PlatformSettings {
