@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "NODE_ENV=production next build",
     "postbuild": "cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public",
-    "start": "npx prisma migrate deploy && node .next/standalone/server.js",
+    "start": "npx prisma migrate deploy && npx tsx prisma/seed-admin.ts && node .next/standalone/server.js",
     "lint": "eslint .",
     "test": "vitest",
     "test:run": "vitest run",
