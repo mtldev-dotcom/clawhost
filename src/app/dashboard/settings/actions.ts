@@ -2,7 +2,7 @@
 
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { provisionInstance } from '@/lib/dokploy'
+import { provisionInstance, setChannelTelegramToken, approvePairing } from '@/lib/dokploy'
 import { revalidatePath } from 'next/cache'
 import { env } from '@/lib/env'
 import { isSupportedPlatformModel } from '@/lib/platform'
@@ -53,26 +53,20 @@ export async function savePlatformModel(model: string) {
   return { success: true }
 }
 
-export async function saveTelegramBot(botToken: string, chatId: string) {
+export async function saveTelegramBot(botToken: string) {
   const user = await requireUser()
 
   const trimmedToken = botToken.trim()
-  const trimmedChatId = chatId.trim()
 
-  if (!trimmedToken || !trimmedChatId) {
-    throw new Error('Bot token and Chat ID are both required')
+  if (!trimmedToken) {
+    throw new Error('Bot token is required')
   }
 
-  // Validate bot token format: numeric_id:hash
   if (!/^\d+:[A-Za-z0-9_-]{35,}$/.test(trimmedToken)) {
     throw new Error('Invalid bot token format. It should look like: 1234567890:ABCdef...')
   }
 
-  if (!/^-?\d+$/.test(trimmedChatId)) {
-    throw new Error('Chat ID must be a number (e.g. 123456789)')
-  }
-
-  // Verify token is real by calling Telegram getMe
+  // Verify the token by calling Telegram getMe
   const res = await fetch(`https://api.telegram.org/bot${trimmedToken}/getMe`)
   if (!res.ok) {
     throw new Error('Telegram rejected the bot token — make sure you copied it correctly from BotFather')
@@ -81,33 +75,44 @@ export async function saveTelegramBot(botToken: string, chatId: string) {
   const botUsername: string = data.result?.username ?? 'unknown'
   const botId: string = String(data.result?.id ?? trimmedToken.split(':')[0])
 
+  // The OpenClaw runtime owns the Telegram channel (long-poll, no HTTPS needed).
+  // Push the token into the user's container and reload the gateway.
+  if (!user.instance?.dokployAppId || user.instance.status !== 'active') {
+    throw new Error('Your runtime is not active yet — deploy it from Settings before linking Telegram.')
+  }
+
+  await setChannelTelegramToken(user.instance.dokployAppId, trimmedToken)
+
   await prisma.user.update({
     where: { id: user.id },
     data: {
       telegramBotToken: encrypt(trimmedToken),
       telegramBotId: botId,
-      telegramChatId: trimmedChatId,
       telegramUsername: botUsername,
       telegramLinkedAt: new Date(),
     },
   })
 
-  // Register webhook with Telegram (only works when app is on HTTPS)
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
-  if (appUrl.startsWith('https')) {
-    await fetch(`https://api.telegram.org/bot${trimmedToken}/setWebhook`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        url: `${appUrl}/api/telegram/webhook`,
-        secret_token: user.id,
-        allowed_updates: ['message'],
-      }),
-    })
-  }
-
   revalidatePath('/dashboard/settings')
   return { success: true, botUsername }
+}
+
+export async function approveTelegramPairing(pairingCode: string) {
+  const user = await requireUser()
+
+  const code = pairingCode.trim()
+  if (!/^[a-zA-Z0-9]{4,32}$/.test(code)) {
+    throw new Error('Pairing code must be 4–32 alphanumeric characters')
+  }
+
+  if (!user.instance?.dokployAppId || user.instance.status !== 'active') {
+    throw new Error('Your runtime is not active yet — deploy it from Settings.')
+  }
+
+  await approvePairing(user.instance.dokployAppId, code)
+
+  revalidatePath('/dashboard/settings')
+  return { success: true }
 }
 
 export async function deployInstance() {
